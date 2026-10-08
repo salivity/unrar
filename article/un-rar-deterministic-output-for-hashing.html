@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnRAR Deterministic Output for Hashing - unrar</title>
+    <meta name="description" content="This guide explains how to generate clean, deterministic output using the unrar command-line utility for cryptographic hashing and checksum verification. It details the precise switches required to suppress standard diagnostic messages, handle stdout pip">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/un-rar-deterministic-output-for-hashing">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UnRAR Deterministic Output for Hashing - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/un-rar-deterministic-output-for-hashing" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to generate clean, deterministic output using the unrar command-line utility for cryptographic hashing and checksum verification. It details the precise switches required to suppress standard diagnostic messages, handle stdout pip" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-deterministic-output-for-hashing">UnRAR Deterministic
+Output for Hashing</h1>
+<p>This guide explains how to generate clean, deterministic output using
+the <code>unrar</code> command-line utility for cryptographic hashing
+and checksum verification. It details the precise switches required to
+suppress standard diagnostic messages, handle stdout piping cleanly, and
+neutralize file metadata to ensure repeatable hash values across
+different environments.</p>
+<h3 id="raw-stream-hashing-via-standard-output">Raw Stream Hashing via
+Standard Output</h3>
+<p>When hashing extracted archive contents directly through tools such
+as <code>sha256sum</code>, <code>b2sum</code>, or <code>md5sum</code>,
+<code>unrar</code> must emit raw file bytes to standard output
+(<code>stdout</code>) without progress indicators, headers, or status
+banners.</p>
+<p>The standard command and switch combination for deterministic
+standard output is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar target_file.ext <span class="kw">|</span> <span class="fu">sha256sum</span></span></code></pre></div>
+<ul>
+<li><strong><code>p</code></strong>: Instructs <code>unrar</code> to
+extract the specified file directly to standard output instead of
+writing it to disk.</li>
+<li><strong><code>-inul</code></strong>: Completely disables all
+informational and diagnostic messages. This prevents <code>unrar</code>
+from prepending or appending console strings (such as copyright text and
+extraction status) to the byte stream, guaranteeing deterministic
+output.</li>
+</ul>
+<p>An alternative to <code>-inul</code> is
+<strong><code>-ierr</code></strong>, which redirects all status messages
+and errors to standard error (<code>stderr</code>), leaving
+<code>stdout</code> uncontaminated for downstream hash calculation:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-ierr</span> archive.rar target_file.ext <span class="kw">|</span> <span class="fu">sha256sum</span></span></code></pre></div>
+<h3 id="deterministic-extraction-to-disk">Deterministic Extraction to
+Disk</h3>
+<p>If files must be extracted to the filesystem before hashing,
+differences in filesystem metadata can cause discrepancies in
+verification workflows. To achieve deterministic metadata during disk
+extraction, use the following switches:</p>
+<ul>
+<li><strong><code>-ts-</code></strong>: Disables the restoration of file
+timestamps (modification, creation, and last access times).</li>
+<li><strong><code>-ai</code></strong>: Ignores and does not restore
+standard OS file attributes.</li>
+</ul>
+<p>Example:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-ts-</span> <span class="at">-ai</span> <span class="at">-inul</span> archive.rar /destination/path/</span></code></pre></div>
+<h3 id="built-in-archive-checksum-verification">Built-in Archive
+Checksum Verification</h3>
+<p>If you are verifying files against the checksums stored within the
+RAR container itself, <code>unrar</code> contains native verification
+via the <strong><code>t</code></strong> (test) command:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t <span class="at">-inul</span> archive.rar</span></code></pre></div>
+<p>RAR archives (specifically RAR5) store per-file CRC32 or BLAKE2sp
+hashes within archive headers. The <code>t</code> command checks archive
+data against these internal hashes and returns an exit code of
+<code>0</code> on success, providing a built-in method for deterministic
+integrity checking.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

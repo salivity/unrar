@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Files While Downloading? - unrar</title>
+    <meta name="description" content="The short answer is no; standard unrar cannot natively stream and extract a single archive incrementally as it downloads byte-by-byte. Because the RAR format generally requires random access (seeking) to read headers, file tables, and compressed data blo">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-files-while-downloading">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Files While Downloading? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-files-while-downloading" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The short answer is no; standard unrar cannot natively stream and extract a single archive incrementally as it downloads byte-by-byte. Because the RAR format generally requires random access (seeking) to read headers, file tables, and compressed data blo" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-files-while-downloading">Can Unrar Extract
+Files While Downloading?</h1>
+<p>The short answer is no; standard <code>unrar</code> cannot natively
+stream and extract a single archive incrementally as it downloads
+byte-by-byte. Because the RAR format generally requires random access
+(seeking) to read headers, file tables, and compressed data blocks, the
+command-line utility cannot process an incomplete data stream via
+standard input. However, you can achieve partial or volume-based
+incremental extraction under specific conditions, particularly when
+dealing with multi-part RAR archives.</p>
+<h3 id="why-incremental-extraction-fails-on-single-archives">Why
+Incremental Extraction Fails on Single Archives</h3>
+<p>The official <code>unrar</code> utility does not support reading
+archives directly from standard input (<code>stdin</code>). Formats like
+<code>tar</code> are strictly linear and can be piped directly into an
+extractor while downloading. In contrast, RAR archives—especially RAR5
+format or solid archives—store metadata, dictionary states, and
+checksums that require the extractor to navigate back and forth
+throughout the file. If <code>unrar</code> attempts to read an
+incomplete, actively downloading file, it will crash or terminate with
+an unexpected end-of-file (EOF) error once it reaches the portion that
+has not yet downloaded.</p>
+<h3 id="incremental-extraction-with-multi-volume-archives">Incremental
+Extraction with Multi-Volume Archives</h3>
+<p>The closest practical solution to incremental extraction is using
+multi-part archives (<code>.part01.rar</code>, <code>.part02.rar</code>,
+etc.). If you are downloading a segmented archive, you do not always
+need every single volume to extract early contents:</p>
+<ol type="1">
+<li><strong>Self-Contained Files</strong>: If an individual file within
+the archive begins and ends completely inside <code>part01.rar</code>,
+it can technically be extracted before <code>part02.rar</code> finishes
+downloading.</li>
+<li><strong>Missing Volume Behavior</strong>: When <code>unrar</code>
+reaches a file that spans across to a missing part, it will prompt for
+the next volume. If the next volume is unavailable, the process will
+pause or fail.</li>
+</ol>
+<h3 id="using-the-keep-broken-files-flag--kb">Using the Keep Broken
+Files Flag (<code>-kb</code>)</h3>
+<p>If you must extract whatever data is available from an actively
+downloading or partially complete archive, you can use the
+<code>-kb</code> (Keep Broken) switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.part01.rar /target/directory/</span></code></pre></div>
+<p>By default, <code>unrar</code> deletes any partially unpacked or
+corrupted files when an extraction fails due to missing volumes or an
+unexpected EOF. The <code>-kb</code> flag overrides this behavior,
+forcing the utility to save any completely extracted files and keep
+whatever partial data was decoded before encountering the missing
+bytes.</p>
+<h3 id="automated-alternatives">Automated Alternatives</h3>
+<p>If your goal is to extract contents automatically as downloads
+finish, standard practice is to decouple downloading from
+extraction:</p>
+<ul>
+<li><strong>Archive-Aware Download Managers</strong>: Tools like
+JDownloader, SABnzbd, or NZBGet manage downloads sequentially and
+trigger extraction scripts automatically only when a complete archive or
+the necessary sequential volume has finished verifying.</li>
+<li><strong>Stream-Friendly Formats</strong>: If you have control over
+the archive creation, use uncompressed <code>tar</code> or
+<code>zip</code> with linear compression, which allows piping directly
+from tools like <code>curl</code> or <code>wget</code> into standard
+extraction utilities.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

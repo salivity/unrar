@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnRAR Source Code Reverse Engineering Restrictions - unrar</title>
+    <meta name="description" content="The UnRAR utility source code, provided by Alexander Roshal and RARLAB, is distributed under a restrictive source-available license rather than an open-source license. While the code is freely available to read and integrate into third-party software for">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/un-rar-source-code-reverse-engineering-restrictions">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UnRAR Source Code Reverse Engineering Restrictions - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/un-rar-source-code-reverse-engineering-restrictions" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The UnRAR utility source code, provided by Alexander Roshal and RARLAB, is distributed under a restrictive source-available license rather than an open-source license. While the code is freely available to read and integrate into third-party software for" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-source-code-reverse-engineering-restrictions">UnRAR Source
+Code Reverse Engineering Restrictions</h1>
+<p>The UnRAR utility source code, provided by Alexander Roshal and
+RARLAB, is distributed under a restrictive source-available license
+rather than an open-source license. While the code is freely available
+to read and integrate into third-party software for extraction purposes,
+its licensing terms strictly forbid developers from using it to
+reverse-engineer, recreate, or emulate the proprietary RAR compression
+algorithm. This article details the specific legal and technical
+boundaries governing the use and study of the UnRAR source code.</p>
+<h3 id="the-core-compression-prohibition">The Core Compression
+Prohibition</h3>
+<p>The primary legal restriction found in the UnRAR license explicitly
+bans the use of the source code to develop a RAR-compatible compressor.
+The license dictates that while the UnRAR sources may be used in any
+software to decompress RAR archives without fee, they cannot be used
+to:</p>
+<ul>
+<li>Recreate or reverse-engineer the RAR compression algorithm.</li>
+<li>Develop a RAR-compatible compression engine.</li>
+<li>Assist in writing software that generates RAR archives without
+licensing the official algorithm.</li>
+</ul>
+<p>While RAR decompression specifications are effectively laid bare
+through the UnRAR source, the compression algorithm itself remains
+proprietary intellectual property.</p>
+<h3 id="tainted-status-and-clean-room-engineering">"Tainted" Status and
+Clean-Room Engineering</h3>
+<p>Because the UnRAR license specifically prohibits using the
+decompression code to discover or reimplement the compression
+mechanisms, developers who study the UnRAR source code are legally
+considered "tainted" regarding the creation of RAR compression
+tools.</p>
+<p>If a developer reads the UnRAR source code to infer how compression
+tables, dictionary sizes, or encoding schemes function on the writing
+end, any resulting compression software could be subject to copyright
+and license violation claims. For developers attempting to build
+independent RAR-compatible tools, a strict clean-room
+reverse-engineering design is legally required—meaning the engineer
+analyzing binary formats or creating the compression software must not
+have reviewed the proprietary UnRAR source code.</p>
+<h3 id="modifications-and-distribution-limits">Modifications and
+Distribution Limits</h3>
+<p>Beyond reverse engineering the algorithm, the UnRAR license limits
+how the source code itself can be redistributed:</p>
+<ul>
+<li><strong>No Standalone Redistribution of Modified Code:</strong>
+Developers may not distribute modified versions of the UnRAR source code
+as a separate product. Modifications may only be distributed as part of
+a compiled software product or in the form of patches/diffs relative to
+the original source.</li>
+<li><strong>Attribution Requirement:</strong> Any derivative application
+using the UnRAR decompression code must clearly acknowledge the original
+copyright held by Alexander Roshal in its documentation and source
+files.</li>
+<li><strong>No Sub-Licensing as Open Source:</strong> The UnRAR code
+cannot be re-licensed under copyleft or permissive open-source licenses
+such as the GNU General Public License (GPL) or MIT license, as the
+anti-compression restriction conflicts with the open-source definition
+of software freedom.</li>
+</ul>
+<h3 id="permitted-uses-vs-prohibited-actions">Permitted Uses vs.
+Prohibited Actions</h3>
+<p>To remain compliant with the UnRAR source terms:</p>
+<ul>
+<li><strong>Permitted:</strong> Compiling the source directly into an
+application to read and extract <code>.rar</code> archives.</li>
+<li><strong>Permitted:</strong> Modifying the decompression routines to
+optimize extraction performance or integrate with specific operating
+system APIs.</li>
+<li><strong>Prohibited:</strong> Analyzing the decompression logic to
+deductively construct an encoder that outputs <code>.rar</code>
+files.</li>
+<li><strong>Prohibited:</strong> Copying decoding structures to
+construct an independent, closed or open-source compression
+library.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

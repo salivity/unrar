@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UnRAR Added Support for Unicode Filenames - unrar</title>
+    <meta name="description" content="Early versions of the UnRAR extraction utility relied on local code pages, causing filenames with non-Latin characters to become corrupted when extracted across different operating systems or language locales. To solve this, developers introduced a multi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-un-rar-added-support-for-unicode-filenames">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UnRAR Added Support for Unicode Filenames - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-un-rar-added-support-for-unicode-filenames" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Early versions of the UnRAR extraction utility relied on local code pages, causing filenames with non-Latin characters to become corrupted when extracted across different operating systems or language locales. To solve this, developers introduced a multi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-added-support-for-unicode-filenames">How UnRAR Added
+Support for Unicode Filenames</h1>
+<p>Early versions of the UnRAR extraction utility relied on local code
+pages, causing filenames with non-Latin characters to become corrupted
+when extracted across different operating systems or language locales.
+To solve this, developers introduced a multi-stage overhaul of the RAR
+archive format and the UnRAR codebase: first implementing a
+backward-compatible compressed UTF-16 storage mechanism in the RAR 3.0
+specification, later switching to native UTF-8 strings in RAR 5.0, and
+refactoring internal path processing to use wide-character system APIs
+across all target platforms.</p>
+<h3 id="the-rar-2x-limitation">The RAR 2.x Limitation</h3>
+<p>In RAR 2.x and earlier formats, filenames were saved strictly as
+single-byte character strings using the host machine's active ANSI or
+OEM code page (such as Windows-1252 or CP437). UnRAR read these raw
+bytes directly and passed them to the operating system's standard file
+creation routines. If an archive created on a Japanese system was
+extracted on a machine configured for English or Cyrillic, the missing
+codepage mapping resulted in unreadable characters (mojibake) or invalid
+path errors.</p>
+<h3 id="the-rar-30-hybrid-utf-16-system">The RAR 3.0 Hybrid UTF-16
+System</h3>
+<p>To introduce Unicode support without breaking compatibility with
+older extractors, the RAR 3.0 specification altered the main file header
+structure:</p>
+<ol type="1">
+<li><strong>Header Flag Activation:</strong> A specific flag
+(<code>LHD_UNICODE</code>, value <code>0x0200</code>) was introduced
+into the file header's flags field. If this flag was unset, UnRAR
+treated the filename as legacy single-byte text.</li>
+<li><strong>Dual-String Storage:</strong> If the Unicode flag was set,
+the archive stored two versions of the name within the same byte block:
+a standard null-terminated 8-bit ASCII-compatible fallback name,
+followed immediately by an encoded Unicode data stream.</li>
+<li><strong>Delta and High-Byte Compression:</strong> Storing raw 16-bit
+UTF-16 characters would have doubled the header overhead for filenames.
+UnRAR implemented a specialized decoding function (commonly implemented
+as <code>ExtrNameToWide</code>) that parsed a stateful byte stream:
+<ul>
+<li>A control byte dictated whether following characters inherited the
+current high byte or switched to a new base page.</li>
+<li>Single-byte characters matching the ASCII fallback were referenced
+directly to reduce payload size.</li>
+<li>Multi-byte characters were reassembled into full 16-bit integers
+(<code>wchar_t</code> / UTF-16LE values).</li>
+</ul></li>
+</ol>
+<p>This allowed older versions of UnRAR to safely read the first ASCII
+string and ignore the trailing payload, while updated versions detected
+the flag, ran the decompression routine, and recovered the full Unicode
+representation.</p>
+<h3 id="the-rar-50-overhaul-to-utf-8">The RAR 5.0 Overhaul to UTF-8</h3>
+<p>With the introduction of the RAR 5.0 format, the
+backward-compatibility layer with legacy 1990s formats was deprecated in
+favor of a cleaner architecture:</p>
+<ul>
+<li><strong>Direct UTF-8 Storage:</strong> RAR 5.0 abandoned both
+single-byte code page fallbacks and the proprietary compressed UTF-16
+stream. All file paths, directory entries, and archive comments are now
+stored natively as variable-length UTF-8 byte sequences.</li>
+<li><strong>Header Structure Simplification:</strong> Filenames are
+stored with a length-prefixed UTF-8 byte array. UnRAR reads the string
+directly, eliminating the need for stateful decompression passes over
+header text.</li>
+</ul>
+<h3 id="internal-unrar-source-code-changes">Internal UnRAR Source Code
+Changes</h3>
+<p>Accommodating Unicode required deep architectural changes within the
+UnRAR C++ source code:</p>
+<ul>
+<li><strong>Wide Character Buffers:</strong> Internal path management
+shifted from simple <code>char</code> arrays to <code>wchar_t</code>
+arrays and custom wide-string wrappers.</li>
+<li><strong>Platform-Specific Conversion Layers:</strong> On Windows
+systems, UnRAR was rewritten to bypass ANSI Win32 APIs (such as
+<code>CreateFileA</code> and <code>FindFirstFileA</code>) in favor of
+Unicode-native APIs (<code>CreateFileW</code>,
+<code>FindFirstFileW</code>, and <code>_wstat</code>). On POSIX
+platforms (Linux and macOS), UnRAR converts UTF-16 inputs into UTF-8
+strings before interacting with system calls, as modern POSIX
+filesystems treat filenames as byte sequences typically interpreted as
+UTF-8.</li>
+<li><strong>Normalization and Invalid Sequence Handling:</strong> UnRAR
+added validation checks to identify and sanitize illegal characters,
+mismatched surrogate pairs, and path traversal tokens (<code>../</code>)
+across different character encodings before files are written to
+disk.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

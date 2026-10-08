@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Itanium Compressed Archives? - unrar</title>
+    <meta name="description" content="Yes, the unrar utility can successfully extract archives created using the Intel Itanium (IA-64) executable compression algorithm. Introduced alongside the RAR 3.0 specification, this specialized filter was designed to increase compression ratios for Ita">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-itanium-compressed-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Itanium Compressed Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-itanium-compressed-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, the unrar utility can successfully extract archives created using the Intel Itanium (IA-64) executable compression algorithm. Introduced alongside the RAR 3.0 specification, this specialized filter was designed to increase compression ratios for Ita" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-itanium-compressed-archives">Can Unrar Extract
+Itanium Compressed Archives?</h1>
+<p>Yes, the <code>unrar</code> utility can successfully extract archives
+created using the Intel Itanium (IA-64) executable compression
+algorithm. Introduced alongside the RAR 3.0 specification, this
+specialized filter was designed to increase compression ratios for
+Itanium binaries, and extraction support remains integrated into modern
+versions of the official <code>unrar</code> tool to ensure complete
+backward compatibility.</p>
+<h3 id="the-itanium-filter-in-rar-archives">The Itanium Filter in RAR
+Archives</h3>
+<p>Starting with the RAR 3.0 archive format, developer Eugene Roshal
+introduced architecture-specific preprocessing filters. These filters
+were tailored for specific data types, including ARM processors, x86
+executables, True Audio, and Intel Itanium (IA-64) executables.</p>
+<p>The Itanium architecture utilizes 128-bit instruction "bundles" that
+pack three instructions together. Because standard byte-oriented
+compression algorithms struggle to detect repeating patterns across
+aligned instruction words, the Itanium filter rearranged and normalized
+relative jump targets and instruction offsets before passing the data to
+the general-purpose compression engine.</p>
+<h3 id="how-unrar-handles-itanium-decompression">How <code>unrar</code>
+Handles Itanium Decompression</h3>
+<p>When extracting a file, <code>unrar</code> reads the header flags
+embedded within each compressed block. If a block was processed using
+the IA-64 executable filter, the decompression routine reverses the
+transformation by decoding the normalized jump targets back into
+standard Itanium machine code instructions after LZ-based decompression
+completes.</p>
+<p>Because the official <code>unrar</code> source code distributes all
+legacy decompression routines (including the full RAR 3.x unpacking
+engine), any standard release of <code>unrar</code>—whether run on
+Linux, Windows, or macOS—contains the code necessary to unpack these
+files.</p>
+<h3 id="modern-availability-and-limitations">Modern Availability and
+Limitations</h3>
+<p>While extraction is fully supported, creating new archives with the
+Itanium filter is no longer part of current RAR standards:</p>
+<ul>
+<li><strong>Extraction Support:</strong> Both modern RAR 5.x and legacy
+RAR 2.x/3.x formats can be extracted using the current
+<code>unrar</code> binary. Even if the archive is decades old, executing
+<code>unrar x filename.rar</code> will decompress the Itanium binaries
+without requiring legacy hardware or emulation.</li>
+<li><strong>Deprecation in RAR 5.0:</strong> When RARLAB introduced the
+RAR 5.0 format, several specialized 32-bit and architecture-specific
+filters were retired, including the Itanium preprocessing filter, due to
+the decline of the IA-64 platform. However, the decompression codebase
+retained legacy unpack modules specifically to ensure older archives
+remain accessible.</li>
+<li><strong>Third-Party Extractors:</strong> Official builds of
+<code>unrar</code> or tools using the official <code>unrarlib</code>
+license handle the Itanium algorithm natively. However, independent
+open-source cleanroom implementations of RAR decompression (such as
+certain minimal third-party libraries) occasionally omit
+architecture-specific RAR 3.0 filters. To ensure complete extraction
+fidelity, use the official RARLAB <code>unrar</code> package.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

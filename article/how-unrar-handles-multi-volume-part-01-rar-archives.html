@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Multi-Volume Part01 RAR Archives - unrar</title>
+    <meta name="description" content="When dealing with split RAR archives, the unrar utility simplifies the extraction process by automatically detecting, sequencing, and assembling files across multiple segments. When an extraction command targets the first file—typically named with the">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-multi-volume-part-01-rar-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Multi-Volume Part01 RAR Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-multi-volume-part-01-rar-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When dealing with split RAR archives, the unrar utility simplifies the extraction process by automatically detecting, sequencing, and assembling files across multiple segments. When an extraction command targets the first file—typically named with the" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-multi-volume-part01-rar-archives">How Unrar
+Handles Multi-Volume Part01 RAR Archives</h1>
+<p>When dealing with split RAR archives, the <code>unrar</code> utility
+simplifies the extraction process by automatically detecting,
+sequencing, and assembling files across multiple segments. When an
+extraction command targets the first file—typically named with the
+<code>.part01.rar</code> suffix—the tool reads the archive's internal
+metadata, verifies the presence of subsequent volumes in the directory,
+and reconstructs the original files continuously without requiring
+manual intervention for each individual part.</p>
+<h3 id="the-multi-volume-naming-convention">The Multi-Volume Naming
+Convention</h3>
+<p>Modern versions of RAR use a standardized naming convention for split
+archives:</p>
+<ul>
+<li><code>archive.part01.rar</code> (the initial volume)</li>
+<li><code>archive.part02.rar</code> (the second volume)</li>
+<li><code>archive.part03.rar</code>, and so on.</li>
+</ul>
+<p>This system replaced the legacy naming format (which used
+<code>.rar</code>, <code>.r00</code>, <code>.r01</code>). The
+<code>.partXX.rar</code> convention makes the exact order of parts
+immediately identifiable to both the user and the software.</p>
+<h3 id="how-extraction-works">How Extraction Works</h3>
+<p>To unpack a multi-volume archive, you only need to run the extraction
+command against the primary volume:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part01.rar</span></code></pre></div>
+<p>When this command is executed, <code>unrar</code> performs the
+following steps:</p>
+<ol type="1">
+<li><strong>Header Inspection:</strong> The utility checks the header of
+<code>archive.part01.rar</code>. This header contains flags indicating
+that the file is part of a multi-volume set, along with details about
+whether a stored file spans across multiple boundaries.</li>
+<li><strong>Sequential Reading:</strong> <code>unrar</code> extracts the
+data stored inside <code>part01</code>.</li>
+<li><strong>Automatic Volume Chaining:</strong> As soon as the end of
+<code>part01.rar</code> is reached, <code>unrar</code> automatically
+searches the current directory for <code>archive.part02.rar</code>. If
+found, it seamlessly continues reading the stream.</li>
+<li><strong>Data Assembly and Integrity Checks:</strong> If an
+individual file within the archive spans across <code>part01</code> and
+<code>part02</code>, <code>unrar</code> reconstructs the file without
+corruption. Once extraction finishes, it verifies the checksums (CRC32
+or BLAKE2) to ensure data integrity.</li>
+</ol>
+<h3 id="requirements-for-successful-extraction">Requirements for
+Successful Extraction</h3>
+<p>For <code>unrar</code> to successfully process a
+<code>.part01.rar</code> archive:</p>
+<ul>
+<li><strong>Complete Set:</strong> All subsequent parts
+(<code>.part02.rar</code>, <code>.part03.rar</code>, etc.) must be
+present.</li>
+<li><strong>Same Directory:</strong> By default, all parts must reside
+in the same folder where the command is executed.</li>
+<li><strong>Unmodified File Names:</strong> The base name and numbering
+pattern must remain intact. If <code>archive.part02.rar</code> is
+renamed or missing, <code>unrar</code> halts and prompts the user to
+specify the path to the missing volume. If the volume cannot be
+provided, the process terminates with an error.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

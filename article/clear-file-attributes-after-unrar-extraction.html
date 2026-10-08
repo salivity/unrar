@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear File Attributes After Unrar Extraction - unrar</title>
+    <meta name="description" content="When extracting RAR archives, files frequently retain restricted permissions, hidden flags, or read-only statuses embedded by the original creator. This guide explains how to prevent unrar from applying archived file attributes during the extraction proc">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/clear-file-attributes-after-unrar-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Clear File Attributes After Unrar Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/clear-file-attributes-after-unrar-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting RAR archives, files frequently retain restricted permissions, hidden flags, or read-only statuses embedded by the original creator. This guide explains how to prevent unrar from applying archived file attributes during the extraction proc" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="clear-file-attributes-after-unrar-extraction">Clear File
+Attributes After Unrar Extraction</h1>
+<p>When extracting RAR archives, files frequently retain restricted
+permissions, hidden flags, or read-only statuses embedded by the
+original creator. This guide explains how to prevent <code>unrar</code>
+from applying archived file attributes during the extraction process, as
+well as how to recursively reset file attributes immediately after
+extraction on both Windows and Linux systems.</p>
+<h2 id="prevent-attributes-during-extraction-with-unrar">Prevent
+Attributes During Extraction with Unrar</h2>
+<p>The cleanest way to handle file attributes is to instruct
+<code>unrar</code> to ignore them entirely during extraction. By
+default, <code>unrar</code> attempts to restore original file properties
+such as Read-Only, System, Hidden, and Archive flags.</p>
+<p>You can bypass this behavior using the <code>-ai</code> switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-ai</span> archive.rar</span></code></pre></div>
+<ul>
+<li><strong><code>x</code></strong>: Extracts files with full
+paths.</li>
+<li><strong><code>-ai</code></strong>: Ignore file attributes. The
+extracted files will inherit the default permissions and attributes of
+the destination directory instead of the attributes saved in the
+archive.</li>
+</ul>
+<hr />
+<h2 id="clear-attributes-after-extraction-on-windows">Clear Attributes
+After Extraction on Windows</h2>
+<p>If files have already been extracted with unwanted attributes (such
+as <code>Read-Only</code> or <code>Hidden</code>), you can clear them
+using the native Windows Command Prompt tool <code>attrib</code>.</p>
+<p>Open Command Prompt, navigate to the target folder, and run:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">attrib</span> <span class="at">-r</span> <span class="at">-a</span> <span class="at">-s</span> <span class="at">-h</span> *.* <span class="at">/s</span> <span class="at">/d</span></span></code></pre></div>
+<h3 id="parameter-breakdown">Parameter Breakdown:</h3>
+<ul>
+<li><strong><code>-r</code></strong>: Clears the Read-Only
+attribute.</li>
+<li><strong><code>-a</code></strong>: Clears the Archive attribute.</li>
+<li><strong><code>-s</code></strong>: Clears the System attribute.</li>
+<li><strong><code>-h</code></strong>: Clears the Hidden attribute.</li>
+<li><strong><code>/s</code></strong>: Applies the command to matching
+files in the current folder and all subfolders.</li>
+<li><strong><code>/d</code></strong>: Applies the command to directories
+as well as files.</li>
+</ul>
+<hr />
+<h2 id="reset-attributes-and-permissions-on-linux">Reset Attributes and
+Permissions on Linux</h2>
+<p>On Linux and Unix-like environments, <code>unrar</code> may restore
+strict POSIX permissions or extended file attributes.</p>
+<h3 id="1-reset-standard-posix-permissions">1. Reset Standard POSIX
+Permissions</h3>
+<p>To strip restricted read-only permissions and set safe defaults
+across all extracted files and folders, run:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set directories to standard read, write, and execute permissions</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /path/to/extracted/ <span class="at">-type</span> d <span class="at">-exec</span> chmod 755 {} +</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Set files to standard read and write permissions</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /path/to/extracted/ <span class="at">-type</span> f <span class="at">-exec</span> chmod 644 {} +</span></code></pre></div>
+<h3 id="2-remove-extended-attributes-xattr">2. Remove Extended
+Attributes (xattr)</h3>
+<p>If the archive restored extended attributes or security metadata, you
+can clear them using <code>attr</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On Linux (removes user-defined attributes recursively)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">setfattr</span> <span class="at">-h</span> <span class="at">-x</span> user.<span class="pp">*</span> /path/to/extracted/<span class="pp">*</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># On macOS (clears all extended attributes recursively)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">xattr</span> <span class="at">-rc</span> /path/to/extracted/</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

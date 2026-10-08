@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Files with a Destroyed Index? - unrar</title>
+    <meta name="description" content="When a RAR archive suffers catastrophic damage and its central index or main headers are completely destroyed, standard unrar commands cannot parse or extract the contained files on their own. However, whether your data is entirely lost depends on the fo">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-files-with-a-destroyed-index">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Files with a Destroyed Index? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-files-with-a-destroyed-index" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When a RAR archive suffers catastrophic damage and its central index or main headers are completely destroyed, standard unrar commands cannot parse or extract the contained files on their own. However, whether your data is entirely lost depends on the fo" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-files-with-a-destroyed-index">Can Unrar
+Extract Files with a Destroyed Index?</h1>
+<p>When a RAR archive suffers catastrophic damage and its central index
+or main headers are completely destroyed, standard <code>unrar</code>
+commands cannot parse or extract the contained files on their own.
+However, whether your data is entirely lost depends on the format
+version (RAR4 vs. RAR5), whether the archive is solid, and whether an
+internal recovery record was created when the archive was generated.</p>
+<h3 id="why-standard-unrar-fails-without-an-index">Why Standard Unrar
+Fails Without an Index</h3>
+<p>The <code>unrar</code> utility relies on metadata blocks to
+understand how an archive is structured. The archive index maps out file
+boundaries, names, compression parameters, and dictionary states. If the
+main index or file headers are missing or wiped out:</p>
+<ul>
+<li><code>unrar</code> will return errors such as
+<code>Corrupt header</code>, <code>Unexpected end of archive</code>, or
+<code>Cannot find archive header</code>.</li>
+<li>The tool cannot initialize decompression dictionaries because it
+lacks the parameters needed to interpret the compressed binary
+streams.</li>
+<li>If the archive is "solid" (where multiple files are compressed as a
+single continuous data block), losing the index or the stream offset
+guarantees that standard tools cannot separate or decompress individual
+files past the point of corruption.</li>
+</ul>
+<h3 id="using-the-built-in-repair-command">Using the Built-In Repair
+Command</h3>
+<p>Standard <code>unrar</code> features a built-in recovery mechanism
+via the repair command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> r archive.rar</span></code></pre></div>
+<p>This command scans the entire archive binary to locate valid recovery
+records (parity data). If the archive was created with a recovery record
+(often between 1% and 10% of total size), <code>unrar</code> can
+reconstruct the damaged table of contents and repair the broken headers.
+If this repair succeeds, a new file named <code>fixed.archive.rar</code>
+is generated, which can then be extracted normally.</p>
+<h3 id="non-solid-archives-and-sequential-file-headers">Non-Solid
+Archives and Sequential File Headers</h3>
+<p>In non-solid RAR4 and some RAR5 structures, individual file headers
+(<code>0x74</code> marker blocks in RAR4) precede each file's compressed
+payload rather than being stored exclusively at the start or end of the
+archive.</p>
+<p>If only the primary volume header is destroyed while the subsequent
+local file headers remain intact:</p>
+<ul>
+<li>Native <code>unrar</code> might still abort immediately upon failing
+the initial header check.</li>
+<li>Dedicated recovery software or Hex editors can strip the corrupted
+leading bytes, allowing recovery tools to scan for subsequent valid file
+signatures.</li>
+<li>Files stored without compression (the "Store" compression method)
+can be carved directly from the binary using forensic tools like
+<code>binwalk</code> or <code>photorec</code>, entirely bypassing
+<code>unrar</code>.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>Standard <code>unrar</code> cannot directly extract an archive whose
+index is completely destroyed. Extraction is only possible if the
+archive contains a valid recovery record that allows
+<code>unrar r</code> to reconstruct the metadata, or if third-party raw
+file-carving tools are used to salvage uncompressed or independently
+bounded data from non-solid archives.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trigger a Webhook After Unrar Extraction - unrar</title>
+    <meta name="description" content="While the standard unrar command-line utility does not have a native feature to send HTTP requests or fire webhooks, you can easily trigger a webhook upon successful extraction by pairing unrar with a simple wrapper script or automation tool. This articl">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/trigger-a-webhook-after-unrar-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Trigger a Webhook After Unrar Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/trigger-a-webhook-after-unrar-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While the standard unrar command-line utility does not have a native feature to send HTTP requests or fire webhooks, you can easily trigger a webhook upon successful extraction by pairing unrar with a simple wrapper script or automation tool. This articl" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="trigger-a-webhook-after-unrar-extraction">Trigger a Webhook
+After Unrar Extraction</h1>
+<p>While the standard <code>unrar</code> command-line utility does not
+have a native feature to send HTTP requests or fire webhooks, you can
+easily trigger a webhook upon successful extraction by pairing
+<code>unrar</code> with a simple wrapper script or automation tool. This
+article explains how extraction exit codes work, demonstrates how to
+send an instant webhook using a lightweight Bash script, and outlines
+automated workflows for continuous monitoring.</p>
+<h3 id="why-unrar-cannot-send-webhooks-natively">Why Unrar Cannot Send
+Webhooks Natively</h3>
+<p>The official <code>unrar</code> binary is designed solely for archive
+manipulation and decompression. It does not include an embedded HTTP
+client or network communication library. Because it focuses strictly on
+local file operations, it cannot make external network calls on its
+own.</p>
+<h3 id="the-solution-using-exit-codes-and-shell-scripts">The Solution:
+Using Exit Codes and Shell Scripts</h3>
+<p>Command-line utilities return an exit code upon termination. For
+<code>unrar</code>, an exit code of <code>0</code> signifies a
+successful extraction with no errors. By checking this code immediately
+after running the command, you can trigger an HTTP request using tools
+like <code>curl</code> or <code>wget</code>.</p>
+<p>Here is a straightforward Bash script demonstrating this
+workflow:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">ARCHIVE_PATH</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$1</span><span class="st">&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">TARGET_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="va">$2</span><span class="st">&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">WEBHOOK_URL</span><span class="op">=</span><span class="st">&quot;https://your-domain.com/api/webhook&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute the extraction</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-y</span> <span class="st">&quot;</span><span class="va">$ARCHIVE_PATH</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if unrar completed successfully</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Extraction successful. Sending webhook...&quot;</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">curl</span> <span class="at">-X</span> POST <span class="st">&quot;</span><span class="va">$WEBHOOK_URL</span><span class="st">&quot;</span> <span class="dt">\</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="dt">\</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">-d</span> <span class="st">&quot;{</span><span class="dt">\&quot;</span><span class="st">status</span><span class="dt">\&quot;</span><span class="st">: </span><span class="dt">\&quot;</span><span class="st">success</span><span class="dt">\&quot;</span><span class="st">, </span><span class="dt">\&quot;</span><span class="st">archive</span><span class="dt">\&quot;</span><span class="st">: </span><span class="dt">\&quot;</span><span class="va">$ARCHIVE_PATH</span><span class="dt">\&quot;</span><span class="st">}&quot;</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Extraction failed. Webhook not sent.&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div>
+<h3 id="chaining-with-the--operator">Chaining with the
+<code>&amp;&amp;</code> Operator</h3>
+<p>For quick manual tasks or one-line operations, you do not need a full
+script. You can use the shell <code>&amp;&amp;</code> operator, which
+only executes the second command if the first command exits with a
+status of <code>0</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar /destination/path/ <span class="kw">&amp;&amp;</span> <span class="ex">curl</span> <span class="at">-X</span> POST <span class="at">-H</span> <span class="st">&quot;Content-Type: application/json&quot;</span> <span class="at">-d</span> <span class="st">&#39;{&quot;event&quot;:&quot;unrar_completed&quot;}&#39;</span> https://your-domain.com/api/webhook</span></code></pre></div>
+<h3 id="automating-the-process">Automating the Process</h3>
+<p>If you need this to happen automatically without manual intervention,
+you can implement one of several approaches:</p>
+<ul>
+<li><strong>Directory Watchers:</strong> Use a Linux daemon like
+<code>inotifywait</code> or cross-platform utilities like
+<code>fswatch</code> to monitor a folder for new <code>.rar</code>
+files, automatically execute <code>unrar</code>, and post to the webhook
+upon completion.</li>
+<li><strong>Download Client Post-Processing:</strong> Popular tools such
+as SABnzbd, NZBGet, and qBittorrent support custom post-processing
+scripts. You can pass the downloaded archive to a script that unpacks it
+and notifies your endpoint.</li>
+<li><strong>Docker or Event-Driven Workflows:</strong> Containerized
+microservices or orchestrators like Node-RED can listen for new archive
+events, run extraction tasks inside a container, and publish status
+updates to a webhook or message broker.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

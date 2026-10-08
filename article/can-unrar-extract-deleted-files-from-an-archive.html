@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Deleted Files from an Archive? - unrar</title>
+    <meta name="description" content="This article examines whether the command-line utility unrar can recover and extract files marked as "deleted" within a RAR archive's update history. When modifying archives, users often wonder if historical versions or discarded files remain accessible.">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-deleted-files-from-an-archive">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Deleted Files from an Archive? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-deleted-files-from-an-archive" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines whether the command-line utility unrar can recover and extract files marked as "deleted" within a RAR archive's update history. When modifying archives, users often wonder if historical versions or discarded files remain accessible." />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-deleted-files-from-an-archive">Can Unrar
+Extract Deleted Files from an Archive?</h1>
+<p>This article examines whether the command-line utility
+<code>unrar</code> can recover and extract files marked as "deleted"
+within a RAR archive's update history. When modifying archives, users
+often wonder if historical versions or discarded files remain
+accessible. In short, <code>unrar</code> cannot extract files flagged as
+deleted because it lacks file-carving functionality and only parses
+active file records defined in the archive's central directory.</p>
+<p>The standard <code>unrar</code> tool is strictly an extraction and
+decompression utility designed to read valid, active data blocks. When
+you delete a file from a RAR archive using the full <code>rar</code>
+management tool (for example, via the <code>rar d</code> command), the
+archiver physically rewrites the archive structure. During this process,
+the central directory is updated to remove references to the discarded
+files, and the corresponding compressed data blocks are purged to reduce
+the overall archive size.</p>
+<p>In scenarios where an archive retains an update history log or
+non-purged metadata, <code>unrar</code> still will not retrieve the
+deleted content. The utility only recognizes entries marked with active
+file headers. It does not contain any flags, options, or internal logic
+to parse orphaned blocks, roll back transaction states, or undelete
+entries that are marked as obsolete or removed.</p>
+<p>If you must recover a deleted file from a modified RAR file,
+<code>unrar</code> is the wrong tool. Instead, you must rely on:</p>
+<ul>
+<li><strong>File carving and forensic tools:</strong> Tools like
+Photorec or generic hex editors may locate residual compressed data
+streams if the archive was not cleanly truncated, though decompression
+without intact header pointers is technically difficult, especially for
+password-protected or solid archives.</li>
+<li><strong>Volume Shadow Copies / Backups:</strong> Restoring an
+earlier version of the archive file itself before the deletion operation
+was executed.</li>
+<li><strong>Temporary files:</strong> Checking local temporary folders
+(<code>%TEMP%</code> on Windows or <code>/tmp</code> on Linux) where the
+archiver may have left a working copy during the update process.</li>
+</ul>
+<p>Because <code>unrar</code> strictly obeys the active archive index,
+any file removed or flagged as deleted in an update log is permanently
+inaccessible through the program.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

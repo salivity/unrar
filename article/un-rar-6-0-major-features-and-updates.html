@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnRAR 6.0 Major Features and Updates - unrar</title>
+    <meta name="description" content="UnRAR version 6.0 introduced several key updates focused on extraction performance, command-line flexibility, and overall system security. This article outlines the major technical features and enhancements included in the 6.0 release, detailing how they">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/un-rar-6-0-major-features-and-updates">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="UnRAR 6.0 Major Features and Updates - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/un-rar-6-0-major-features-and-updates" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="UnRAR version 6.0 introduced several key updates focused on extraction performance, command-line flexibility, and overall system security. This article outlines the major technical features and enhancements included in the 6.0 release, detailing how they" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-60-major-features-and-updates">UnRAR 6.0 Major Features
+and Updates</h1>
+<p>UnRAR version 6.0 introduced several key updates focused on
+extraction performance, command-line flexibility, and overall system
+security. This article outlines the major technical features and
+enhancements included in the 6.0 release, detailing how they improve
+archive decompression, error handling, and multi-threaded system
+utilization.</p>
+<h3 id="enhanced-archive-repair-and-recovery">Enhanced Archive Repair
+and Recovery</h3>
+<p>UnRAR 6.0 improved the efficiency and reliability of processing
+archives with recovery records. The algorithm for reconstructing missing
+or damaged volumes in multi-volume sets was streamlined, allowing faster
+verification and error correction without unnecessary disk I/O
+operations.</p>
+<h3 id="multi-core-benchmark-upgrades">Multi-Core Benchmark
+Upgrades</h3>
+<p>The built-in benchmark switch (<code>-b</code>) received major
+updates to reflect modern multi-core architectures:</p>
+<ul>
+<li><strong>Thread Scaling:</strong> The benchmarking tool now
+accurately detects and scales across high core-count CPUs, delivering
+more realistic performance metrics for multi-threaded
+decompression.</li>
+<li><strong>Memory Management:</strong> Memory allocation algorithms
+during benchmarking were adjusted to reflect modern 64-bit system
+capabilities.</li>
+</ul>
+<h3 id="new-and-updated-command-line-switches">New and Updated
+Command-Line Switches</h3>
+<p>Several command-line options were refined or introduced to give
+administrators and developers finer control over unattended
+operations:</p>
+<ul>
+<li><strong>Error Redirection (<code>-ierr</code>):</strong> Enhanced
+error messaging redirection allows scripts to send standard error output
+directly to <code>stderr</code>, making integration into automated
+deployment pipelines more reliable.</li>
+<li><strong>Warning Thresholds:</strong> Stricter exit code
+differentiation was applied, allowing calling processes to distinguish
+between minor warnings, file corruption, and critical fatal errors.</li>
+</ul>
+<h3 id="improved-timestamp-and-metadata-precision">Improved Timestamp
+and Metadata Precision</h3>
+<p>UnRAR 6.0 added full support for high-precision file timestamps
+stored in RAR5 archives. The decompression engine accurately extracts
+and applies file creation, access, and modification times down to
+nanosecond precision on supported file systems (such as NTFS and modern
+Linux filesystems).</p>
+<h3 id="security-hardening-and-path-sanitization">Security Hardening and
+Path Sanitization</h3>
+<p>Security received significant attention in this release, particularly
+regarding malicious archive paths:</p>
+<ul>
+<li><strong>Directory Traversal Protection:</strong> Extraction routines
+were fortified to block directory traversal attacks (such as embedded
+<code>../</code> paths) that attempt to write files outside the target
+extraction folder.</li>
+<li><strong>Symlink Validation:</strong> UnRAR 6.0 introduced stricter
+checks for symbolic and hard links, preventing the extraction process
+from overwriting critical system files through crafted links.</li>
+</ul>
+<h3 id="performance-and-64-bit-optimizations">Performance and 64-Bit
+Optimizations</h3>
+<p>The core decompression routines for the RAR5 format were optimized to
+take advantage of modern processor instruction sets, resulting in lower
+CPU usage and faster extraction times for solid archives containing
+large numbers of small files.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

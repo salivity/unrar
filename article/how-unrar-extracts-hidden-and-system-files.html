@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Extracts Hidden and System Files - unrar</title>
+    <meta name="description" content="This article explains how the unrar utility processes archives containing hidden and system files, detailing its attribute preservation mechanisms, cross-platform behavior, and relevant command-line flags. When unpacking an archive, unrar reads the metad">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-extracts-hidden-and-system-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Extracts Hidden and System Files - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-extracts-hidden-and-system-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the unrar utility processes archives containing hidden and system files, detailing its attribute preservation mechanisms, cross-platform behavior, and relevant command-line flags. When unpacking an archive, unrar reads the metad" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-extracts-hidden-and-system-files">How Unrar Extracts
+Hidden and System Files</h1>
+<p>This article explains how the <code>unrar</code> utility processes
+archives containing hidden and system files, detailing its attribute
+preservation mechanisms, cross-platform behavior, and relevant
+command-line flags. When unpacking an archive, <code>unrar</code> reads
+the metadata attached to each entry, determining whether to restore
+OS-specific flags like the Windows "Hidden" and "System" attributes or
+POSIX hidden file formats. Understanding this process ensures you can
+safely extract or ignore sensitive and concealed files across different
+environments.</p>
+<h3 id="file-attribute-preservation">File Attribute Preservation</h3>
+<p>The RAR file format stores extended file metadata alongside the
+compressed data. When files are archived on a Windows system, their
+standard DOS/NTFS attributes—such as <strong>Read-Only</strong>,
+<strong>Archive</strong>, <strong>Hidden</strong>, and
+<strong>System</strong>—are saved into the archive header.</p>
+<p>By default, when <code>unrar</code> unpacks an archive on a Windows
+system, it applies these preserved attributes directly to the extracted
+files. If a file was marked as both hidden and a system file in the
+archive, it will retain both statuses in the destination directory,
+making it invisible in standard file managers unless configured to show
+protected operating system files.</p>
+<h3 id="cross-platform-handling-windows-vs-linuxmacos">Cross-Platform
+Handling: Windows vs. Linux/macOS</h3>
+<p>Operating systems treat "hidden" and "system" statuses differently,
+and <code>unrar</code> adapts according to the host platform:</p>
+<ul>
+<li><strong>On Windows:</strong> <code>unrar</code> maps the internal
+attribute flags directly to the Windows file system API. Files with the
+hidden or system bit set will immediately receive those attributes upon
+extraction.</li>
+<li><strong>On Unix-like Systems (Linux, macOS):</strong> Unix systems
+do not natively use "hidden" or "system" metadata flags. Instead, files
+are considered hidden if their filename begins with a dot
+(<code>.filename</code>). If an archive contains a file that was named
+with a leading dot, <code>unrar</code> extracts it as-is, and it becomes
+hidden in Unix environments. However, if a file only has the Windows
+"Hidden" or "System" attribute flag set without a leading dot,
+<code>unrar</code> extracts it as a visible file on Linux/macOS, though
+it may attempt to store these flags in extended attributes (xattr) if
+configured to do so.</li>
+</ul>
+<h3 id="command-line-switches-for-attribute-control">Command-Line
+Switches for Attribute Control</h3>
+<p>You can control how <code>unrar</code> processes attributes and
+system-level permissions using specific command-line switches:</p>
+<ul>
+<li><strong><code>-ai</code> (Ignore file attributes):</strong>
+Instructs <code>unrar</code> not to apply the stored file attributes
+(including Hidden, System, and Read-Only) to the extracted files. The
+extracted files inherit the default attributes of the target
+folder.</li>
+<li><strong><code>-ow</code> (Restore file owner and group):</strong>
+Restores security information, including user and group ownership on
+platforms that support it (requires administrative/root
+privileges).</li>
+<li><strong><code>-os</code> (Save and restore NTFS streams):</strong>
+Directs <code>unrar</code> to restore alternate data streams and
+extended file properties associated with Windows NTFS file systems.</li>
+</ul>
+<h3 id="security-and-overwrite-protections">Security and Overwrite
+Protections</h3>
+<p>Because hidden and system files can theoretically be used to replace
+critical operating system components, <code>unrar</code> includes
+built-in safeguards:</p>
+<ol type="1">
+<li><strong>Directory Traversal Protection:</strong> <code>unrar</code>
+automatically strips absolute paths (such as <code>C:\Windows\</code> or
+<code>/etc/</code>) and relative path traversal sequences (such as
+<code>../</code>) to prevent an archive from silently planting hidden
+system files into sensitive system directories.</li>
+<li><strong>Overwrite Confirmations:</strong> By default,
+<code>unrar</code> prompts the user before overwriting existing files,
+preventing an incoming hidden system file from silently replacing an
+existing document or configuration file, unless overridden by flags such
+as <code>-o+</code> (overwrite without prompt) or <code>-o-</code> (do
+not overwrite).</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

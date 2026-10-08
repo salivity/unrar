@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles an Incorrect System Clock - unrar</title>
+    <meta name="description" content="When extracting archives, unrar primarily relies on the metadata stored inside the archive headers rather than the host machine's current system clock. This article explains how unrar assigns file timestamps during extraction, how a drastically incorrect">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-an-incorrect-system-clock">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles an Incorrect System Clock - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-an-incorrect-system-clock" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives, unrar primarily relies on the metadata stored inside the archive headers rather than the host machine's current system clock. This article explains how unrar assigns file timestamps during extraction, how a drastically incorrect" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-an-incorrect-system-clock">How Unrar Handles
+an Incorrect System Clock</h1>
+<p>When extracting archives, <code>unrar</code> primarily relies on the
+metadata stored inside the archive headers rather than the host
+machine's current system clock. This article explains how
+<code>unrar</code> assigns file timestamps during extraction, how a
+drastically incorrect system clock affects file attributes, and the
+filesystem or operational anomalies that can occur as a result.</p>
+<h3 id="preservation-of-stored-modification-times">Preservation of
+Stored Modification Times</h3>
+<p>By default, <code>unrar</code> does not use the current system time
+to set the modification date (mtime) of extracted files. Instead, it
+reads the timestamp stored within the RAR archive and applies it to the
+extracted file using operating system system calls, such as
+<code>SetFileTime</code> on Windows or
+<code>utime</code>/<code>futimens</code> on Unix-like platforms.</p>
+<p>Because <code>unrar</code> explicitly overwrites the modification
+time with the archived value, an incorrect system clock will not alter
+the modification date of successfully extracted files.</p>
+<h3 id="impact-on-creation-and-access-times">Impact on Creation and
+Access Times</h3>
+<p>While modification time is preserved, other file timestamps depend on
+the archive version and specific extraction flags:</p>
+<ul>
+<li><strong>Access Time (atime):</strong> The operating system often
+marks the file access time as the moment the file was written to disk.
+If the system clock is incorrect, the access time will reflect that
+incorrect system time unless the archive includes stored access times
+and the user extracted with full precision timestamp switches (e.g.,
+<code>-ts</code>).</li>
+<li><strong>Creation Time (ctime / Birth Time):</strong> On filesystems
+that support file creation timestamps (such as NTFS or ext4), the
+operating system assigns the current system time as the file's birth
+time during creation. If the system clock is set decades in the past or
+future, the file's creation time will inherit that error, potentially
+resulting in a creation date that is newer or older than its stored
+modification date.</li>
+</ul>
+<h3 id="timestamp-range-and-filesystem-limits">Timestamp Range and
+Filesystem Limits</h3>
+<p>If a drastically incorrect system clock causes interactions with
+system-level time boundaries, issues can arise:</p>
+<ul>
+<li><strong>Epoch Violations:</strong> On Unix-based systems using
+32-bit signed timestamps, dates before January 1, 1970, or after January
+19, 2038, cannot be properly represented. If an incorrect clock causes
+an application or timezone calculation to wrap past these limits, calls
+to set the timestamp may fail silently or produce an error, leaving the
+file with a fallback timestamp.</li>
+<li><strong>"Future" File Warnings:</strong> If the system clock is set
+to a past date (such as 1980) and files from 2024 are extracted, the
+operating system and downstream utilities will view those files as
+existing in the future. While <code>unrar</code> itself will complete
+the extraction without blocking the operation, subsequent tools such as
+backup software, version control systems, or build tools like
+<code>make</code> may behave unpredictably or trigger clock skew
+warnings.</li>
+</ul>
+<h3 id="rar-format-differences-rar4-vs-rar5">RAR Format Differences:
+RAR4 vs. RAR5</h3>
+<p>The format version of the archive influences how time is
+calculated:</p>
+<ul>
+<li><strong>RAR 4.x:</strong> Stores timestamps in MS-DOS local time
+format. If the system clock is drastically wrong, especially regarding
+daylight saving transitions or timezone settings, <code>unrar</code> may
+calculate local-to-UTC conversions improperly, introducing hour-level
+offsets.</li>
+<li><strong>RAR 5.0+:</strong> Stores timestamps in UTC with high
+precision (up to nanoseconds). <code>unrar</code> translates this UTC
+timestamp directly to the target filesystem, making it largely immune to
+local system clock errors, provided the target filesystem supports the
+date range.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

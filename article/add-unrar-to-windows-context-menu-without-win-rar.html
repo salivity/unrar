@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Unrar to Windows Context Menu Without WinRAR - unrar</title>
+    <meta name="description" content="This article explains how to integrate RAR archive extraction directly into the Windows right-click context menu without installing the full WinRAR software suite. By pairing the official, standalone, freeware UnRAR.exe utility from RARLab with a simple">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/add-unrar-to-windows-context-menu-without-win-rar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Add Unrar to Windows Context Menu Without WinRAR - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/add-unrar-to-windows-context-menu-without-win-rar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to integrate RAR archive extraction directly into the Windows right-click context menu without installing the full WinRAR software suite. By pairing the official, standalone, freeware UnRAR.exe utility from RARLab with a simple" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="add-unrar-to-windows-context-menu-without-winrar">Add Unrar to
+Windows Context Menu Without WinRAR</h1>
+<p>This article explains how to integrate RAR archive extraction
+directly into the Windows right-click context menu without installing
+the full WinRAR software suite. By pairing the official, standalone,
+freeware <code>UnRAR.exe</code> utility from RARLab with a simple
+Windows Registry tweak, users can add lightweight "Extract Here" and
+"Extract to Subfolder" options to File Explorer.</p>
+<h3 id="step-1-obtain-the-standalone-unrar-utility">Step 1: Obtain the
+Standalone UnRAR Utility</h3>
+<p>You do not need the full WinRAR setup to extract archives. RARLab
+distributes a free command-line tool called <code>UnRAR.exe</code>.</p>
+<ol type="1">
+<li>Download the command-line UnRAR utility package from the official
+RARLab download repository.</li>
+<li>Extract the <code>unrar.exe</code> file from the downloaded archive
+or installer.</li>
+<li>Move <code>unrar.exe</code> into a permanent directory that is
+accessible system-wide. Placing it in <code>C:\Windows\System32</code>
+or <code>C:\Windows</code> allows you to call the executable directly
+without specifying a full directory path in commands. Alternatively,
+place it in a custom folder such as <code>C:\Tools\UnRAR\</code>.</li>
+</ol>
+<h3 id="step-2-create-a-registry-script-for-the-context-menu">Step 2:
+Create a Registry Script for the Context Menu</h3>
+<p>To add right-click options for <code>.rar</code> files, create a
+<code>.reg</code> file that links the file type to your
+<code>unrar.exe</code> executable.</p>
+<ol type="1">
+<li>Open <strong>Notepad</strong>.</li>
+<li>Paste the following registry configuration:</li>
+</ol>
+<pre class="registry"><code>Windows Registry Editor Version 5.00
+
+; Add &quot;Extract Here&quot; to the context menu
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarHere]
+@=&quot;Extract Here&quot;
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarHere\command]
+@=&quot;\&quot;C:\\Windows\\unrar.exe\&quot; x -y \&quot;%1\&quot;&quot;
+
+; Add &quot;Extract to Subfolder&quot; to the context menu
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarFolder]
+@=&quot;Extract to Subfolder&quot;
+
+[HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarFolder\command]
+@=&quot;\&quot;C:\\Windows\\unrar.exe\&quot; x -ad -y \&quot;%1\&quot;&quot;</code></pre>
+<p><em>Note: If you stored <code>unrar.exe</code> somewhere other than
+<code>C:\Windows\</code>, update the path inside the quotes, using
+double backslashes (<code>\\</code>) to escape directory
+separators.</em></p>
+<ol start="3" type="1">
+<li>In Notepad, click <strong>File</strong> &gt; <strong>Save
+As</strong>.</li>
+<li>Set the <strong>Save as type</strong> dropdown to <strong>All Files
+(<em>.</em>)</strong>.</li>
+<li>Name the file <code>AddUnrarMenu.reg</code> and save it to your
+desktop or downloads folder.</li>
+</ol>
+<h3 id="step-3-apply-the-registry-changes">Step 3: Apply the Registry
+Changes</h3>
+<ol type="1">
+<li>Double-click the saved <code>AddUnrarMenu.reg</code> file.</li>
+<li>Click <strong>Yes</strong> when prompted by User Account Control
+(UAC).</li>
+<li>Click <strong>Yes</strong> to confirm merging the registry values,
+then click <strong>OK</strong>.</li>
+</ol>
+<h3 id="explanation-of-the-parameters">Explanation of the
+Parameters</h3>
+<ul>
+<li><code>x</code>: Tells the program to extract files while preserving
+the original folder structure.</li>
+<li><code>-y</code>: Automatically answers "yes" to prompts (such as
+overwriting files).</li>
+<li><code>-ad</code>: Appends the archive name to the destination folder
+to prevent cluttering the current directory with extracted
+contents.</li>
+<li><code>"%1"</code>: Represents the path of the archive selected in
+the Windows context menu.</li>
+</ul>
+<h3 id="how-to-remove-the-context-menu-entries">How to Remove the
+Context Menu Entries</h3>
+<p>If you wish to remove these entries later, create another
+<code>.reg</code> file containing the following code and run it:</p>
+<pre class="registry"><code>Windows Registry Editor Version 5.00
+
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarHere]
+[-HKEY_CLASSES_ROOT\SystemFileAssociations\.rar\shell\UnrarFolder]</code></pre></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

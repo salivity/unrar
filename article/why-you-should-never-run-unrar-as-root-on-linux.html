@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why You Should Never Run unrar as Root on Linux - unrar</title>
+    <meta name="description" content="Running the unrar utility as the root user on Linux poses critical security risks, including arbitrary file overwrites, privilege escalation, and unintended file ownership changes. This article explains the technical consequences of executing unrar with">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/why-you-should-never-run-unrar-as-root-on-linux">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why You Should Never Run unrar as Root on Linux - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/why-you-should-never-run-unrar-as-root-on-linux" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Running the unrar utility as the root user on Linux poses critical security risks, including arbitrary file overwrites, privilege escalation, and unintended file ownership changes. This article explains the technical consequences of executing unrar with" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="why-you-should-never-run-unrar-as-root-on-linux">Why You Should
+Never Run unrar as Root on Linux</h1>
+<p>Running the <code>unrar</code> utility as the root user on Linux
+poses critical security risks, including arbitrary file overwrites,
+privilege escalation, and unintended file ownership changes. This
+article explains the technical consequences of executing
+<code>unrar</code> with administrative privileges, details the dangers
+of archive-based exploits like path traversal, and explains how to
+safely extract RAR archives on a Linux system.</p>
+<h3 id="arbitrary-file-overwrite-via-path-traversal">Arbitrary File
+Overwrite via Path Traversal</h3>
+<p>When <code>unrar</code> processes an archive, it unpacks files
+according to the paths stored within the archive headers. Attackers can
+craft malicious RAR archives containing path traversal sequences (such
+as <code>../../etc/cron.d/malicious_job</code>).</p>
+<p>When executed by an unprivileged user, the operating system blocks
+writes to protected system directories. However, when run as
+<code>root</code>, <code>unrar</code> possesses full write permissions
+across the entire filesystem. A malicious archive can silently overwrite
+critical system binaries, configuration files (such as
+<code>/etc/shadow</code>), or scheduled tasks, resulting in immediate
+and complete system compromise. A notable real-world example is
+CVE-2022-30333, a path traversal vulnerability in unRAR that allowed
+attackers to write arbitrary files anywhere on the disk if the process
+had root privileges.</p>
+<h3 id="memory-corruption-and-remote-code-execution">Memory Corruption
+and Remote Code Execution</h3>
+<p>The unRAR codebase is primarily written in C++, a memory-unsafe
+language. Complex file formats like RAR require intricate parsing logic
+for compression algorithms, header metadata, and encryption layers. Over
+the years, multiple memory corruption vulnerabilities—such as buffer
+overflows and out-of-bounds writes—have been discovered in various
+versions of <code>unrar</code>.</p>
+<p>If a vulnerability exists in the parsing engine, an attacker can
+craft an archive that triggers a buffer overflow when parsed. If you
+execute this command as <code>root</code>, any shellcode or payload
+triggered by that exploit immediately inherits root privileges, giving
+an attacker persistent superuser access to the host machine.</p>
+<h3 id="symlink-and-hard-link-exploitation">Symlink and Hard Link
+Exploitation</h3>
+<p>RAR archives can store symbolic and hard links. If <code>unrar</code>
+does not strictly validate where these links point, extracting an
+archive as root can allow an attacker to create links targeting
+sensitive system locations. Subsequent file operations might then write
+data into files like <code>/etc/passwd</code> or
+<code>/root/.bashrc</code>, bypassing standard Linux access control
+policies.</p>
+<h3 id="file-ownership-and-permission-issues">File Ownership and
+Permission Issues</h3>
+<p>Any file or directory extracted by the root user will be owned by
+<code>root:root</code> by default. If you extract an archive intended
+for a specific application (such as a web server running under
+<code>www-data</code> or a database running under <code>mysql</code>),
+the service will often fail to read, write, or execute those files due
+to permission denied errors. This frequently leads administrators into
+fixing permissions using dangerous commands like
+<code>chmod 777</code>.</p>
+<h3 id="archive-bombs-and-disk-exhaustion">Archive Bombs and Disk
+Exhaustion</h3>
+<p>An archive bomb (or decompression bomb) is a tiny file that expands
+to hundreds of gigabytes or terabytes of data once extracted. Normal
+user accounts can be constrained by disk quotas (<code>edquota</code>)
+or standard storage limits. Running <code>unrar</code> as root
+circumvents safety thresholds, allowing a malicious or corrupted archive
+to fill the root partition (<code>/</code>) entirely. When the root
+partition runs out of space, critical system services, logging
+facilities, and system daemons will crash, causing a complete system
+denial of service.</p>
+<h3 id="safe-practices-for-extracting-rar-archives">Safe Practices for
+Extracting RAR Archives</h3>
+<p>To eliminate these risks, adhere to the following best practices:</p>
+<ul>
+<li><strong>Always Run as an Unprivileged User:</strong> Never use
+<code>sudo unrar</code> or extract archives while logged into the root
+account. Run the extraction utility under a standard, non-privileged
+user account.</li>
+<li><strong>Use Sandboxing or Isolation:</strong> If you must extract
+untrusted archives, do so inside an ephemeral Docker container or an
+isolated virtual machine without access to host volumes.</li>
+<li><strong>Keep unrar Updated:</strong> Ensure the package is updated
+through your distribution’s package manager to protect against known
+security vulnerabilities.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

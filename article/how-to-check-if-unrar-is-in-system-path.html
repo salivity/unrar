@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Check if Unrar Is in System PATH - unrar</title>
+    <meta name="description" content="Configuring the unrar utility in your system's PATH environment variable allows you to extract RAR archives directly from any directory using the command line. This guide provides a straightforward method to verify whether unrar is properly configured on">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-check-if-unrar-is-in-system-path">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Check if Unrar Is in System PATH - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-check-if-unrar-is-in-system-path" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Configuring the unrar utility in your system's PATH environment variable allows you to extract RAR archives directly from any directory using the command line. This guide provides a straightforward method to verify whether unrar is properly configured on" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-check-if-unrar-is-in-system-path">How to Check if Unrar
+Is in System PATH</h1>
+<p>Configuring the <code>unrar</code> utility in your system's PATH
+environment variable allows you to extract RAR archives directly from
+any directory using the command line. This guide provides a
+straightforward method to verify whether <code>unrar</code> is properly
+configured on Windows, macOS, and Linux systems, explains the commands
+used to locate the executable, and highlights how to identify
+PATH-related errors.</p>
+<h3 id="the-quick-test-run-the-unrar-command">The Quick Test: Run the
+Unrar Command</h3>
+<p>The fastest way to verify if <code>unrar</code> is recognized
+globally is to call it directly from your command-line interface.</p>
+<ol type="1">
+<li><p>Open <strong>Command Prompt</strong> or
+<strong>PowerShell</strong> (on Windows) or <strong>Terminal</strong>
+(on macOS and Linux).</p></li>
+<li><p>Type the following command and press <strong>Enter</strong>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div></li>
+</ol>
+<p><strong>Interpreting the Output:</strong></p>
+<ul>
+<li><strong>Properly Configured:</strong> The terminal outputs a list of
+version details, commands, and switches (e.g.,
+<code>UNRAR 6.x.x freeware...</code>).</li>
+<li><strong>Not Configured:</strong> The system returns an error
+message:
+<ul>
+<li>On Windows:
+<code>'unrar' is not recognized as an internal or external command, operable program or batch file.</code></li>
+<li>On Linux/macOS: <code>command not found: unrar</code> or
+<code>unrar: command not found</code>.</li>
+</ul></li>
+</ul>
+<hr />
+<h3 id="verifying-the-executable-path">Verifying the Executable
+Path</h3>
+<p>If you want to confirm the exact location where your operating system
+finds the <code>unrar</code> binary, use the platform-specific lookup
+commands.</p>
+<h4 id="on-windows">On Windows</h4>
+<p>Open Command Prompt and run:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>where unrar</span></code></pre></div>
+<ul>
+<li><strong>Success:</strong> It displays the full file path to the
+executable, such as <code>C:\Program Files\WinRAR\unrar.exe</code>.</li>
+<li><strong>Failure:</strong> It returns
+<code>INFO: Could not find files for the given pattern(s).</code></li>
+</ul>
+<h4 id="on-linux-and-macos">On Linux and macOS</h4>
+<p>Open Terminal and run:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> unrar</span></code></pre></div>
+<p><em>(Alternatively, use <code>command -v unrar</code> or
+<code>type -a unrar</code>)</em></p>
+<ul>
+<li><strong>Success:</strong> It displays the installation path, such as
+<code>/usr/bin/unrar</code> or <code>/usr/local/bin/unrar</code>.</li>
+<li><strong>Failure:</strong> It produces no output or displays a "not
+found" message.</li>
+</ul>
+<hr />
+<h3 id="inspecting-the-path-variable-directly">Inspecting the PATH
+Variable Directly</h3>
+<p>If the utility is installed but cannot be called, verify that the
+directory containing <code>unrar</code> is present inside your
+environment variables.</p>
+<ul>
+<li><strong>Windows:</strong>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="pp">%</span><span class="va">PATH</span><span class="pp">%</span></span></code></pre></div>
+Look for the directory path containing <code>unrar.exe</code> (e.g.,
+<code>C:\Program Files\WinRAR</code>).</li>
+<li><strong>Linux/macOS:</strong>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$PATH</span></span></code></pre></div>
+Ensure common binary directories like <code>/usr/bin</code>,
+<code>/usr/local/bin</code>, or your custom installation folder are
+listed.</li>
+</ul>
+<hr />
+<h3 id="what-to-do-if-it-is-not-configured">What to Do if It Is Not
+Configured</h3>
+<p>If the tests fail despite <code>unrar</code> being installed:</p>
+<ol type="1">
+<li>Locate the directory containing the <code>unrar</code> executable on
+your hard drive.</li>
+<li>Add that folder path to your system's <code>PATH</code> environment
+variable:
+<ul>
+<li><strong>Windows:</strong> Search for "Edit the system environment
+variables" in the Start menu, click <strong>Environment
+Variables</strong>, select <code>Path</code> under User or System
+variables, click <strong>Edit</strong>, and add the folder.</li>
+<li><strong>Linux/macOS:</strong> Add
+<code>export PATH="$PATH:/path/to/unrar"</code> to your shell profile
+(<code>~/.bashrc</code>, <code>~/.zshrc</code>).</li>
+</ul></li>
+<li>Restart your command line interface and run the test commands
+again.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

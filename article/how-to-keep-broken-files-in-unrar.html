@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Keep Broken Files in Unrar - unrar</title>
+    <meta name="description" content="This article explains how to handle corrupted or incomplete archives using the unrar command-line utility. It details the specific switch used to prevent unrar from deleting damaged files upon encountering extraction errors, clarifies command-line limita">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-keep-broken-files-in-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Keep Broken Files in Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-keep-broken-files-in-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to handle corrupted or incomplete archives using the unrar command-line utility. It details the specific switch used to prevent unrar from deleting damaged files upon encountering extraction errors, clarifies command-line limita" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-keep-broken-files-in-unrar">How to Keep Broken Files in
+Unrar</h1>
+<p>This article explains how to handle corrupted or incomplete archives
+using the <code>unrar</code> command-line utility. It details the
+specific switch used to prevent <code>unrar</code> from deleting damaged
+files upon encountering extraction errors, clarifies command-line
+limitations regarding automatic file renaming, and outlines how to
+handle broken files effectively.</p>
+<h2 id="the-keep-broken-files-switch--kb">The Keep Broken Files Switch
+(<code>-kb</code>)</h2>
+<p>The switch that instructs <code>unrar</code> to retain damaged or
+incomplete files is <strong><code>-kb</code></strong> (Keep Broken).</p>
+<p>By default, when <code>unrar</code> encounters a CRC error, missing
+volume, or data corruption during extraction, it aborts the process for
+that file and deletes the partial output from your disk. Applying the
+<code>-kb</code> switch overrides this behavior, forcing the utility to
+leave whatever portion of the file was successfully decompressed in the
+destination directory.</p>
+<h3 id="basic-command-syntax">Basic Command Syntax</h3>
+<p>To extract an archive and keep any damaged files, use:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar</span></code></pre></div>
+<ul>
+<li><code>x</code>: Extracts files with full paths.</li>
+<li><code>-kb</code>: Retains broken or corrupted extracted files.</li>
+</ul>
+<h2 id="can-unrar-automatically-rename-broken-files">Can Unrar
+Automatically Rename Broken Files?</h2>
+<p>Standard <code>unrar</code> (both the freeware command-line version
+and the RAR command line by RARLAB) <strong>does not</strong> include a
+switch to automatically rename broken files or append a custom file
+extension (such as <code>.broken</code> or <code>.corrupt</code>).</p>
+<p>When <code>-kb</code> is enabled:</p>
+<ol type="1">
+<li><code>unrar</code> writes the file using its standard filename
+defined in the archive header.</li>
+<li>If a CRC or extraction error occurs, a warning is printed to the
+console.</li>
+<li>The incomplete file remains on disk under its original filename
+without modification.</li>
+</ol>
+<h2 id="how-to-rename-broken-files">How to Rename Broken Files</h2>
+<p>Because <code>unrar</code> lacks native extension-modifying switches
+for damaged files, post-processing via a shell script or batch file is
+required if you need to flag broken outputs.</p>
+<p><code>unrar</code> outputs non-zero exit codes when errors occur
+(exit code <code>3</code> denotes a CRC error, while <code>1</code>
+indicates a non-fatal error). You can monitor extraction logs or
+standard error to identify damaged files and rename them
+programmatically.</p>
+<h3 id="bash-example-linuxmacos">Bash Example (Linux/macOS)</h3>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar <span class="kw">|</span> <span class="fu">tee</span> extraction.log</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Search the log for CRC errors and rename affected files</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">grep</span> <span class="st">&quot;CRC failed&quot;</span> extraction.log <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{print $NF}&#39;</span> <span class="kw">|</span> <span class="cf">while</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">filename</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="va">$filename</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mv</span> <span class="st">&quot;</span><span class="va">$filename</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$filename</span><span class="st">.corrupt&quot;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p>This approach allows you to retain partially recovered data while
+explicitly marking damaged items with your desired extension.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

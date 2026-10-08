@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Escape Shell Characters for unrar - unrar</title>
+    <meta name="description" content="Passing filenames with special shell characters—such as brackets, spaces, dollar signs, and asterisks—to the unrar command-line utility often leads to syntax errors, unintended globbing, or failed extractions. This guide explains how to properly hand">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-escape-shell-characters-for-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Escape Shell Characters for unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-escape-shell-characters-for-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Passing filenames with special shell characters—such as brackets, spaces, dollar signs, and asterisks—to the unrar command-line utility often leads to syntax errors, unintended globbing, or failed extractions. This guide explains how to properly hand" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-escape-shell-characters-for-unrar">How to Escape Shell
+Characters for unrar</h1>
+<p>Passing filenames with special shell characters—such as brackets,
+spaces, dollar signs, and asterisks—to the <code>unrar</code>
+command-line utility often leads to syntax errors, unintended globbing,
+or failed extractions. This guide explains how to properly handle these
+characters using single quotes, backslash escaping, argument delimiters,
+and safe scripting practices to ensure commands execute reliably across
+Unix-like shells.</p>
+<h3 id="use-strong-quoting-single-quotes">Use Strong Quoting (Single
+Quotes)</h3>
+<p>The simplest and most reliable way to prevent the shell from
+interpreting special characters is to wrap the filename in single quotes
+(<code>'</code>). Unlike double quotes, single quotes preserve the
+literal value of every character within the string, preventing variable
+expansion (<code>$</code>), command substitution (<code>`</code> or
+<code>$()</code>), and path expansion (<code>*</code>, <code>?</code>,
+<code>[]</code>).</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="st">&#39;Archive [2023] (Final) $100.rar&#39;</span></span></code></pre></div>
+<p>If the filename contains a literal single quote, close the quote,
+insert an escaped quote, and reopen the quote:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="st">&#39;Bob&#39;</span><span class="dt">\&#39;</span><span class="st">&#39;s Archive.rar&#39;</span></span></code></pre></div>
+<h3 id="manual-backslash-escaping">Manual Backslash Escaping</h3>
+<p>Alternatively, individual shell-sensitive characters can be escaped
+by prefixing them with a backslash (<code>\</code>). This prevents the
+shell from treating them as metacharacters.</p>
+<p>Characters requiring escaping include spaces, tabs, parentheses,
+brackets, quotes, ampersands, semicolons, and wildcards:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x Archive<span class="dt">\ \[</span>2023<span class="dt">\]\ \(</span>Final<span class="dt">\)\ \$</span>100.rar</span></code></pre></div>
+<h3 id="handle-leading-hyphens-with-the-end-of-options-delimiter">Handle
+Leading Hyphens with the End-of-Options Delimiter</h3>
+<p>If a filename begins with a hyphen (for example,
+<code>-archive.rar</code>), <code>unrar</code> will interpret the
+filename as a command-line flag or switch, resulting in an "Unknown
+option" error. To resolve this, use the standard double-hyphen delimiter
+(<code>--</code>) to signal the end of command-line switches before
+supplying the filename:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">--</span> <span class="st">&#39;-my-archive.rar&#39;</span></span></code></pre></div>
+<p>Alternatively, specify the relative path explicitly:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x ./-my-archive.rar</span></code></pre></div>
+<h3 id="disabling-unrar-internal-wildcards">Disabling unrar Internal
+Wildcards</h3>
+<p><code>unrar</code> has its own internal pattern-matching engine. Even
+if the shell ignores square brackets, <code>unrar</code> might treat
+<code>[name]</code> as a wildcard character set. To force
+<code>unrar</code> to treat brackets as literal characters in file
+extraction targets, escape the brackets with a backslash inside single
+quotes so that the backslash reaches the <code>unrar</code> binary
+itself:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="st">&#39;archive\[1\].rar&#39;</span></span></code></pre></div>
+<h3 id="safe-invocation-in-scripts">Safe Invocation in Scripts</h3>
+<p>When writing scripts, avoid constructing commands by concatenating
+strings inside a shell. Instead, pass filenames as discrete arguments
+via arrays or execution lists:</p>
+<ul>
+<li><strong>Bash Array:</strong>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">file</span><span class="op">=</span><span class="st">&quot;Archive [2023].rar&quot;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">--</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span></span></code></pre></div></li>
+<li><strong>Python:</strong>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>filename <span class="op">=</span> <span class="st">&quot;Archive [2023].rar&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>subprocess.run([<span class="st">&quot;unrar&quot;</span>, <span class="st">&quot;x&quot;</span>, <span class="st">&quot;--&quot;</span>, filename])</span></code></pre></div></li>
+</ul>
+<p>Bypassing intermediate shell interpretation entirely eliminates the
+need for escaping and prevents shell injection vulnerabilities.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

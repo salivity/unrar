@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Default Text Encoding in Unrar Console - unrar</title>
+    <meta name="description" content="When extracting archives containing filenames from different language sets, console-based unrar can produce garbled characters (mojibake) if the encoding does not match your system environment. This article provides straightforward methods to change and">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/change-default-text-encoding-in-unrar-console">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Change Default Text Encoding in Unrar Console - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/change-default-text-encoding-in-unrar-console" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives containing filenames from different language sets, console-based unrar can produce garbled characters (mojibake) if the encoding does not match your system environment. This article provides straightforward methods to change and" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="change-default-text-encoding-in-unrar-console">Change Default
+Text Encoding in Unrar Console</h1>
+<p>When extracting archives containing filenames from different language
+sets, console-based <code>unrar</code> can produce garbled characters
+(mojibake) if the encoding does not match your system environment. This
+article provides straightforward methods to change and configure the
+default text encoding in <code>unrar</code>, including using the
+built-in charset switch, adjusting system environment variables, and
+setting persistent configuration defaults.</p>
+<hr />
+<h3 id="method-1-use-the--sc-switch-in-the-command-line">Method 1: Use
+the <code>-sc</code> Switch in the Command Line</h3>
+<p>The command-line version of RAR/UnRAR includes a built-in character
+set switch (<code>-sc</code>) to specify the encoding for text
+operations.</p>
+<p>The syntax is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="at">-sc</span><span class="op">&lt;</span>charset<span class="op">&gt;</span><span class="pp">[</span><span class="ss">objects</span><span class="pp">]</span> <span class="op">&lt;</span>command<span class="op">&gt;</span> <span class="op">&lt;</span>archive<span class="op">&gt;</span></span></code></pre></div>
+<h4 id="charset-values">Charset Values:</h4>
+<ul>
+<li><strong><code>f</code></strong>: UTF-8</li>
+<li><strong><code>a</code></strong>: ANSI (Windows code page)</li>
+<li><strong><code>o</code></strong>: OEM (DOS code page)</li>
+<li><strong><code>u</code></strong>: Unicode (UTF-16)</li>
+</ul>
+<h4 id="object-values">Object Values:</h4>
+<ul>
+<li><strong><code>c</code></strong>: Archive comments</li>
+<li><strong><code>l</code></strong>: List files</li>
+</ul>
+<h4 id="example">Example:</h4>
+<p>To force <code>unrar</code> to use UTF-8 for reading list files and
+comments during extraction:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="at">-scfl</span> x archive.rar</span></code></pre></div>
+<hr />
+<h3 id="method-2-configure-system-locale-variables-linux--macos">Method
+2: Configure System Locale Variables (Linux &amp; macOS)</h3>
+<p>On Unix-based operating systems, <code>unrar</code> relies heavily on
+standard POSIX locale variables (<code>LANG</code>,
+<code>LC_CTYPE</code>, or <code>LC_ALL</code>) to determine how text is
+rendered to the terminal.</p>
+<ol type="1">
+<li><p><strong>Check your current locale:</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">locale</span></span></code></pre></div></li>
+<li><p><strong>Run <code>unrar</code> with an overridden UTF-8
+locale:</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">LC_ALL</span><span class="op">=</span>en_US.UTF-8 <span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+<li><p><strong>Make the encoding permanent:</strong> Add the locale
+configuration to your shell profile (<code>~/.bashrc</code>,
+<code>~/.zshrc</code>, or <code>/etc/environment</code>):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LANG</span><span class="op">=</span>en_US.UTF-8</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">LC_ALL</span><span class="op">=</span>en_US.UTF-8</span></code></pre></div>
+<p>Apply the changes immediately:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code></pre></div></li>
+</ol>
+<hr />
+<h3
+id="method-3-change-active-code-page-in-windows-cmd--powershell">Method
+3: Change Active Code Page in Windows (CMD / PowerShell)</h3>
+<p>In Windows, the command prompt defaults to legacy OEM code pages
+(e.g., CP437). To display and process UTF-8 filenames correctly:</p>
+<ol type="1">
+<li>Open the command prompt.</li>
+<li>Change the active console code page to UTF-8 using
+<code>chcp</code>:
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">chcp</span> 65001</span></code></pre></div></li>
+<li>Run your extraction command:
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>unrar x archive.rar</span></code></pre></div></li>
+</ol>
+<hr />
+<h3
+id="method-4-set-persistent-default-parameters-via-the-rar-variable">Method
+4: Set Persistent Default Parameters via the <code>RAR</code>
+Variable</h3>
+<p>To avoid typing encoding switches repeatedly, define the
+<code>RAR</code> environment variable. The <code>unrar</code> binary
+automatically reads this variable for default switches every time it
+executes.</p>
+<ul>
+<li><p><strong>On Linux/macOS:</strong> Add this line to
+<code>~/.bashrc</code> or <code>~/.profile</code>:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">RAR</span><span class="op">=</span><span class="st">&quot;-scf&quot;</span></span></code></pre></div></li>
+<li><p><strong>On Windows (Command Prompt):</strong></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>setx RAR <span class="st">&quot;-scf&quot;</span></span></code></pre></div></li>
+</ul>
+<p>Alternatively, on Linux systems, you can create or edit
+<code>/etc/rarrc</code> (system-wide) or <code>~/.rarrc</code>
+(user-specific) and add default switches:</p>
+<pre class="text"><code>-scf</code></pre>
+<hr />
+<h3 id="handling-legacy-rar4-archives-with-specific-encodings">Handling
+Legacy RAR4 Archives with Specific Encodings</h3>
+<p>Old archives created under RAR4 format do not store Unicode headers
+and rely on the local OEM/ANSI code page of the operating system where
+they were created. If <code>unrar</code> fails to translate these
+filenames properly:</p>
+<ul>
+<li><p><strong>Use <code>unar</code> as an alternative:</strong> The
+<code>unar</code> utility supports an explicit encoding flag
+(<code>-e</code>):</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unar</span> <span class="at">-e</span> GBK archive.rar</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unar</span> <span class="at">-e</span> Shift-JIS archive.rar</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">unar</span> <span class="at">-e</span> CP1251 archive.rar</span></code></pre></div></li>
+<li><p><strong>Fix filenames post-extraction using <code>convmv</code>
+(Linux):</strong></p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">convmv</span> <span class="at">-f</span> cp936 <span class="at">-t</span> utf-8 <span class="at">--notest</span> <span class="at">-r</span> ./extracted_folder</span></code></pre></div></li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

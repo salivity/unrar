@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast Multi-Threaded Unrar Builds Explained - unrar</title>
+    <meta name="description" content="Extracting RAR archives can become a performance bottleneck on modern multi-core processors, leading many users to seek multi-threaded versions of unrar. While the underlying design of RAR decompression imposes fundamental limits on parallelizing a singl">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/fast-multi-threaded-unrar-builds-explained">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Fast Multi-Threaded Unrar Builds Explained - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/fast-multi-threaded-unrar-builds-explained" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting RAR archives can become a performance bottleneck on modern multi-core processors, leading many users to seek multi-threaded versions of unrar. While the underlying design of RAR decompression imposes fundamental limits on parallelizing a singl" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="fast-multi-threaded-unrar-builds-explained">Fast Multi-Threaded
+Unrar Builds Explained</h1>
+<p>Extracting RAR archives can become a performance bottleneck on modern
+multi-core processors, leading many users to seek multi-threaded
+versions of <code>unrar</code>. While the underlying design of RAR
+decompression imposes fundamental limits on parallelizing a single file
+stream, specific builds, compilation flags, and alternative tools
+leverage multi-threading across multiple files, checksum calculations,
+and hardware optimizations. This article details how multi-threading
+works within <code>unrar</code>, the differences between available
+builds, and the best ways to maximize extraction speeds on multi-core
+systems.</p>
+<h3 id="the-technical-limitation-of-rar-decompression">The Technical
+Limitation of RAR Decompression</h3>
+<p>Traditional RAR compression algorithms (RAR4 and earlier) are
+strictly sequential. The Lempel-Ziv (LZ) dictionary-based decompression
+requires the processor to know the previous data blocks to decode the
+subsequent ones, which inherently prevents parallel decoding of a single
+file stream.</p>
+<p>With the introduction of the RAR5 format, RARLAB added features that
+better accommodate multi-core processors. While individual compressed
+streams remain largely single-threaded, RAR5 allows multithreaded data
+checksumming (such as BLAKE2sp) and faster parallel processing of
+multiple independent files inside an archive.</p>
+<h3 id="official-rarlab-unrar-vs-winrar">Official RARLAB unrar vs.
+WinRAR</h3>
+<p>The standalone command-line <code>unrar</code> utility distributed by
+RARLAB is primarily single-threaded for extracting single archives
+containing single large files. However, there are distinctions between
+the official tools:</p>
+<ul>
+<li><strong>WinRAR (Windows GUI):</strong> The graphical client natively
+incorporates multi-threading for extraction. It offloads cryptographic
+operations, BLAKE2sp checksum verification, and multi-file extraction to
+separate worker threads.</li>
+<li><strong>Official unrar source (Non-free):</strong> The standard
+source code released by RARLAB (<code>unrar</code> /
+<code>libunrar</code>) has limited threading capabilities compared to
+the Windows GUI client, but it handles RAR5's multi-threaded checksums
+if compiled with appropriate thread libraries (such as pthreads on
+Unix-like environments).</li>
+<li><strong>unrar-free:</strong> An open-source, reverse-engineered
+version available in many Linux repositories. This build is completely
+single-threaded, generally slower, and lacks full support for the modern
+RAR5 format. It should be avoided if performance is a priority.</li>
+</ul>
+<h3 id="compiling-unrar-for-maximum-performance">Compiling unrar for
+Maximum Performance</h3>
+<p>While RARLAB does not ship a dedicated "multi-threaded edition"
+binary for the command line, users can significantly improve
+<code>unrar</code> performance by building it from the official RARLAB
+source code using modern compiler optimizations.</p>
+<p>Compiling <code>unrar</code> locally enables instruction set
+extensions (such as AVX2, AVX-512, and SSE4.2) that accelerate memory
+copy operations, decompression tables, and cryptographic hashing:</p>
+<ol type="1">
+<li>Download the latest source package from RARLAB.</li>
+<li>Modify the <code>makefile</code> to include aggressive optimization
+flags:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">CXXFLAGS</span><span class="op">=</span>-O3 <span class="ex">-march=native</span> <span class="at">-pipe</span></span></code></pre></div></li>
+<li>Compile the binary using <code>make</code>.</li>
+</ol>
+<p>Compiling with <code>-march=native</code> tailors the executable to
+your specific CPU architecture, yielding faster throughput than generic
+pre-compiled distribution packages.</p>
+<h3 id="alternatives-for-parallel-archive-extraction">Alternatives for
+Parallel Archive Extraction</h3>
+<p>Because a single instance of <code>unrar</code> cannot fully saturate
+high-core-count processors on single files, alternative strategies and
+tools are required to achieve true multi-threaded speeds:</p>
+<ul>
+<li><strong>7-Zip (<code>7z x</code>):</strong> The 7-Zip decompression
+engine supports multi-threading for many formats and can decompress
+multiple files inside non-solid archives concurrently across available
+CPU threads.</li>
+<li><strong>GNU Parallel with unrar:</strong> For environments with many
+individual <code>.rar</code> archives, piping jobs through GNU Parallel
+provides the most efficient multi-core utilization. Executing multiple
+<code>unrar</code> processes simultaneously ensures that every CPU core
+is actively extracting independent streams.</li>
+<li><strong>I/O Considerations:</strong> In high-speed multi-threading
+scenarios, CPU performance is rarely the ultimate bottleneck.
+Decompressing across multiple threads simultaneously requires fast NVMe
+storage; running parallel extractions on mechanical hard drives (HDDs)
+often degrades performance due to disk head thrashing and I/O wait
+times.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

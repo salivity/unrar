@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How unrar Handles Unicode Filenames on macOS - unrar</title>
+    <meta name="description" content="This article provides an overview of how the unrar command-line utility handles Unicode normalization when extracting archives on macOS. When extracting files, unrar does not internally alter or re-normalize Unicode text; instead, it outputs standard UTF">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-unicode-filenames-on-mac-os">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How unrar Handles Unicode Filenames on macOS - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-unicode-filenames-on-mac-os" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides an overview of how the unrar command-line utility handles Unicode normalization when extracting archives on macOS. When extracting files, unrar does not internally alter or re-normalize Unicode text; instead, it outputs standard UTF" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-unicode-filenames-on-macos">How unrar Handles
+Unicode Filenames on macOS</h1>
+<p>This article provides an overview of how the <code>unrar</code>
+command-line utility handles Unicode normalization when extracting
+archives on macOS. When extracting files, <code>unrar</code> does not
+internally alter or re-normalize Unicode text; instead, it outputs
+standard UTF-8 strings directly to POSIX file system APIs, relying on
+the macOS file system layer (APFS or HFS+) to determine whether file
+names are preserved as precomposed (NFC) or decomposed (NFD)
+characters.</p>
+<h3 id="unicode-representation-in-rar-archives">Unicode Representation
+in RAR Archives</h3>
+<p>Modern RAR archives (RAR 5.0 and later) store file names natively as
+UTF-8 byte sequences. Older archives (RAR 4.x and earlier) store file
+names in UTF-16 alongside local codepages, which <code>unrar</code>
+converts to UTF-8 during extraction. In most operating environments,
+particularly Windows and Linux, Unicode file names are saved using
+Normalization Form C (NFC), where accented characters are represented as
+single precomposed code points (for example, <code>é</code> as
+<code>U+00E9</code>).</p>
+<h3 id="the-behavior-of-unrar-during-extraction">The Behavior of unrar
+During Extraction</h3>
+<p>The portable Unix source code of <code>unrar</code> (provided by
+RARLAB) treats file paths on Unix-like operating systems as opaque
+null-terminated UTF-8 byte streams. When executing on macOS:</p>
+<ol type="1">
+<li><strong>No Application-Level Normalization:</strong>
+<code>unrar</code> does not invoke macOS-specific APIs (such as
+<code>CFStringNormalize</code>) to alter Unicode normalization forms. It
+preserves the exact UTF-8 character sequences embedded in the archive
+headers.</li>
+<li><strong>Direct POSIX Calls:</strong> Filenames are passed directly
+to standard system calls such as <code>open()</code>,
+<code>creat()</code>, and <code>mkdir()</code>.</li>
+</ol>
+<p>Because <code>unrar</code> does not convert the encoding between NFC
+and NFD itself, the resulting normalization form on disk depends
+entirely on the file system hosting the destination directory.</p>
+<h3 id="macos-file-system-normalization-apfs-vs-hfs">macOS File System
+Normalization: APFS vs. HFS+</h3>
+<p>How the file name is actually written to the storage drive depends on
+the macOS version and the disk format:</p>
+<ul>
+<li><strong>APFS (Apple File System):</strong> APFS is
+normalization-preserving and normalization-insensitive. When
+<code>unrar</code> creates a file using an NFC-encoded path (common in
+Windows-generated archives), APFS writes the exact NFC byte sequence to
+disk. Lookups remain normalization-insensitive, meaning the operating
+system treats both NFC and NFD representations of the name as the same
+file.</li>
+<li><strong>HFS+ (Mac OS Extended):</strong> HFS+ enforces a proprietary
+variant of Normalization Form D (NFD). If <code>unrar</code> extracts a
+file to an HFS+ volume, the kernel's Virtual File System (VFS) layer
+intercepts the file creation call and automatically decomposes
+precomposed characters into multiple code points (for example,
+translating <code>é</code> into <code>e</code> + combining acute accent
+<code>U+0065 U+0301</code>).</li>
+</ul>
+<h3 id="implications-for-macos-users-and-developers">Implications for
+macOS Users and Developers</h3>
+<p>Because modern macOS systems use APFS, <code>unrar</code> will
+typically leave extracted file names in the normalization format used by
+the archive's creator—usually NFC. This can cause subtle issues in
+workflows that expect native macOS NFD formatting:</p>
+<ul>
+<li><strong>Shell and Scripting Mismatches:</strong> Tools or scripts
+comparing file names via exact byte matching may fail if comparing an
+<code>unrar</code>-extracted NFC file name with an NFD file name
+generated natively by a standard macOS GUI application.</li>
+<li><strong>Archive Collisions:</strong> If an archive contains two
+distinct entries that differ only by Unicode normalization (one in NFC
+and one in NFD), extracting on macOS will cause the second file to
+overwrite the first due to the operating system's
+normalization-insensitive lookup rules.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

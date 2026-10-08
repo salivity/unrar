@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How SELinux Blocks Unrar File Extraction - unrar</title>
+    <meta name="description" content="When the unrar utility attempts to extract an archive into a target location restricted by Security-Enhanced Linux (SELinux), the operating system's kernel enforces Mandatory Access Control (MAC) to block the unauthorized write or create operations. This">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-se-linux-blocks-unrar-file-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How SELinux Blocks Unrar File Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-se-linux-blocks-unrar-file-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When the unrar utility attempts to extract an archive into a target location restricted by Security-Enhanced Linux (SELinux), the operating system's kernel enforces Mandatory Access Control (MAC) to block the unauthorized write or create operations. This" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-selinux-blocks-unrar-file-extraction">How SELinux Blocks
+Unrar File Extraction</h1>
+<p>When the <code>unrar</code> utility attempts to extract an archive
+into a target location restricted by Security-Enhanced Linux (SELinux),
+the operating system's kernel enforces Mandatory Access Control (MAC) to
+block the unauthorized write or create operations. This results in
+standard "Permission denied" terminal errors, incomplete or missing
+extracted files, and logged Access Vector Cache (AVC) denial messages
+within system audit logs, all while leaving the source RAR archive
+completely unmodified.</p>
+<h3 id="the-enforcement-mechanism">The Enforcement Mechanism</h3>
+<p>SELinux operates at the Linux kernel level, evaluating permissions
+beyond standard Discretionary Access Control (DAC) file permissions
+(such as read, write, and execute bits). Even if the user executing
+<code>unrar</code> has standard write privileges or root access, SELinux
+evaluates the security context (user, role, type, and level) of both the
+<code>unrar</code> process and the destination directory.</p>
+<p>If the security policy does not explicitly permit the domain of the
+running process to write to, create files in, or relabel files within
+the target context, the kernel immediately halts the system call.</p>
+<h3 id="manifestation-in-unrar">Manifestation in unrar</h3>
+<p>When a restriction occurs during extraction, <code>unrar</code>
+typically demonstrates the following behaviors:</p>
+<ul>
+<li><strong>Creation Failure:</strong> If <code>unrar</code> cannot
+create the target file or subdirectory, it outputs an error message such
+as <code>Cannot create &lt;filename&gt;</code> followed by
+<code>Permission denied</code>.</li>
+<li><strong>Extraction Halts or Skips:</strong> Depending on the flags
+passed to <code>unrar</code> (such as <code>-kb</code> to keep broken
+extracted files), the process will either abort immediately or skip the
+restricted file and attempt to process remaining items in the
+archive.</li>
+<li><strong>Partial Files:</strong> If the file creation call is allowed
+but subsequent writing or attribute adjustments are restricted, an empty
+or truncated file may remain in the destination directory.</li>
+</ul>
+<h3 id="audit-logging-avc-denials">Audit Logging (AVC Denials)</h3>
+<p>Whenever SELinux denies an action initiated by <code>unrar</code>, it
+logs an AVC denial message. On most enterprise Linux distributions (such
+as RHEL, CentOS, Rocky Linux, or Fedora), this event is recorded in
+<code>/var/log/audit/audit.log</code>.</p>
+<p>A typical denial entry includes:</p>
+<ul>
+<li><strong><code>scontext</code> (Source Context):</strong> The SELinux
+label under which <code>unrar</code> is running (e.g.,
+<code>unconfined_u:unconfined_r:unconfined_t:s0</code>).</li>
+<li><strong><code>tcontext</code> (Target Context):</strong> The label
+of the destination directory or existing target file (e.g.,
+<code>system_u:object_r:httpd_sys_content_t:s0</code>).</li>
+<li><strong><code>tclass</code> (Target Class):</strong> The resource
+type being accessed, typically <code>file</code> or
+<code>dir</code>.</li>
+<li><strong><code>comm</code>:</strong> The command name, showing
+<code>unrar</code>.</li>
+<li><strong><code>denied</code>:</strong> The specific action prevented,
+such as <code>write</code>, <code>create</code>, or
+<code>setattr</code>.</li>
+</ul>
+<h3 id="enforcing-mode-vs-permissive-mode">Enforcing Mode vs. Permissive
+Mode</h3>
+<p>The outcome of the extraction depends on the active SELinux operating
+mode:</p>
+<ul>
+<li><strong>Enforcing Mode:</strong> The default operational mode where
+policy rules are strictly applied. The extraction is physically blocked,
+and an AVC denial is generated.</li>
+<li><strong>Permissive Mode:</strong> SELinux does not block the
+extraction. <code>unrar</code> successfully writes the files to disk,
+but the kernel still records the AVC denial in the audit log to warn
+administrators that the action violated active policy rules.</li>
+</ul>
+<h3 id="resolving-extraction-failures">Resolving Extraction
+Failures</h3>
+<p>To address these restrictions without globally disabling system
+security:</p>
+<ol type="1">
+<li><strong>Verify the Denial:</strong> Use
+<code>ausearch -m avc -ts recent</code> or
+<code>journalctl -t setroubleshoot</code> to confirm that SELinux caused
+the failure.</li>
+<li><strong>Inspect Contexts:</strong> Check the target path's context
+using <code>ls -dZ /path/to/destination</code>.</li>
+<li><strong>Reset Contexts:</strong> If the target directory was
+mislabeled, restore the correct default security context using
+<code>restorecon -Rv /path/to/destination</code>.</li>
+<li><strong>Adjust Booleans or Policies:</strong> If extracting to
+shared or service-specific locations (such as web server roots or
+network shares), enable the relevant SELinux boolean or generate a
+custom policy module using <code>audit2allow</code>.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

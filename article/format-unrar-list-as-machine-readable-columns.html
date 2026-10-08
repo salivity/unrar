@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Format Unrar List as Machine-Readable Columns - unrar</title>
+    <meta name="description" content="Parsing the contents of a RAR archive from the command line often requires transforming human-readable tables into clean, structured data suitable for automated scripts and pipelines. By default, the unrar utility prints decorative headers, horizontal ru">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/format-unrar-list-as-machine-readable-columns">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Format Unrar List as Machine-Readable Columns - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/format-unrar-list-as-machine-readable-columns" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Parsing the contents of a RAR archive from the command line often requires transforming human-readable tables into clean, structured data suitable for automated scripts and pipelines. By default, the unrar utility prints decorative headers, horizontal ru" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="format-unrar-list-as-machine-readable-columns">Format Unrar List
+as Machine-Readable Columns</h1>
+<p>Parsing the contents of a RAR archive from the command line often
+requires transforming human-readable tables into clean, structured data
+suitable for automated scripts and pipelines. By default, the
+<code>unrar</code> utility prints decorative headers, horizontal rule
+lines, and summary footers that break standard parsers. This guide
+demonstrates how to suppress formatting artifacts using native
+<code>unrar</code> listing flags and pipe the output into standard
+stream editors to generate structured, column-delimited formats like TSV
+or CSV.</p>
+<h2 id="method-1-bare-listing-file-paths-only">Method 1: Bare Listing
+(File Paths Only)</h2>
+<p>If your workflow only requires a list of file paths without metadata,
+use the <code>lb</code> (list bare) switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar</span></code></pre></div>
+<p>This outputs one relative file path per line, stripping away all
+banners, headers, and file attributes.</p>
+<h2 id="method-2-technical-listing-unrar-lt-with-awk">Method 2:
+Technical Listing (<code>unrar lt</code>) with <code>awk</code></h2>
+<p>For multi-column data including file sizes, timestamps, and
+attributes, the <code>lt</code> (list technical) switch provides
+key-value blocks for each entry, making it the most reliable source for
+machine-readable extraction.</p>
+<p>You can parse these blocks into tab-separated values (TSV) using
+<code>awk</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lt archive.rar <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span><span class="st">&#39;: &#39;</span> <span class="st">&#39;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="st">    /^Name/ { name = $2 }</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="st">    /^Size/ { size = $2 }</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="st">    /^Type/ { type = $2 }</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="st">    /^mtime/ { mtime = $2 }</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="st">    /^Attributes/ {</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="st">        attr = $2</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="st">        if (name != &quot;&quot;) {</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="st">            print name &quot;\t&quot; size &quot;\t&quot; type &quot;\t&quot; mtime &quot;\t&quot; attr</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="st">        }</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="st">        name = size = type = mtime = attr = &quot;&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;</span></span></code></pre></div>
+<p>This outputs standard columns:</p>
+<ul>
+<li><strong>Column 1:</strong> File Name</li>
+<li><strong>Column 2:</strong> Uncompressed Size (bytes)</li>
+<li><strong>Column 3:</strong> Type (File/Directory)</li>
+<li><strong>Column 4:</strong> Modification Time</li>
+<li><strong>Column 5:</strong> File Attributes</li>
+</ul>
+<h2 id="method-3-stripping-the-standard-verbose-table-unrar-v">Method 3:
+Stripping the Standard Verbose Table (<code>unrar v</code>)</h2>
+<p>The standard verbose list (<code>unrar v</code>) outputs a
+fixed-width table. To extract columns directly, use <code>sed</code> to
+strip the non-data header lines and footer summaries, then parse the
+remaining rows.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v <span class="at">-c-</span> archive.rar <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-e</span> <span class="st">&#39;1,/^---/d&#39;</span> <span class="at">-e</span> <span class="st">&#39;/^---/,$d&#39;</span> <span class="kw">|</span> <span class="fu">awk</span> <span class="st">&#39;{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="st">    # Size is $1, Packed is $2, Ratio is $3, Date is $4, Time is $5, Attr is $6</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="st">    # Filename starts at column 7 and may contain spaces</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">    size = $1; packed = $2; ratio = $3; date = $4 &quot; &quot; $5; attr = $6</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">    $1=$2=$3=$4=$5=$6=&quot;&quot;; sub(/^[ \t]+/, &quot;&quot;)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">    print size &quot;\t&quot; packed &quot;\t&quot; ratio &quot;\t&quot; date &quot;\t&quot; attr &quot;\t&quot; $0</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">}&#39;</span></span></code></pre></div>
+<p>The <code>-c-</code> switch disables archive comments to prevent
+unexpected text from disrupting line counts.</p>
+<h2 id="best-practices-for-automation">Best Practices for
+Automation</h2>
+<ul>
+<li><strong>Use Tab Delimiters (<code>\t</code>):</strong> Because
+filenames inside archives frequently contain spaces, avoid
+space-separated columns.</li>
+<li><strong>Disable Comments:</strong> Always append <code>-c-</code>
+when invoking <code>unrar</code> in automated scripts to ensure
+archive-level comments do not interfere with line parsers.</li>
+<li><strong>Check Return Codes:</strong> Ensure your script monitors
+exit code <code>0</code> from <code>unrar</code> prior to piping into
+formatting utilities to avoid parsing incomplete or corrupted
+outputs.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Append Unrar Output to an Existing File - unrar</title>
+    <meta name="description" content="While the unrar utility does not include a native command-line switch to append extracted data directly to an existing file, you can achieve this behavior using command-line stream redirection. By instructing unrar to print the contents of an archived fi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-append-unrar-output-to-an-existing-file">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Append Unrar Output to an Existing File - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-append-unrar-output-to-an-existing-file" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While the unrar utility does not include a native command-line switch to append extracted data directly to an existing file, you can achieve this behavior using command-line stream redirection. By instructing unrar to print the contents of an archived fi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-append-unrar-output-to-an-existing-file">How to Append
+Unrar Output to an Existing File</h1>
+<p>While the <code>unrar</code> utility does not include a native
+command-line switch to append extracted data directly to an existing
+file, you can achieve this behavior using command-line stream
+redirection. By instructing <code>unrar</code> to print the contents of
+an archived file to the standard output (stdout) and suppressing
+metadata output, you can redirect and append that stream directly to
+your target file using the shell append operator
+(<code>&gt;&gt;</code>).</p>
+<h3 id="the-append-command">The Append Command</h3>
+<p>To extract data from an archive and append it to an existing file,
+use the following command syntax in your terminal or command prompt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar file_inside.txt <span class="op">&gt;&gt;</span> existing_file.txt</span></code></pre></div>
+<h3 id="command-breakdown">Command Breakdown</h3>
+<ul>
+<li><strong><code>p</code></strong>: Instructs <code>unrar</code> to
+extract the file and write its contents to standard output
+(<code>stdout</code>) instead of saving it directly as a new file on the
+filesystem.</li>
+<li><strong><code>-inul</code></strong>: Disables all informational and
+error messages. This is critical because <code>unrar</code> outputs
+banner details, copyright notices, and progress percentages by default.
+The <code>-inul</code> flag ensures that only the actual file content is
+passed through stdout.</li>
+<li><strong><code>archive.rar</code></strong>: The path to your source
+RAR archive.</li>
+<li><strong><code>file_inside.txt</code></strong>: The specific file
+inside the archive you wish to extract. If you omit this,
+<code>unrar</code> will print all files contained within the archive
+sequentially.</li>
+<li><strong><code>&gt;&gt; existing_file.txt</code></strong>: The
+standard shell redirection operator that appends standard output to the
+specified target file without overwriting its existing contents.</li>
+</ul>
+<h3 id="example-appending-log-data">Example: Appending Log Data</h3>
+<p>If you have daily compressed logs and need to concatenate them into a
+master log file, run:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> logs_2023.rar app.log <span class="op">&gt;&gt;</span> master_log.log</span></code></pre></div>
+<p>This command extracts <code>app.log</code> from
+<code>logs_2023.rar</code>, strips the utility's terminal messages, and
+appends the content to the end of <code>master_log.log</code>. This
+technique works across Linux, macOS, and Windows environments (using
+Command Prompt or PowerShell).</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

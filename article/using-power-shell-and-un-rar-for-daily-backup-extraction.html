@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using PowerShell and UnRAR for Daily Backup Extraction - unrar</title>
+    <meta name="description" content="Automating backup restoration is critical for verifying data integrity and maintaining updated secondary environments. This guide explains how to build a PowerShell script that uses the command-line utility UnRAR to automatically locate and extract daily">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/using-power-shell-and-un-rar-for-daily-backup-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Using PowerShell and UnRAR for Daily Backup Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/using-power-shell-and-un-rar-for-daily-backup-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Automating backup restoration is critical for verifying data integrity and maintaining updated secondary environments. This guide explains how to build a PowerShell script that uses the command-line utility UnRAR to automatically locate and extract daily" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="using-powershell-and-unrar-for-daily-backup-extraction">Using
+PowerShell and UnRAR for Daily Backup Extraction</h1>
+<p>Automating backup restoration is critical for verifying data
+integrity and maintaining updated secondary environments. This guide
+explains how to build a PowerShell script that uses the command-line
+utility UnRAR to automatically locate and extract daily RAR backup
+archives, complete with error logging and automated scheduling
+instructions using Windows Task Scheduler.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>To implement this workflow, ensure the following requirements are
+met:</p>
+<ul>
+<li><strong>UnRAR Utility</strong>: Download <code>UnRAR.exe</code>
+(part of the WinRAR package or the standalone command-line version) and
+place it in a known directory, such as
+<code>C:\Program Files\WinRAR\UnRAR.exe</code>.</li>
+<li><strong>Execution Rights</strong>: Ensure your PowerShell execution
+policy allows running custom scripts (<code>RemoteSigned</code> or
+<code>Bypass</code>).</li>
+</ul>
+<h2 id="powershell-script-implementation">PowerShell Script
+Implementation</h2>
+<p>The script below identifies the most recent backup archive matching a
+specific pattern, checks if the destination directory exists, and
+invokes <code>UnRAR.exe</code> to perform the extraction.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration paths</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="va">$UnrarPath</span>   <span class="op">=</span> <span class="st">&quot;C:\Program Files\WinRAR\UnRAR.exe&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">$BackupDir</span>   <span class="op">=</span> <span class="st">&quot;D:\Backups\Daily&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">$ExtractDir</span>  <span class="op">=</span> <span class="st">&quot;E:\Restores\Today&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="va">$LogFile</span>     <span class="op">=</span> <span class="st">&quot;C:\Logs\BackupExtraction.log&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Function to write log messages</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">function</span> Write-Log <span class="op">{</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">param</span> <span class="op">([</span><span class="dt">string</span><span class="op">]</span><span class="va">$Message</span><span class="op">)</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">$Timestamp</span> <span class="op">=</span> <span class="fu">Get-Date</span> <span class="op">-</span>Format <span class="st">&quot;yyyy-MM-dd HH:mm:ss&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Add-Content</span> <span class="op">-</span>Path <span class="va">$LogFile</span> <span class="op">-</span>Value <span class="st">&quot;[</span><span class="va">$Timestamp</span><span class="st">] </span><span class="va">$Message</span><span class="st">&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure destination directory exists</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="op">(-not</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="op">-</span>Path <span class="va">$ExtractDir</span><span class="op">))</span> <span class="op">{</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">New-Item</span> <span class="op">-</span>ItemType Directory <span class="op">-</span>Path <span class="va">$ExtractDir</span> <span class="op">-</span>Force <span class="op">|</span> <span class="fu">Out-Null</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    Write-Log <span class="st">&quot;Created extraction directory: </span><span class="va">$ExtractDir</span><span class="st">&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Locate the newest RAR file modified in the last 24 hours</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="va">$LatestArchive</span> <span class="op">=</span> <span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="va">$BackupDir</span> <span class="op">-</span>Filter <span class="st">&quot;*.rar&quot;</span> <span class="op">|</span> </span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">Sort-Object</span> LastWriteTime <span class="op">-</span>Descending <span class="op">|</span> </span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">Select-Object</span> <span class="op">-</span>First <span class="dv">1</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="dt">if</span> <span class="op">(</span><span class="va">$LatestArchive</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    Write-Log <span class="st">&quot;Found backup file: </span><span class="op">$(</span><span class="va">$LatestArchive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="co"># UnRAR parameters:</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="co"># x   = Extract files with full path</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># -o+ = Overwrite existing files</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="co"># -y  = Assume Yes on all queries</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="va">$UnrarArgs</span> <span class="op">=</span> <span class="op">@(</span><span class="st">&quot;x&quot;</span><span class="op">,</span> <span class="st">&quot;-o+&quot;</span><span class="op">,</span> <span class="st">&quot;-y&quot;</span><span class="op">,</span> <span class="st">&quot;</span><span class="ch">`&quot;</span><span class="op">$(</span><span class="va">$LatestArchive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="ch">`&quot;</span><span class="st">&quot;</span><span class="op">,</span> <span class="st">&quot;</span><span class="ch">`&quot;</span><span class="va">$ExtractDir</span><span class="st">\</span><span class="ch">`&quot;</span><span class="st">&quot;</span><span class="op">)</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span> <span class="op">{</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>        Write-Log <span class="st">&quot;Starting extraction...&quot;</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">$Process</span> <span class="op">=</span> <span class="fu">Start-Process</span> <span class="op">-</span>FilePath <span class="va">$UnrarPath</span> <span class="op">-</span>ArgumentList <span class="va">$UnrarArgs</span> <span class="op">-</span>Wait <span class="op">-</span>NoNewWindow <span class="op">-</span>PassThru</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="op">(</span><span class="va">$Process</span><span class="op">.</span><span class="fu">ExitCode</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            Write-Log <span class="st">&quot;Extraction completed successfully.&quot;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>            Write-Log <span class="st">&quot;UnRAR failed with exit code: </span><span class="op">$(</span><span class="va">$Process</span><span class="op">.</span><span class="fu">ExitCode</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>        <span class="op">}</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">catch</span> <span class="op">{</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        Write-Log <span class="st">&quot;Error executing extraction: </span><span class="va">$_</span><span class="st">&quot;</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>    Write-Log <span class="st">&quot;Warning: No backup archive found in </span><span class="va">$BackupDir</span><span class="st">.&quot;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h2 id="explanation-of-key-unrar-switches">Explanation of Key UnRAR
+Switches</h2>
+<ul>
+<li><code>x</code>: Extracts files while preserving the original folder
+structure stored inside the archive.</li>
+<li><code>-o+</code>: Automatically overwrites any existing files in the
+destination directory to ensure stale data is replaced.</li>
+<li><code>-y</code>: Suppresses all user prompts by answering "Yes" by
+default, preventing the script from hanging during unattended
+execution.</li>
+</ul>
+<h2 id="automating-the-script-daily">Automating the Script Daily</h2>
+<p>To run the extraction automatically, schedule it via Windows Task
+Scheduler:</p>
+<ol type="1">
+<li>Open <strong>Task Scheduler</strong> and select <strong>Create Basic
+Task</strong>.</li>
+<li>Name the task (e.g., <code>Daily-Backup-Extraction</code>) and set
+the trigger to <strong>Daily</strong> at your preferred time.</li>
+<li>For the action, select <strong>Start a program</strong>.</li>
+<li>In the <strong>Program/script</strong> field, enter:
+<code>powershell.exe</code></li>
+<li>In the <strong>Add arguments (optional)</strong> field, provide the
+execution parameters:
+<code>-ExecutionPolicy Bypass -File "C:\Scripts\ExtractBackup.ps1"</code></li>
+<li>Finish the setup and ensure the task is configured to "Run whether
+user is logged on or not" with administrative privileges.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

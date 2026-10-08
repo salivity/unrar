@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Multi-Volume Files Across Different Folders - unrar</title>
+    <meta name="description" content="This article explains whether the command-line tool unrar can extract split, multi-volume archives when individual volume files are scattered across different folders. It details the default behavior of the utility, demonstrates how to use the interactiv">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-multi-volume-files-across-different-folders">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Multi-Volume Files Across Different Folders - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-multi-volume-files-across-different-folders" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains whether the command-line tool unrar can extract split, multi-volume archives when individual volume files are scattered across different folders. It details the default behavior of the utility, demonstrates how to use the interactiv" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-multi-volume-files-across-different-folders">Unrar
+Multi-Volume Files Across Different Folders</h1>
+<p>This article explains whether the command-line tool
+<code>unrar</code> can extract split, multi-volume archives when
+individual volume files are scattered across different folders. It
+details the default behavior of the utility, demonstrates how to use the
+interactive path prompt to locate missing pieces manually, and covers
+practical workarounds—such as symbolic linking and script-based
+aggregation—to handle dispersed archive parts efficiently.</p>
+<p>By default, <code>unrar</code> cannot automatically search across
+multiple directories to locate the subsequent parts of a multi-volume
+archive. When you start an extraction using
+<code>unrar x archive.part1.rar</code>, the program expects every
+subsequent file (<code>.part2.rar</code>, <code>.part3.rar</code>, etc.)
+to reside in the exact same directory as the initial file. If an
+automated or non-interactive flag (such as <code>-y</code> or
+<code>-inul</code>) is passed, the command immediately terminates with
+an error when it reaches the end of the first file and fails to find the
+next part in the local directory.</p>
+<p>However, you can extract archives across different locations natively
+using interactive mode. When executed without flags that suppress user
+prompts, <code>unrar</code> halts extraction as soon as a required
+volume is missing and displays a prompt:</p>
+<pre class="text"><code>Cannot find volume /path/to/archive.part2.rar
+Insert disk with this volume and press Enter, or type new volume path:</code></pre>
+<p>At this prompt, you can manually input the full absolute or relative
+file path to the missing volume (for example,
+<code>/storage/downloads/archive.part2.rar</code>). Pressing Enter
+instructs <code>unrar</code> to continue extracting from that location.
+The utility repeats this request for every subsequent missing volume,
+allowing you to manually steer the extraction process across entirely
+different drives or directories.</p>
+<p>Because entering file paths manually is impractical for archives with
+dozens of split volumes or headless automation scripts, alternative
+methods are recommended:</p>
+<ul>
+<li><strong>Symbolic Links:</strong> Create symbolic links for all
+scattered files inside a single temporary directory. Commands like
+<code>ln -s /path/to/part*.rar /target/dir/</code> place lightweight
+pointers into one location, enabling <code>unrar</code> to treat them as
+local files without duplicating disk space.</li>
+<li><strong>Consolidation:</strong> Move or copy all archive parts into
+a single folder prior to running the extraction command.</li>
+<li><strong>Scripted Staging:</strong> Use a shell script to search for
+matching archive filenames across your directory tree, link or move them
+to a staging directory, execute <code>unrar</code>, and clean up the
+staging area afterward.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

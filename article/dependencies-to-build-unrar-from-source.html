@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dependencies to Build Unrar from Source - unrar</title>
+    <meta name="description" content="Building the unrar utility directly from its official source code requires a minimal set of development tools and system libraries. This guide outlines the essential software packages, compilers, and utilities needed to prepare a system for compiling unr">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/dependencies-to-build-unrar-from-source">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dependencies to Build Unrar from Source - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/dependencies-to-build-unrar-from-source" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Building the unrar utility directly from its official source code requires a minimal set of development tools and system libraries. This guide outlines the essential software packages, compilers, and utilities needed to prepare a system for compiling unr" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="dependencies-to-build-unrar-from-source">Dependencies to Build
+Unrar from Source</h1>
+<p>Building the unrar utility directly from its official source code
+requires a minimal set of development tools and system libraries. This
+guide outlines the essential software packages, compilers, and utilities
+needed to prepare a system for compiling unrar, along with package
+manager commands for common Linux distributions.</p>
+<h3 id="essential-build-requirements">Essential Build Requirements</h3>
+<p>The official unrar source code distributed by RARLAB is largely
+self-contained and does not rely on third-party compression or archive
+libraries. To compile it, you only need the fundamental C++ development
+toolchain:</p>
+<ol type="1">
+<li><strong>C++ Compiler:</strong> A modern C++ compiler such as GCC
+(<code>g++</code>) or Clang (<code>clang++</code>) capable of supporting
+standard C++ specifications.</li>
+<li><strong>GNU Make:</strong> The <code>make</code> build automation
+tool to execute the build instructions defined in unrar's
+<code>makefile</code>.</li>
+<li><strong>Standard C and C++ Libraries:</strong> Standard system
+runtime libraries (<code>libc</code>, <code>libstdc++</code>, or
+standard POSIX equivalents), which are included with standard developer
+toolchains.</li>
+<li><strong>Archive Utilities (Optional):</strong> Tools such as
+<code>tar</code> to extract the <code>unrarsrc</code> archive and
+<code>wget</code> or <code>curl</code> to download it.</li>
+</ol>
+<h3 id="installing-dependencies-by-operating-system">Installing
+Dependencies by Operating System</h3>
+<p>Depending on your distribution, these requirements can be installed
+via the system package manager:</p>
+<h4 id="debian--ubuntu">Debian / Ubuntu</h4>
+<p>On Debian-based systems, the <code>build-essential</code>
+meta-package provides the necessary compiler and build utilities:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install build-essential wget</span></code></pre></div>
+<h4 id="fedora--rhel--centos">Fedora / RHEL / CentOS</h4>
+<p>On Red Hat-based distributions, install the basic development
+tools:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install gcc-c++ make wget tar</span></code></pre></div>
+<p>Alternatively, install the development group:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf groupinstall <span class="st">&quot;Development Tools&quot;</span></span></code></pre></div>
+<h4 id="arch-linux">Arch Linux</h4>
+<p>On Arch Linux, the base development package group contains all
+necessary dependencies:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-S</span> base-devel wget</span></code></pre></div>
+<h4 id="alpine-linux">Alpine Linux</h4>
+<p>For lightweight environments like Alpine Linux, install the GNU C++
+compiler and make:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apk</span> add g++ make wget</span></code></pre></div>
+<h3 id="compiling-unrar">Compiling unrar</h3>
+<p>Once the dependencies are installed, download and compile the source
+code:</p>
+<ol type="1">
+<li>Download and extract the source archive:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://www.rarlab.com/rar/unrarsrc-6.2.12.tar.gz</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> unrarsrc-<span class="pp">*</span>.tar.gz</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> unrar</span></code></pre></div></li>
+<li>Build the binary using the provided makefile:
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> makefile</span></code></pre></div></li>
+<li>Install the compiled binary into your system path:
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> install <span class="at">-v</span> <span class="at">-m755</span> unrar /usr/local/bin</span></code></pre></div></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

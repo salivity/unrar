@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Performance on Raspberry Pi and ARM CPUs - unrar</title>
+    <meta name="description" content="Running unrar on ARM-based architectures like the Raspberry Pi delivers vastly different performance depending on the hardware generation, the storage media used, and the specific version of the decompression software. While modern 64-bit ARM boards hand">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-performance-on-raspberry-pi-and-arm-cp-us">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Performance on Raspberry Pi and ARM CPUs - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-performance-on-raspberry-pi-and-arm-cp-us" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Running unrar on ARM-based architectures like the Raspberry Pi delivers vastly different performance depending on the hardware generation, the storage media used, and the specific version of the decompression software. While modern 64-bit ARM boards hand" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-performance-on-raspberry-pi-and-arm-cpus">Unrar
+Performance on Raspberry Pi and ARM CPUs</h1>
+<p>Running <code>unrar</code> on ARM-based architectures like the
+Raspberry Pi delivers vastly different performance depending on the
+hardware generation, the storage media used, and the specific version of
+the decompression software. While modern 64-bit ARM boards handle RAR
+archives efficiently, older single-board computers often struggle due to
+single-threaded CPU bottlenecks, limited memory bandwidth, and slow SD
+card write speeds. This article examines the architectural constraints,
+software variants, and real-world performance expectations when
+extracting RAR archives on ARM hardware.</p>
+<h3 id="cpu-architecture-and-single-core-limits">CPU Architecture and
+Single-Core Limits</h3>
+<p>The standard <code>unrar</code> utility (distributed by RARLAB) is
+predominantly single-threaded during the decompression of a single file
+within an archive. Because of this, extraction speed directly depends on
+the single-core Instructions Per Cycle (IPC) and clock frequency of the
+processor.</p>
+<ul>
+<li><strong>Raspberry Pi 1, 2, and Zero:</strong> Utilizing low-power
+ARMv6 and ARMv7 cores, extraction speeds are extremely slow.
+Decompressing multi-gigabyte archives can take hours.</li>
+<li><strong>Raspberry Pi 3:</strong> The quad-core Cortex-A53 (ARMv8)
+provides usable speeds for small files, but heavily compressed RAR5
+archives will easily saturate a single core and lead to thermal
+throttling without active cooling.</li>
+<li><strong>Raspberry Pi 4:</strong> Powered by the Cortex-A72 at
+1.5–1.8 GHz, performance reaches an acceptable baseline for media
+servers and automated downloaders.</li>
+<li><strong>Raspberry Pi 5:</strong> Featuring the Cortex-A76 clocked at
+2.4 GHz with cryptographic hardware extensions, extraction speeds rival
+low-power x86 chips (such as Intel Celeron or N100 series), reducing
+extraction times to minutes.</li>
+</ul>
+<h3 id="the-storage-bottleneck-io">The Storage Bottleneck (I/O)</h3>
+<p>On single-board computers, storage speed often becomes the primary
+bottleneck before CPU limitations appear.</p>
+<ol type="1">
+<li><strong>MicroSD Cards:</strong> Standard Class 10 or A1 MicroSD
+cards offer low random write speeds (often below 10 MB/s). Because
+decompression involves continuous disk writes, using an SD card severely
+limits throughput regardless of processor capability.</li>
+<li><strong>USB 3.0 SSDs and NVMe:</strong> On the Raspberry Pi 4 (via
+USB 3.0) and Raspberry Pi 5 (via PCIe/NVMe), storage bandwidth is high
+enough to allow the ARM CPU to decompress at its maximum potential
+rate.</li>
+</ol>
+<h3 id="software-differences-non-free-unrar-vs-unrar-free">Software
+Differences: Non-Free <code>unrar</code> vs.
+<code>unrar-free</code></h3>
+<p>Linux distributions on ARM generally offer two distinct packages:</p>
+<ul>
+<li><strong><code>unrar</code> (non-free):</strong> The official binary
+or source release from RARLAB. It includes full support for the modern
+RAR5 algorithm, multi-threading optimizations for certain dictionary
+sizes, and hand-tuned assembly routines. This package provides the best
+performance.</li>
+<li><strong><code>unrar-free</code>:</strong> A reverse-engineered,
+open-source alternative. It lacks support for RAR5 archives and performs
+significantly slower due to missing optimizations.</li>
+<li><strong><code>7z</code> (<code>p7zip-full</code>):</strong> Can
+extract RAR files using the RAR engine. On ARM, <code>7z x</code> is
+often on par with proprietary <code>unrar</code> and supports
+multi-threading across multiple files in a batch.</li>
+</ul>
+<h3 id="thermal-throttling">Thermal Throttling</h3>
+<p>ARM processors maintain a small thermal envelope. Intensive
+decompression tasks keep the CPU at 100% utilization on active cores for
+extended periods. On a passively cooled Raspberry Pi 4 or 5, core
+temperatures will rapidly hit 80°C, causing the SoC to throttle clock
+frequencies downward. Active cooling (a fan or large heatsink) is
+necessary to maintain peak <code>unrar</code> performance during large
+batch jobs.</p>
+<h3 id="summary-of-performance-expectations">Summary of Performance
+Expectations</h3>
+<p>For small archives (under 500 MB), any 64-bit ARM board handles
+extraction with negligible delay. For large, multi-gigabyte files (such
+as 4K video or disc images), the combination of a Raspberry Pi 4 or 5,
+the official RARLAB <code>unrar</code> binary, an SSD over USB 3.0 or
+NVMe, and active cooling is required to achieve extraction speeds
+comparable to standard desktop computers.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

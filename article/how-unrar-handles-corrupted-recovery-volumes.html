@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Corrupted Recovery Volumes - unrar</title>
+    <meta name="description" content="When extracting multi-part RAR archives, recovery volumes (.rev files) are designed to reconstruct missing or damaged archive parts using parity-based error correction. If the recovery volumes themselves are corrupted, unrar evaluates the integrity of ea">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-corrupted-recovery-volumes">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Corrupted Recovery Volumes - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-corrupted-recovery-volumes" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting multi-part RAR archives, recovery volumes (.rev files) are designed to reconstruct missing or damaged archive parts using parity-based error correction. If the recovery volumes themselves are corrupted, unrar evaluates the integrity of ea" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-corrupted-recovery-volumes">How Unrar Handles
+Corrupted Recovery Volumes</h1>
+<p>When extracting multi-part RAR archives, recovery volumes
+(<code>.rev</code> files) are designed to reconstruct missing or damaged
+archive parts using parity-based error correction. If the recovery
+volumes themselves are corrupted, <code>unrar</code> evaluates the
+integrity of each individual volume, discards unusable parity blocks,
+and only proceeds if enough healthy recovery files remain to satisfy the
+mathematical threshold required for reconstruction.</p>
+<h3 id="initial-integrity-verification">Initial Integrity
+Verification</h3>
+<p>Before initiating any data reconstruction, <code>unrar</code> reads
+the header and block checksums (typically CRC32 for RAR4 or BLAKE2sp for
+RAR5) of every available <code>.rev</code> file. Recovery volumes do not
+possess a self-healing mechanism; they cannot repair other damaged
+recovery volumes. If <code>unrar</code> detects a checksum mismatch or
+structural truncation within a <code>.rev</code> file, it immediately
+flags that specific volume as invalid and discards it from the recovery
+pool.</p>
+<h3 id="the-parity-threshold-requirement">The Parity Threshold
+Requirement</h3>
+<p>RAR archives use erasure coding (such as Reed-Solomon algorithms) to
+recover damaged sets. The fundamental rule of this mechanism is simple:
+to reconstruct <em>N</em> missing or corrupted data volumes
+(<code>.rar</code>, <code>.partXX.rar</code>), the utility requires at
+least <em>N</em> fully intact recovery volumes (<code>.rev</code>).</p>
+<p>When one or more recovery volumes are damaged:</p>
+<ul>
+<li><strong>Sufficient Valid Volumes:</strong> If you have more
+<code>.rev</code> files than missing archive volumes, a corrupted
+<code>.rev</code> file has no negative impact on the extraction. For
+example, if two archive parts are missing and you have four
+<code>.rev</code> files, but one <code>.rev</code> file is corrupt,
+<code>unrar</code> still possesses three valid <code>.rev</code> files.
+Because three is greater than or equal to two, the extraction and
+reconstruction proceed successfully.</li>
+<li><strong>Insufficient Valid Volumes:</strong> If the corruption of
+recovery volumes reduces the count of valid <code>.rev</code> files
+below the number of missing main volumes, the mathematical threshold
+cannot be met. In this state, <code>unrar</code> cannot reconstruct the
+missing data.</li>
+</ul>
+<h3 id="extraction-failure-and-error-handling">Extraction Failure and
+Error Handling</h3>
+<p>When the valid recovery volume count falls below the required
+threshold, <code>unrar</code> aborts the reconstruction process. It
+typically reports a checksum error or outputs a message indicating that
+the archive is corrupt or that there are not enough recovery volumes to
+rebuild the dataset.</p>
+<p>If the extraction is executed using standard commands,
+<code>unrar</code> deletes any partially unpacked or incomplete files to
+avoid leaving corrupt data on the disk. However, if invoked with the
+keep broken files flag (<code>-kb</code>), <code>unrar</code> will
+extract whatever intact data it can read up to the point of corruption,
+though any files spanning the damaged or missing volumes will remain
+incomplete.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

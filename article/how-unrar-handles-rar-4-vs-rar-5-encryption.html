@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles RAR4 vs RAR5 Encryption - unrar</title>
+    <meta name="description" content="When processing encrypted archives, the unrar utility applies two distinct decryption pipelines depending on whether the archive is formatted under the legacy RAR4 specification or the modern RAR5 format. This article examines how unrar detects the forma">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-rar-4-vs-rar-5-encryption">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles RAR4 vs RAR5 Encryption - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-rar-4-vs-rar-5-encryption" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When processing encrypted archives, the unrar utility applies two distinct decryption pipelines depending on whether the archive is formatted under the legacy RAR4 specification or the modern RAR5 format. This article examines how unrar detects the forma" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-rar4-vs-rar5-encryption">How Unrar Handles
+RAR4 vs RAR5 Encryption</h1>
+<p>When processing encrypted archives, the <code>unrar</code> utility
+applies two distinct decryption pipelines depending on whether the
+archive is formatted under the legacy RAR4 specification or the modern
+RAR5 format. This article examines how <code>unrar</code> detects the
+format version, switches between AES-128 and AES-256 cryptographic
+algorithms, processes key derivation functions, and validates user
+passwords during extraction.</p>
+<h3 id="archive-detection-and-header-parsing">Archive Detection and
+Header Parsing</h3>
+<p>Before initiating decryption, <code>unrar</code> inspects the initial
+byte signature (magic bytes) of the target file to determine the archive
+version:</p>
+<ul>
+<li><strong>RAR4:</strong> Uses the standard 7-byte marker
+<code>52 61 72 21 1A 07 00</code>.</li>
+<li><strong>RAR5:</strong> Uses an updated 8-byte marker
+<code>52 61 72 21 1A 07 01 00</code>.</li>
+</ul>
+<p>This detection dictates which cryptographic routines the engine
+initializes. If header encryption is enabled (created via WinRAR's
+<code>-hp</code> switch), standard archive markers are obscured or
+preceded by encryption headers, prompting <code>unrar</code> to
+immediately request the user password before reading file metadata.</p>
+<h3 id="symmetric-cipher-implementation">Symmetric Cipher
+Implementation</h3>
+<p>The underlying symmetric encryption differs substantially between the
+two formats:</p>
+<ul>
+<li><strong>RAR4 (AES-128):</strong> <code>unrar</code> decrypts payload
+data and file headers using the Advanced Encryption Standard (AES) with
+a 128-bit key in Cipher Block Chaining (CBC) mode. The initialization
+vector (IV) and keystream setup rely on legacy block-padding
+conventions.</li>
+<li><strong>RAR5 (AES-256):</strong> <code>unrar</code> upgrades the
+cipher to AES-256 in CBC mode. The 256-bit key length significantly
+increases brute-force complexity compared to RAR4.</li>
+</ul>
+<h3 id="key-derivation-functions-kdf">Key Derivation Functions
+(KDF)</h3>
+<p>The most significant security divergence handled by
+<code>unrar</code> lies in how user-supplied plaintext passwords are
+transformed into cryptographic keys.</p>
+<h4 id="rar4-legacy-derivation">RAR4 Legacy Derivation</h4>
+<p>RAR4 uses a custom, lightweight key derivation mechanism:</p>
+<ul>
+<li>The user's password string is concatenated with an 8-byte (64-bit)
+random salt stored in the archive header.</li>
+<li>The combined input is repeatedly hashed using SHA-1 over a fixed,
+relatively low iteration count (typically around 262,144 rounds of raw
+SHA-1 hashing).</li>
+<li>While effective when introduced, this approach lacks modern
+memory-hardness and allows high-throughput cracking on modern GPUs.</li>
+</ul>
+<h4 id="rar5-modern-derivation">RAR5 Modern Derivation</h4>
+<p>RAR5 transitions to industry-standard key stretching:</p>
+<ul>
+<li>It increases the salt size to 16 bytes (128 bits) to eliminate the
+risk of rainbow-table collisions across archives.</li>
+<li>It uses standard PBKDF2 (Password-Based Key Derivation Function 2)
+built on HMAC-SHA-256.</li>
+<li>The iteration count is drastically increased, scaling dynamically or
+defaulting to thousands of rounds of computationally heavy HMAC
+evaluations. This forces <code>unrar</code> to consume more CPU time per
+key generation, effectively mitigating automated dictionary
+attacks.</li>
+</ul>
+<h3 id="password-verification">Password Verification</h3>
+<p>The mechanism <code>unrar</code> uses to check if an entered password
+is correct differs between formats:</p>
+<ul>
+<li><strong>RAR4 Verification:</strong> The legacy format does not
+include a dedicated password checksum for encrypted file data. To check
+if a password is correct, <code>unrar</code> must decrypt the file block
+and verify the uncompressed data against an internal cyclic redundancy
+check (CRC32). A wrong password results in a corrupted CRC checksum
+error at the end of extraction.</li>
+<li><strong>RAR5 Verification:</strong> Modern RAR5 headers include a
+cryptographically secure password verification hash (derived via
+PBKDF2). This allows <code>unrar</code> to instantly confirm password
+validity before attempting any decompression, eliminating false
+extraction runs and reducing overhead.</li>
+</ul>
+<h3 id="backward-compatibility-within-unrar">Backward Compatibility
+within <code>unrar</code></h3>
+<p>To maintain seamless backward compatibility, the official
+<code>unrar</code> source code retains both cryptographic code paths.
+When an extraction job starts, <code>unrar</code> allocates the
+necessary buffer structures for the specific format. If a RAR4 archive
+is detected, modern optimizations like hardware-accelerated AES-NI still
+apply to the AES-128 decryption routine, but the software relies on the
+legacy hashing structures strictly for compatibility with older
+archives.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

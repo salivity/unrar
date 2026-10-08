@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Extracts Files Larger Than RAM - unrar</title>
+    <meta name="description" content="When extracting an archive containing a file larger than the system's available physical memory, the unrar utility does not load the entire uncompressed file into RAM. Instead, it relies on stream-based processing, a bounded sliding dictionary, and buffe">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-extracts-files-larger-than-ram">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Extracts Files Larger Than RAM - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-extracts-files-larger-than-ram" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting an archive containing a file larger than the system's available physical memory, the unrar utility does not load the entire uncompressed file into RAM. Instead, it relies on stream-based processing, a bounded sliding dictionary, and buffe" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-extracts-files-larger-than-ram">How Unrar Extracts
+Files Larger Than RAM</h1>
+<p>When extracting an archive containing a file larger than the system's
+available physical memory, the <code>unrar</code> utility does not load
+the entire uncompressed file into RAM. Instead, it relies on
+stream-based processing, a bounded sliding dictionary, and buffered disk
+writes. This architecture ensures that memory consumption remains tied
+strictly to the compression parameters rather than the actual size of
+the extracted contents.</p>
+<h3 id="stream-based-processing">Stream-Based Processing</h3>
+<p>The RAR decompression algorithm operates on sequential streams of
+data rather than monolithic datasets. The <code>unrar</code> program
+reads small chunks of compressed data from the archive on the storage
+drive, processes that data in memory, and immediately writes the
+resulting decompressed stream back to the target storage device. Because
+the data passes through the program continuously, the total file
+size—whether 10 gigabytes or several terabytes—has no direct bearing on
+the amount of RAM required for the operation.</p>
+<h3 id="the-sliding-dictionary-window">The Sliding Dictionary
+Window</h3>
+<p>Memory usage during extraction is primarily determined by the
+"dictionary size" selected when the archive was created. RAR uses a
+Lempel-Ziv-based compression algorithm, which relies on a sliding
+history window to identify repeated byte sequences:</p>
+<ul>
+<li><strong>RAR4 Archives:</strong> Typically use a dictionary size of
+up to 4 megabytes.</li>
+<li><strong>RAR5 Archives:</strong> Support larger dictionary sizes
+ranging from 128 kilobytes up to 1 gigabyte (or up to 4 gigabytes in
+newer revisions), with 32 megabytes being the standard default.</li>
+</ul>
+<p>During extraction, <code>unrar</code> allocates only enough memory to
+hold this sliding dictionary window, along with internal decompression
+tables and small I/O buffers. For example, extracting a 100-gigabyte
+file created with a 32-megabyte dictionary requires only roughly 40 to
+60 megabytes of working memory.</p>
+<h3 id="direct-disk-flushing">Direct Disk Flushing</h3>
+<p>As the sliding window updates, data that falls out of the history
+window is flushed to the destination file on the disk via standard
+operating system write buffers. Once written to disk or the OS write
+cache, that memory is recycled for subsequent chunks of the stream.</p>
+<p>If the system's RAM is smaller than the archive's required dictionary
+size—such as attempting to extract an archive using a 1-gigabyte
+dictionary on a legacy system with only 512 megabytes of RAM—the process
+will rely on the operating system's swap space or pagefile. In cases
+where virtual memory is also exhausted, <code>unrar</code> will
+terminate with an out-of-memory error rather than attempting extraction.
+However, under normal conditions with standard dictionary sizes,
+<code>unrar</code> routinely extracts files many times larger than the
+host system's RAM without performance degradation.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

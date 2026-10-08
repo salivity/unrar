@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Recovery Records as Files? - unrar</title>
+    <meta name="description" content="This article examines whether the command-line utility unrar can extract an embedded RAR recovery record as a standalone file. While RAR archives allow creators to embed recovery records to repair damaged archives, unrar does not provide an option to iso">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-recovery-records-as-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Recovery Records as Files? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-recovery-records-as-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines whether the command-line utility unrar can extract an embedded RAR recovery record as a standalone file. While RAR archives allow creators to embed recovery records to repair damaged archives, unrar does not provide an option to iso" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-recovery-records-as-files">Can Unrar Extract
+Recovery Records as Files?</h1>
+<p>This article examines whether the command-line utility
+<code>unrar</code> can extract an embedded RAR recovery record as a
+standalone file. While RAR archives allow creators to embed recovery
+records to repair damaged archives, <code>unrar</code> does not provide
+an option to isolate or dump this parity data into an external file.
+Below, you will learn how recovery records are structured, why
+<code>unrar</code> cannot extract them independently, and what
+alternatives exist if you require standalone parity files.</p>
+<h2 id="the-short-answer">The Short Answer</h2>
+<p>No, <code>unrar</code> cannot extract the recovery record as a
+standalone file. The recovery record is an integrated structural
+component of the RAR container format, not an archived file entry,
+meaning standard extraction commands cannot target, read, or output it
+as an individual item.</p>
+<h2 id="why-recovery-records-cannot-be-extracted">Why Recovery Records
+Cannot Be Extracted</h2>
+<p>To understand why extraction is not possible, it helps to examine how
+the RAR format handles error correction data:</p>
+<ul>
+<li><strong>Internal Metadata, Not File Payloads:</strong> When an
+archive is created with a recovery record (such as using the
+<code>-rr</code> switch in RAR or WinRAR), the software appends
+Reed-Solomon error correction blocks directly into the archive's
+internal structure. It does not treat the redundancy data as a file or
+folder payload.</li>
+<li><strong>Limitations of <code>unrar</code>:</strong> The
+<code>unrar</code> utility is designed specifically to decompress and
+unpack the files listed in the archive header. Because the recovery
+record does not exist in the file allocation table of the archive,
+<code>unrar</code> simply bypasses it during extraction operations
+(<code>e</code> or <code>x</code>).</li>
+<li><strong>Repair vs. Extraction:</strong> The recovery record is meant
+strictly for the repair command (<code>rar r</code>), which scans the
+damaged archive and uses the embedded parity blocks to rebuild corrupted
+sectors in-place. The tool has no export function for raw parity
+data.</li>
+</ul>
+<h2 id="standalone-alternatives-using-par2">Standalone Alternatives:
+Using PAR2</h2>
+<p>If your workflow requires parity and error-correction data to exist
+as separate, standalone files alongside your archives, the standard
+solution is to use the Parchive (PAR2) format.</p>
+<p>Tools such as <code>par2cmdline</code> allow you to generate external
+<code>.par2</code> recovery files for any file type, including RAR
+archives. Unlike internal RAR recovery records, PAR2 files exist
+independently in your filesystem, can be moved or distributed
+separately, and can verify or repair the target files whenever
+corruption occurs.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

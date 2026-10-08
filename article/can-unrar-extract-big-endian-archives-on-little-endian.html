@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Extract Big-Endian Archives on Little-Endian? - unrar</title>
+    <meta name="description" content="Yes, unrar can seamlessly extract archives created on a big-endian system when running on a little-endian system. The RAR file format is designed to be cross-platform, meaning that differences in host processor architectures—such as byte ordering—do">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-big-endian-archives-on-little-endian">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Extract Big-Endian Archives on Little-Endian? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-big-endian-archives-on-little-endian" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, unrar can seamlessly extract archives created on a big-endian system when running on a little-endian system. The RAR file format is designed to be cross-platform, meaning that differences in host processor architectures—such as byte ordering—do" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-big-endian-archives-on-little-endian">Can
+unrar Extract Big-Endian Archives on Little-Endian?</h1>
+<p>Yes, <code>unrar</code> can seamlessly extract archives created on a
+big-endian system when running on a little-endian system. The RAR file
+format is designed to be cross-platform, meaning that differences in
+host processor architectures—such as byte ordering—do not affect the
+portability or integrity of the archived data.</p>
+<h3 id="how-rar-format-handles-endianness">How RAR Format Handles
+Endianness</h3>
+<p>File formats meant for interchange must handle endianness
+consistently across platforms. The RAR format achieves portability
+through standardized header specifications:</p>
+<ul>
+<li><strong>Fixed Byte Ordering in Headers:</strong> In older RAR
+versions (such as RAR4), multi-byte numerical values in headers are
+explicitly defined in little-endian format. In modern RAR5 formats,
+multi-byte integers are typically encoded as variable-length integers
+(vints), which are read byte-by-byte in a defined sequence independent
+of native processor endianness.</li>
+<li><strong>Portable Bitstreams:</strong> The compressed payload
+consists of algorithmic bitstreams (such as LZSS and Huffman codes)
+rather than raw, memory-dumped data words. These streams are processed
+bit-by-bit in a standardized order.</li>
+</ul>
+<p>When a big-endian machine (such as an IBM POWER or legacy SPARC
+processor) creates a RAR file, the archiving software writes metadata
+and data to disk according to the RAR specification, converting
+host-endian values where necessary.</p>
+<h3 id="how-unrar-handles-cross-architecture-extraction">How unrar
+Handles Cross-Architecture Extraction</h3>
+<p>The official <code>unrar</code> source code (distributed by RARLAB)
+contains built-in architecture abstraction:</p>
+<ol type="1">
+<li><strong>Byte-Swapping Logic:</strong> The extraction routines
+include macros and functions specifically designed to detect whether the
+host CPU is big-endian or little-endian.</li>
+<li><strong>Explicit Parsing:</strong> When parsing header fields,
+<code>unrar</code> reads raw bytes from the file stream and reconstructs
+multi-byte integers using shift and bitwise OR operations. This
+guarantees identical values in memory regardless of host
+architecture.</li>
+<li><strong>Integrity Verification:</strong> <code>unrar</code>
+validates decompressed data using checksums (CRC32 for RAR4, or
+BLAKE2sp/CRC32 for RAR5). Because these hashing algorithms process byte
+streams consistently, any corruption resulting from byte-order
+mismatches would immediately trigger an extraction error.</li>
+</ol>
+<p>Because both the archiving software and <code>unrar</code> conform to
+the same byte-order specifications, you can safely extract RAR files
+across any combination of big-endian and little-endian systems.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

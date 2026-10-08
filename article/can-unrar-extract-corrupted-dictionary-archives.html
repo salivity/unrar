@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Corrupted Dictionary Archives? - unrar</title>
+    <meta name="description" content="Extracting files from a RAR archive that suffers from a corrupted compression dictionary is generally not possible without data loss, as the decompression algorithm relies directly on historical dictionary states to decode subsequent bytes. However, depe">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-corrupted-dictionary-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Corrupted Dictionary Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-corrupted-dictionary-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting files from a RAR archive that suffers from a corrupted compression dictionary is generally not possible without data loss, as the decompression algorithm relies directly on historical dictionary states to decode subsequent bytes. However, depe" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-corrupted-dictionary-archives">Can Unrar
+Extract Corrupted Dictionary Archives?</h1>
+<p>Extracting files from a RAR archive that suffers from a corrupted
+compression dictionary is generally not possible without data loss, as
+the decompression algorithm relies directly on historical dictionary
+states to decode subsequent bytes. However, depending on whether the
+archive is solid or non-solid, whether a recovery record exists, and
+whether you force extraction using specific command switches, you can
+often recover unaffected files or salvage partial, damaged data.</p>
+<h3 id="how-dictionary-corruption-affects-extraction">How Dictionary
+Corruption Affects Extraction</h3>
+<p>RAR compression relies on sliding dictionary algorithms (LZ-based
+compression). During decompression, <code>unrar</code> references
+previously unpacked data within the dictionary window to reconstruct new
+data.</p>
+<p>If the data defining the dictionary becomes corrupted:</p>
+<ul>
+<li><strong>Loss of Synchronization:</strong> The decompression engine
+encounters invalid back-references or corrupted Huffman tables,
+triggering a checksum mismatch or an abrupt extraction failure.</li>
+<li><strong>Cascading Errors:</strong> Any data compressed
+<em>after</em> the point of dictionary corruption cannot be accurately
+decoded because the algorithm is referencing invalid historical state
+data.</li>
+</ul>
+<h3 id="solid-vs-non-solid-archives">Solid vs. Non-Solid Archives</h3>
+<p>The structural type of the archive determines how widespread the
+damage will be:</p>
+<ul>
+<li><strong>Non-Solid Archives:</strong> Each file maintains its own
+independent compression dictionary. If one file has a corrupted
+dictionary, <code>unrar</code> will fail on that specific file, but all
+other files in the archive can be extracted normally.</li>
+<li><strong>Solid Archives (<code>-s</code>):</strong> Multiple files
+are treated as a single continuous data stream sharing a continuous
+dictionary. If corruption occurs early in the stream, the dictionary
+state is permanently broken for that file and every subsequent file in
+the archive. Any files located physically before the corruption point
+can still be extracted successfully.</li>
+</ul>
+<h3 id="extracting-partial-data-with-the-keep-broken-flag">Extracting
+Partial Data with the Keep Broken Flag</h3>
+<p>By default, <code>unrar</code> aborts decompression and deletes the
+partially extracted file when it detects a dictionary or CRC error. You
+can override this behavior using the <code>-kb</code> (Keep Broken)
+switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar</span></code></pre></div>
+<p>This command instructs <code>unrar</code> to retain the file up to
+the exact byte where the dictionary failed. While the resulting file
+will be truncated or internally corrupted, partial recovery is often
+sufficient for raw text, uncompressed media streams, or non-critical
+assets.</p>
+<h3 id="using-the-built-in-recovery-record">Using the Built-In Recovery
+Record</h3>
+<p>If the archive was originally created with recovery records,
+<code>unrar</code> can mathematically reconstruct the missing or damaged
+dictionary data using Reed-Solomon error correction:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> r archive.rar</span></code></pre></div>
+<p>If successful, this process generates a repaired archive
+(<code>fixed.archive.rar</code>) with restored dictionary integrity,
+allowing a clean, error-free extraction. If no recovery record was
+embedded at creation time, true dictionary reconstruction is
+mathematically impossible.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

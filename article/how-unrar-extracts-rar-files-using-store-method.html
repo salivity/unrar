@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Extracts RAR Files Using Store Method - unrar</title>
+    <meta name="description" content="The "Store" method in the RAR format packages files without applying any data compression algorithms, packaging the data in its raw byte form. When extracting these files, the unrar utility identifies the storage method from the file header, bypasses the">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-extracts-rar-files-using-store-method">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Extracts RAR Files Using Store Method - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-extracts-rar-files-using-store-method" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The "Store" method in the RAR format packages files without applying any data compression algorithms, packaging the data in its raw byte form. When extracting these files, the unrar utility identifies the storage method from the file header, bypasses the" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-extracts-rar-files-using-store-method">How Unrar
+Extracts RAR Files Using Store Method</h1>
+<p>The "Store" method in the RAR format packages files without applying
+any data compression algorithms, packaging the data in its raw byte
+form. When extracting these files, the <code>unrar</code> utility
+identifies the storage method from the file header, bypasses the
+resource-heavy decompression engine, directly streams the file contents
+from the archive to the output destination, and verifies data integrity
+via checksums. This article explains the technical workflow
+<code>unrar</code> follows when reading, verifying, and writing archives
+created with the Store method.</p>
+<h3 id="1-header-parsing-and-method-detection">1. Header Parsing and
+Method Detection</h3>
+<p>Every item in a RAR archive begins with a file block header
+(<code>FILE_HEAD</code>). When <code>unrar</code> scans the archive
+structure, it parses the metadata fields within this header:</p>
+<ul>
+<li><strong>Method Flag:</strong> <code>unrar</code> inspects the
+compression method byte. In the RAR specification, the value
+<code>0x30</code> (decimal 48) indicates the Store method, meaning
+compression was disabled (<code>-m0</code>).</li>
+<li><strong>Sizes:</strong> It reads the <code>PackSize</code>
+(compressed size) and <code>UnpSize</code> (uncompressed size). For
+non-encrypted Store archives, these two values are identical.</li>
+<li><strong>Checksum:</strong> It extracts the expected checksum—either
+a 32-bit CRC (RAR4 and RAR5) or a 256-bit BLAKE2sp hash (RAR5)—for
+subsequent validation.</li>
+</ul>
+<h3 id="2-bypassing-the-decompression-engine">2. Bypassing the
+Decompression Engine</h3>
+<p>For standard compressed archives, <code>unrar</code> allocates
+decompression buffers and initializes decoding routines such as LZSS
+(Lempel-Ziv-Storer-Szymanski), Huffman tables, or PPMd (Prediction by
+Partial Matching).</p>
+<p>When the Store method is detected, <code>unrar</code> completely
+bypasses these decoding engines:</p>
+<ul>
+<li>No sliding dictionary is allocated or maintained in memory.</li>
+<li>Symbol trees and bit-reading abstractions are skipped.</li>
+<li>Execution routes directly to a raw extraction subroutine
+(historically handled via <code>Unpack::Unstore</code> in the UnRAR
+source code).</li>
+</ul>
+<h3 id="3-decryption-when-applicable">3. Decryption (When
+Applicable)</h3>
+<p>If the archive is password-protected, the Store method does not leave
+the file contents in plain text. Even though algorithmic compression is
+disabled, encryption is applied to the payload:</p>
+<ul>
+<li>For RAR 4.x archives, <code>unrar</code> initializes an AES-128
+decryption cipher.</li>
+<li>For RAR 5.x archives, <code>unrar</code> initializes an AES-256
+decryption cipher.</li>
+</ul>
+<p>During extraction, <code>unrar</code> reads the encrypted raw blocks
+into memory, applies the decryption key, and produces the plaintext data
+stream before writing to the target filesystem.</p>
+<h3 id="4-direct-streaming-and-io-execution">4. Direct Streaming and I/O
+Execution</h3>
+<p>Without the need to decode complex bit patterns, <code>unrar</code>
+treats the operation essentially as a buffered stream copy:</p>
+<ol type="1">
+<li><strong>Chunk Reading:</strong> <code>unrar</code> reads data
+sequentially from the archive stream in chunks (typically using a buffer
+sized between 64 KB and several megabytes, depending on the
+implementation).</li>
+<li><strong>Writing to Disk:</strong> The buffer is immediately
+dispatched to the target file descriptor using standard system write
+operations.</li>
+<li><strong>Multi-Volume Spanning:</strong> If the stored file spans
+multiple RAR volumes, <code>unrar</code> reads up to the volume
+boundary, prompts for or locates the next archive volume, verifies the
+continued header, and seamlessly resumes reading raw bytes into the
+output file.</li>
+</ol>
+<h3 id="5-integrity-verification">5. Integrity Verification</h3>
+<p>As bytes pass through the memory buffer to the destination file,
+<code>unrar</code> runs them through an inline checksum calculator. Once
+the number of processed bytes reaches the declared file size,
+<code>unrar</code> finalizes the computed hash and compares it against
+the value stored in the header:</p>
+<ul>
+<li>If the calculated CRC32 or BLAKE2sp matches the header value, the
+file attributes (such as timestamps, file permissions, and extended
+attributes) are applied to the written file, and the file descriptor is
+closed.</li>
+<li>If a mismatch occurs, <code>unrar</code> raises a checksum error
+alert, indicating that corruption occurred in the container or during
+transfer, and handles the output file according to user-specified flags
+(such as deleting broken files or retaining them via
+<code>-kb</code>).</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

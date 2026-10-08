@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Close Command Window Automatically After Unrar - unrar</title>
+    <meta name="description" content="This guide explains how to automatically close the Windows Command Prompt window once the unrar extraction process finishes. By default, how the command line behaves depends on how the utility was launched. You can ensure the window exits immediately upo">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/close-command-window-automatically-after-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Close Command Window Automatically After Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/close-command-window-automatically-after-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to automatically close the Windows Command Prompt window once the unrar extraction process finishes. By default, how the command line behaves depends on how the utility was launched. You can ensure the window exits immediately upo" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="close-command-window-automatically-after-unrar">Close Command
+Window Automatically After Unrar</h1>
+<p>This guide explains how to automatically close the Windows Command
+Prompt window once the <code>unrar</code> extraction process finishes.
+By default, how the command line behaves depends on how the utility was
+launched. You can ensure the window exits immediately upon completion by
+using native Windows command flags, structuring batch files properly, or
+removing blocking commands.</p>
+<h3 id="method-1-execute-with-the-cmd-c-parameter">Method 1: Execute
+with the <code>cmd /c</code> Parameter</h3>
+<p>If you are running <code>unrar</code> from a shortcut, a script, or
+the Windows Run dialog (<code>Win + R</code>), use the <code>/c</code>
+switch with <code>cmd.exe</code>. The <code>/c</code> flag instructs the
+Command Prompt to carry out the specified command and then terminate
+immediately.</p>
+<p>Run the following command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">cmd</span> <span class="at">/c</span> unrar x <span class="st">&quot;archive.rar&quot;</span> <span class="st">&quot;C:\DestinationFolder</span><span class="sc">\&quot;</span></span></code></pre></div>
+<ul>
+<li><code>cmd /c</code> launches a temporary terminal session and
+terminates it when execution finishes.</li>
+<li><code>x</code> extracts files with full paths.</li>
+</ul>
+<h3 id="method-2-update-batch-files-with-the-exit-command">Method 2:
+Update Batch Files with the <code>exit</code> Command</h3>
+<p>If you run <code>unrar</code> inside a batch file (<code>.bat</code>
+or <code>.cmd</code>), the window often stays open because of an
+interactive command or because it was launched from an existing
+shell.</p>
+<ol type="1">
+<li>Open your <code>.bat</code> file in a text editor like Notepad.</li>
+<li>Check the end of the script for the <code>pause</code> command. If
+it is present, delete it.</li>
+<li>Add the <code>exit</code> command to the very end of your
+script:</li>
+</ol>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bat"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">@</span><span class="bu">echo off</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>unrar x <span class="st">&quot;archive.rar&quot;</span> <span class="st">&quot;C:\DestinationFolder</span><span class="sc">\&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code></pre></div>
+<p>Once the extraction finishes, the script executes <code>exit</code>,
+which terminates the Command Prompt window automatically.</p>
+<h3 id="method-3-use-the-windows-start-command">Method 3: Use the
+Windows <code>start</code> Command</h3>
+<p>If you trigger the extraction from an existing script or terminal and
+want it to run in a self-closing external window, you can use the
+<code>start</code> command paired with <code>/wait</code> and
+<code>cmd /c</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">start</span> <span class="at">/wait</span> cmd <span class="at">/c</span> unrar x <span class="st">&quot;archive.rar&quot;</span> <span class="st">&quot;C:\DestinationFolder</span><span class="sc">\&quot;</span></span></code></pre></div>
+<p>The new window opens, extracts the archive, and closes instantly upon
+completion without interrupting the caller environment.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

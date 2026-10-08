@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Pause Unrar on CRC Error - unrar</title>
+    <meta name="description" content="This guide explains how to pause the extraction process when unrar encounters a CRC (Cyclic Redundancy Check) error. Because the unrar utility does not possess an internal command-line switch to halt and wait for user input specifically during a checksum">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-pause-unrar-on-crc-error">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Pause Unrar on CRC Error - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-pause-unrar-on-crc-error" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to pause the extraction process when unrar encounters a CRC (Cyclic Redundancy Check) error. Because the unrar utility does not possess an internal command-line switch to halt and wait for user input specifically during a checksum" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-pause-unrar-on-crc-error">How to Pause Unrar on CRC
+Error</h1>
+<p>This guide explains how to pause the extraction process when
+<code>unrar</code> encounters a CRC (Cyclic Redundancy Check) error.
+Because the <code>unrar</code> utility does not possess an internal
+command-line switch to halt and wait for user input specifically during
+a checksum mismatch, you must handle the pause by capturing
+<code>unrar</code>'s operational exit code in a shell or batch
+script.</p>
+<h3 id="understanding-the-unrar-crc-exit-code">Understanding the Unrar
+CRC Exit Code</h3>
+<p>When <code>unrar</code> unpacks an archive and discovers that a
+file's checksum does not match, it terminates or finishes the run with
+an exit status of <strong><code>3</code></strong>.</p>
+<p>Standard <code>unrar</code> exit codes include:</p>
+<ul>
+<li><strong>0</strong>: Successful operation</li>
+<li><strong>1</strong>: Non-fatal error / warning</li>
+<li><strong>2</strong>: Fatal error</li>
+<li><strong>3</strong>: CRC error occurred during unpacking</li>
+<li><strong>255</strong>: User stopped the process</li>
+</ul>
+<h3 id="windows-command-prompt--batch-command">Windows Command Prompt /
+Batch Command</h3>
+<p>In Windows, use the <code>%errorlevel%</code> variable to detect exit
+code <code>3</code> and invoke the <code>pause</code> command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>unrar x archive.rar</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="pp">%</span><span class="va">errorlevel</span><span class="pp">%</span> <span class="kw">equ</span> 3 <span class="bu">pause</span></span></code></pre></div>
+<p>To run this as a single-line command directly in the command
+prompt:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>unrar x archive.rar <span class="kw">&amp;</span> <span class="cf">if</span> <span class="at">errorlevel</span> <span class="dv">3</span> <span class="cf">if</span> <span class="kw">not</span> <span class="at">errorlevel</span> <span class="dv">4</span> <span class="bu">pause</span></span></code></pre></div>
+<h3 id="linux-and-macos-bash-command">Linux and macOS (Bash)
+Command</h3>
+<p>In a Unix-like environment, evaluate the <code>$?</code> variable
+immediately after executing <code>unrar</code> to prompt the user to
+continue:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">-eq</span> 3 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">read</span> <span class="at">-p</span> <span class="st">&quot;A CRC error was detected. Press [Enter] to continue...&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div>
+<p>As a single-line command:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="kw">||</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">-eq</span> 3 <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="bu">read</span> <span class="at">-p</span> <span class="st">&quot;CRC error encountered. Press Enter to pause...&quot;</span></span></code></pre></div>
+<h3 id="preventing-file-deletion-on-crc-errors--kb">Preventing File
+Deletion on CRC Errors (<code>-kb</code>)</h3>
+<p>By default, <code>unrar</code> deletes damaged files after
+encountering a CRC mismatch. If your goal in pausing is to inspect or
+salvage corrupt data, include the <code>-kb</code> (keep broken
+extracted files) switch:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar</span></code></pre></div>
+<p>Combining <code>-kb</code> with exit-code handling preserves the
+damaged file on disk while still halting your terminal script when exit
+code <code>3</code> is returned.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Decompresses Intel x86 Executables - unrar</title>
+    <meta name="description" content="Unrar processes archives compressed with the Intel executable compression algorithm by first extracting the raw stream using standard dictionary decompression and then passing the resulting data through a dedicated inverse post-processing filter. This fi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-decompresses-intel-x-86-executables">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Decompresses Intel x86 Executables - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-decompresses-intel-x-86-executables" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Unrar processes archives compressed with the Intel executable compression algorithm by first extracting the raw stream using standard dictionary decompression and then passing the resulting data through a dedicated inverse post-processing filter. This fi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-decompresses-intel-x86-executables">How Unrar
+Decompresses Intel x86 Executables</h1>
+<p>Unrar processes archives compressed with the Intel executable
+compression algorithm by first extracting the raw stream using standard
+dictionary decompression and then passing the resulting data through a
+dedicated inverse post-processing filter. This filter scans the byte
+stream for specific x86 branching instructions—specifically relative
+<code>CALL</code> and <code>JMP</code> opcodes—and mathematically
+converts previously normalized absolute memory addresses back into their
+original relative offsets.</p>
+<h3 id="the-purpose-of-intel-executable-pre-processing">The Purpose of
+Intel Executable Pre-Processing</h3>
+<p>Standard LZSS and Huffman-based algorithms depend on recurring byte
+sequences to achieve high compression ratios. In compiled Intel x86
+binaries, repeated calls to the same function generate different byte
+sequences because the target address is encoded as a relative offset
+dependent on the instruction's position in memory.</p>
+<p>To overcome this, the RAR compressor applies an executable filter
+prior to main compression. It translates relative displacement values
+into absolute virtual addresses, ensuring that calls to the same
+function produce identical byte patterns. Consequently,
+<code>unrar</code> must reverse this process upon extraction to recreate
+the original executable code.</p>
+<h3 id="stream-decoding-and-filter-detection">Stream Decoding and Filter
+Detection</h3>
+<p>When unpacking an archive block, <code>unrar</code> reads the header
+flags to identify whether any pre-processing filters were attached to
+the data block:</p>
+<ol type="1">
+<li><strong>Entropy and Dictionary Decompression</strong>: The
+compressed data is initially decoded through standard Huffman tables and
+the LZSS sliding window.</li>
+<li><strong>Filter Queueing</strong>: If an executable filter is marked,
+<code>unrar</code> records the filter type (such as
+<code>FILTER_E8</code> or <code>FILTER_E8E9</code>), the starting offset
+within the unpacked buffer, and the block length.</li>
+<li><strong>Buffer Management</strong>: The decompressed bytes are
+placed into a circular unpack buffer before being written to the output
+file.</li>
+</ol>
+<h3 id="reversing-the-address-transformation">Reversing the Address
+Transformation</h3>
+<p>Once the intermediate data sits in memory, the unpack engine invokes
+its executable filter function (commonly implemented in the
+<code>Unpack::ExecuteFilterE8</code> or
+<code>Unpack::UnstoreFilter</code> routines in the <code>unrar</code>
+source code). The process operates sequentially through the buffer:</p>
+<ol type="1">
+<li><strong>Opcode Scanning</strong>: The algorithm scans byte by byte
+for the x86 opcodes <code>0xE8</code> (relative <code>CALL</code>) and
+<code>0xE9</code> (relative <code>JMP</code>).</li>
+<li><strong>Address Extraction</strong>: When an opcode is encountered,
+the subsequent 4 bytes are read as a 32-bit little-endian integer
+representing the normalized address.</li>
+<li><strong>Range and Validity Checks</strong>: To prevent modifying
+data that resembles an instruction opcode by coincidence (such as bitmap
+data or string constants), <code>unrar</code> applies specific boundary
+checks:
+<ul>
+<li>It checks whether the address exceeds specified thresholds (e.g.,
+negative offsets or addresses beyond the expected memory space).</li>
+<li>In standard RAR implementations, if the top byte of the address
+matches a specific flag byte, the engine adjusts or skips the value to
+handle negative jump displacements correctly.</li>
+</ul></li>
+<li><strong>Inverse Math Calculation</strong>: The engine subtracts the
+current file position from the extracted absolute address:
+<code>RelativeOffset = AbsoluteAddress - CurrentFileOffset</code></li>
+<li><strong>Byte Substitution</strong>: The calculated 32-bit relative
+offset replaces the original 4 bytes in the buffer directly following
+the opcode.</li>
+<li><strong>Pointer Advancement</strong>: The scanner advances past the
+4-byte address to prevent re-evaluating the replacement bytes as new
+opcodes, continuing the scan until the designated filter length is
+exhausted.</li>
+</ol>
+<h3 id="final-output">Final Output</h3>
+<p>After the filter completes its pass across the target block, the
+modified buffer contains the exact machine code of the original binary.
+<code>unrar</code> then verifies the block's CRC or BLAKE2 checksum
+against the archive header and flushes the buffer to disk.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

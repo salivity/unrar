@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Extraction Under Heavy Memory Pressure - unrar</title>
+    <meta name="description" content="Extracting archives with unrar during periods of heavy memory pressure tests both the utility's internal memory architecture and the host operating system's resource management. Because unrar relies on a bounded sliding dictionary and streaming disk I/O,">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-extraction-under-heavy-memory-pressure">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Extraction Under Heavy Memory Pressure - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-extraction-under-heavy-memory-pressure" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting archives with unrar during periods of heavy memory pressure tests both the utility's internal memory architecture and the host operating system's resource management. Because unrar relies on a bounded sliding dictionary and streaming disk I/O," />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-extraction-under-heavy-memory-pressure">Unrar Extraction
+Under Heavy Memory Pressure</h1>
+<p>Extracting archives with <code>unrar</code> during periods of heavy
+memory pressure tests both the utility's internal memory architecture
+and the host operating system's resource management. Because
+<code>unrar</code> relies on a bounded sliding dictionary and streaming
+disk I/O, its memory consumption is largely static during extraction.
+Under extreme constraints, the utility relies on OS-level virtual memory
+and paging to continue execution, though severe starvation will trigger
+controlled allocation failures or process termination by the operating
+system.</p>
+<h2 id="predictable-memory-footprint-via-dictionary-sizing">Predictable
+Memory Footprint via Dictionary Sizing</h2>
+<p>The core memory requirement of the RAR decompression algorithm is
+dictated by the dictionary size chosen during the archive's creation. In
+modern RAR5 formats, dictionary sizes range from 128 KB up to several
+gigabytes (commonly 32 MB to 1 GB), while legacy RAR4 archives rarely
+exceed 4 MB.</p>
+<p>When extraction begins, <code>unrar</code> pre-allocates this
+decompression dictionary along with standard input/output buffers.
+Because this buffer size remains fixed throughout the lifecycle of
+extracting a solid block or file, <code>unrar</code> does not
+continually consume expanding amounts of RAM during normal
+operations.</p>
+<h2 id="behavior-during-low-available-memory">Behavior During Low
+Available Memory</h2>
+<p>When physical RAM is saturated by other processes, <code>unrar</code>
+interacts with the operating system in several distinct phases:</p>
+<h3 id="1-os-swapping-and-paging-thrash">1. OS Swapping and Paging
+Thrash</h3>
+<p>If physical RAM is exhausted, the operating system kernel offloads
+inactive portions of <code>unrar</code>'s sliding dictionary and working
+memory to swap space or page files on disk.</p>
+<ul>
+<li>Because decompression algorithms continuously access the sliding
+dictionary to resolve backward references, paging these segments in and
+out of storage introduces massive latency.</li>
+<li>The operation shifts from being CPU-bound to I/O-bound, resulting in
+a dramatic slowdown known as disk thrashing, though decompression
+continues logically intact.</li>
+</ul>
+<h3 id="2-allocation-failures-graceful-abortion">2. Allocation Failures
+(Graceful Abortion)</h3>
+<p>If physical memory and swap are completely exhausted before
+<code>unrar</code> can allocate its required decompression window, the
+memory allocation call (such as <code>malloc</code> or virtual memory
+reservation) fails.</p>
+<ul>
+<li>Rather than causing silent data corruption, <code>unrar</code> is
+programmed to intercept allocation errors.</li>
+<li>The utility terminates the extraction process and exits with an
+error status indicating insufficient memory (such as
+<code>ERAR_NO_MEMORY</code>).</li>
+<li>Partially extracted files may remain on the disk or be automatically
+deleted depending on whether the overwrite and keep-broken-files flags
+are set.</li>
+</ul>
+<h3 id="3-kernel-oom-killer-intervention">3. Kernel OOM Killer
+Intervention</h3>
+<p>On modern Linux and Unix-like operating systems that employ memory
+overcommit mechanisms, the OS may promise memory to <code>unrar</code>
+that cannot be physically backed when written to. If the system enters
+an unrecoverable memory state:</p>
+<ul>
+<li>The Linux Out-Of-Memory (OOM) Killer may designate
+<code>unrar</code> as a candidate for termination.</li>
+<li>In this scenario, the process receives a <code>SIGKILL</code> and
+halts abruptly without running its cleanup routines, potentially leaving
+corrupt partial files on the filesystem.</li>
+</ul>
+<h2 id="streaming-architecture-limits-dynamic-bloat">Streaming
+Architecture Limits Dynamic Bloat</h2>
+<p>Unlike archiving tools that may attempt to read large chunks of
+compressed data into memory, <code>unrar</code> relies on streaming I/O.
+It reads compressed blocks in small segments from storage, passes them
+through the fixed-size sliding window, and immediately streams the
+decompressed output to the destination drive. This pipeline prevents
+memory usage from scaling with the size of the target files, ensuring
+that heavy memory pressure affects extraction speed via the operating
+system's memory subsystem rather than causing dynamic unbounded memory
+expansion within <code>unrar</code> itself.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

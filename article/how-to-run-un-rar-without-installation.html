@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Run UnRAR Without Installation - unrar</title>
+    <meta name="description" content="The UnRAR utility can be run completely as a portable executable on Windows, Linux, and macOS without requiring any software installation or administrator privileges. This article covers how UnRAR functions as a portable tool, where to get the standalone">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-run-un-rar-without-installation">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Run UnRAR Without Installation - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-run-un-rar-without-installation" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The UnRAR utility can be run completely as a portable executable on Windows, Linux, and macOS without requiring any software installation or administrator privileges. This article covers how UnRAR functions as a portable tool, where to get the standalone" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-run-unrar-without-installation">How to Run UnRAR Without
+Installation</h1>
+<p>The UnRAR utility can be run completely as a portable executable on
+Windows, Linux, and macOS without requiring any software installation or
+administrator privileges. This article covers how UnRAR functions as a
+portable tool, where to get the standalone executable, and how to
+execute core extraction commands directly from any folder or USB flash
+drive.</p>
+<h2 id="yes-unrar-is-portable-by-design">Yes, UnRAR Is Portable by
+Design</h2>
+<p>The official UnRAR tool developed by RARLAB is a self-contained
+command-line utility. It relies on standard system libraries, does not
+write to the Windows Registry, and requires no background services or
+installation wizards. As long as the binary file is present on your
+system, you can run it immediately from a terminal or command
+prompt.</p>
+<h2 id="how-to-use-portable-unrar-on-windows">How to Use Portable UnRAR
+on Windows</h2>
+<ol type="1">
+<li><strong>Obtain the Executable:</strong> Download the command-line
+UnRAR package directly from the RARLAB website or extract
+<code>UnRAR.exe</code> from a standard WinRAR installation.</li>
+<li><strong>Place It Anywhere:</strong> Copy <code>UnRAR.exe</code> to
+any folder of your choice, a network share, or a portable USB
+drive.</li>
+<li><strong>Execute via Terminal:</strong>
+<ul>
+<li>Open Command Prompt or Windows PowerShell.</li>
+<li>Navigate to the folder containing the executable, or provide the
+full path to <code>UnRAR.exe</code>.</li>
+<li>Run extraction commands directly.</li>
+</ul></li>
+</ol>
+<p>To make it accessible from any directory without permanent
+installation, you can place <code>UnRAR.exe</code> in a temporary folder
+and add that folder to your current command-line session's
+<code>PATH</code> variable, or simply copy the executable into the
+folder containing your <code>.rar</code> archives.</p>
+<h2 id="how-to-use-portable-unrar-on-linux-and-macos">How to Use
+Portable UnRAR on Linux and macOS</h2>
+<ol type="1">
+<li><strong>Download the Package:</strong> Download the pre-compiled
+command-line RAR/UnRAR archive for your operating system architecture
+from RARLAB.</li>
+<li><strong>Extract the Binary:</strong> Extract the package archive to
+obtain the standalone <code>unrar</code> binary.</li>
+<li><strong>Set Permissions:</strong> Make the binary executable using
+terminal permissions:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ./unrar</span></code></pre></div></li>
+<li><strong>Run Directly:</strong> Execute the binary directly from its
+current directory without installing it to <code>/usr/bin</code>:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./unrar</span> x archive.rar</span></code></pre></div></li>
+</ol>
+<h2 id="essential-unrar-commands">Essential UnRAR Commands</h2>
+<p>Once the executable is ready, you can interact with archives using
+standard flags:</p>
+<ul>
+<li><strong>Extract with full directory structure:</strong>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+<li><strong>Extract without directory paths (flattened):</strong>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar</span></code></pre></div></li>
+<li><strong>List archive contents without extracting:</strong>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.rar</span></code></pre></div></li>
+<li><strong>Test archive integrity:</strong>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t archive.rar</span></code></pre></div></li>
+</ul>
+<p>Because all settings and configurations are passed via command-line
+arguments, portable UnRAR leaves no configuration files or registry
+traces behind when the process finishes.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

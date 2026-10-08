@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Non-Standard Block Sizes - unrar</title>
+    <meta name="description" content="This article provides an overview of how the unrar utility processes archives configured with non-standard block sizes, detailing its internal parsing logic, dynamic buffer allocation, and error-handling routines. When confronted with non-standard data b">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-non-standard-block-sizes">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Non-Standard Block Sizes - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-non-standard-block-sizes" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides an overview of how the unrar utility processes archives configured with non-standard block sizes, detailing its internal parsing logic, dynamic buffer allocation, and error-handling routines. When confronted with non-standard data b" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-non-standard-block-sizes">How Unrar Handles
+Non-Standard Block Sizes</h1>
+<p>This article provides an overview of how the <code>unrar</code>
+utility processes archives configured with non-standard block sizes,
+detailing its internal parsing logic, dynamic buffer allocation, and
+error-handling routines. When confronted with non-standard data blocks
+or compression dictionaries, <code>unrar</code> relies on metadata
+stored in the archive headers to adapt its extraction pipeline, ensuring
+data integrity while guarding against memory exhaustion and format
+violations.</p>
+<h3 id="dynamic-block-header-parsing">Dynamic Block Header Parsing</h3>
+<p>The RAR archive format (across both RAR4 and RAR5 specifications)
+does not mandate a single, rigid block size for file contents or
+headers. Instead, it relies on structured data blocks where each header
+explicitly declares its own size and the size of the payload that
+follows. In RAR5, these lengths are encoded as variable-length integers
+(LEB128).</p>
+<p>Because of this design, <code>unrar</code> does not assume a fixed,
+standard block size during decompression. When it encounters a block
+with an unconventional size, it reads the explicit length field from the
+header, updates its internal file pointer, and processes the payload
+according to the defined byte boundary.</p>
+<h3 id="sliding-window-and-buffer-allocation">Sliding Window and Buffer
+Allocation</h3>
+<p>Block sizes in RAR archives often relate to compression dictionaries
+and sliding window parameters. When an archive is created with
+non-standard dictionary sizes, <code>unrar</code> evaluates the
+compression flags within the file header before initiating
+decompression:</p>
+<ol type="1">
+<li><strong>Header Inspection:</strong> <code>unrar</code> reads the
+dictionary size exponent or discrete byte value defined in the
+header.</li>
+<li><strong>Buffer Allocation:</strong> It dynamically allocates a
+sliding window memory buffer matching that specific size.</li>
+<li><strong>Circular Buffer Streaming:</strong> During extraction,
+uncompressed data streams through this circular buffer. The unpack
+engine references previously decoded bytes within this window regardless
+of whether the chunk sizes align with standard 4 MB, 32 MB, or
+custom-sized intervals.</li>
+</ol>
+<h3 id="limitations-and-out-of-bounds-handling">Limitations and
+Out-of-Bounds Handling</h3>
+<p>While <code>unrar</code> flexibly handles non-standard block sizes
+within valid operational limits, it enforces strict boundaries to
+prevent memory allocation exploits and buffer overflows:</p>
+<ul>
+<li><strong>Maximum Dictionary Thresholds:</strong> In modern RAR5
+specifications, dictionary sizes can scale up to 1 GB (or 4 GB in
+specialized implementations). If a block specifies a dictionary size
+that exceeds the maximum supported threshold of the specific
+<code>unrar</code> binary version, the utility terminates extraction and
+returns an "unsupported format" or "unknown compression method"
+error.</li>
+<li><strong>Corrupted or Manipulated Sizes:</strong> If a block header
+specifies a size that exceeds the remaining physical size of the archive
+file, <code>unrar</code> flags the archive as damaged or truncated.</li>
+<li><strong>Integrity Validation:</strong> Every data block is verified
+against a checksum (CRC32 for older formats, or BLAKE2sp for RAR5). If
+non-standard block sizes cause misaligned byte streams, the checksum
+verification fails, prompting <code>unrar</code> to issue a checksum
+mismatch error and discard or warn about the extracted file.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

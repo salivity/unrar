@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract RGB Color Compressed Archives? - unrar</title>
+    <meta name="description" content="Yes, the standard unrar utility can extract RAR archives compressed with the specialized RGB color compression algorithm. This article explains how RAR handles true-color image compression, the backward-compatibility built into the official extraction to">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-rgb-color-compressed-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract RGB Color Compressed Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-rgb-color-compressed-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, the standard unrar utility can extract RAR archives compressed with the specialized RGB color compression algorithm. This article explains how RAR handles true-color image compression, the backward-compatibility built into the official extraction to" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-rgb-color-compressed-archives">Can Unrar
+Extract RGB Color Compressed Archives?</h1>
+<p>Yes, the standard <code>unrar</code> utility can extract RAR archives
+compressed with the specialized RGB color compression algorithm. This
+article explains how RAR handles true-color image compression, the
+backward-compatibility built into the official extraction tool, and why
+this specific compression mode is no longer used in modern archives.</p>
+<h3 id="the-rgb-compression-algorithm-in-rar">The RGB Compression
+Algorithm in RAR</h3>
+<p>In older versions of the RAR format—specifically RAR 2.0 through RAR
+4.x—RARLAB implemented specialized compression algorithms tailored for
+multimedia data. One of these was a true-color (RGB) algorithm designed
+to improve the compression ratio of raw, uncompressed bitmap images.</p>
+<p>Standard Lempel-Ziv algorithms often struggle with raw image data
+because pixel data is interleaved across color planes (Red, Green,
+Blue). RAR's RGB algorithm separated these channels and used predictive
+delta encoding across adjacent pixels, significantly reducing data
+redundancy before passing the stream to the entropy coder.</p>
+<h3 id="unrar-compatibility-and-support">Unrar Compatibility and
+Support</h3>
+<p>The official <code>unrar</code> utility (distributed by RARLAB as
+both a standalone executable and an open-source C++ library) retains
+full backward compatibility for archives created with RAR 2.x, 3.x, and
+4.x specifications.</p>
+<p>Because decoding instructions for the multimedia and RGB algorithms
+remain present in the extraction codebase:</p>
+<ul>
+<li><strong>Official <code>unrar</code>:</strong> Fully extracts files
+that utilize the legacy RGB true-color filter without requiring extra
+plugins or flags.</li>
+<li><strong>Third-Party Tools:</strong> Many modern archive managers
+that rely on the official <code>UnRARDLL</code> (such as 7-Zip when
+configured to unpack RAR files) also handle these archives seamlessly.
+However, certain independent, clean-room implementations (such as very
+old builds of <code>unrar-free</code>) may fail if they omitted RAR3
+multimedia decompression routines.</li>
+</ul>
+<h3 id="modern-rar5-and-current-status">Modern RAR5 and Current
+Status</h3>
+<p>When RARLAB introduced the RAR5 format in WinRAR 5.0, the specialized
+multimedia algorithms—including the RGB color compression module—were
+completely removed from the compression engine. Modern files are
+predominantly pre-compressed formats like PNG, JPEG, or WebP, rendering
+dedicated raw image pre-processors obsolete for modern workflows.</p>
+<p>Despite being retired from new archive creation, the legacy
+decompression routines remain embedded in <code>unrar</code>. If you
+encounter an older RAR file containing raw bitmap data compressed via
+the RGB algorithm, running a standard <code>unrar e archive.rar</code>
+or <code>unrar x archive.rar</code> command will extract the contents
+without issue.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

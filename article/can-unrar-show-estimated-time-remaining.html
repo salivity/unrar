@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Show Estimated Time Remaining? - unrar</title>
+    <meta name="description" content="The standard command-line unrar utility cannot natively display the estimated time remaining during an archive extraction. While it outputs a standard percentage indicator to show progress for individual files and the overall archive, it lacks a built-in">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-show-estimated-time-remaining">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Show Estimated Time Remaining? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-show-estimated-time-remaining" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The standard command-line unrar utility cannot natively display the estimated time remaining during an archive extraction. While it outputs a standard percentage indicator to show progress for individual files and the overall archive, it lacks a built-in" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-show-estimated-time-remaining">Can Unrar Show
+Estimated Time Remaining?</h1>
+<p>The standard command-line <code>unrar</code> utility cannot natively
+display the estimated time remaining during an archive extraction. While
+it outputs a standard percentage indicator to show progress for
+individual files and the overall archive, it lacks a built-in
+time-calculation feature or ETA counter. To view an estimated completion
+time for large RAR extractions, you must rely on external terminal
+monitoring tools, alternative archive utilities, or graphical
+frontends.</p>
+<h3 id="default-progress-reporting-in-unrar">Default Progress Reporting
+in Unrar</h3>
+<p>When you extract an archive using standard commands like
+<code>unrar x archive.rar</code>, the program outputs the current file
+being unpacked along with a percentage counter:</p>
+<pre class="text"><code>Extracting  large_file.iso                     42%</code></pre>
+<p>This percentage updates dynamically in your terminal, showing how
+much data has been processed relative to the total uncompressed size.
+However, the command-line flags provided by RARLAB do not include an
+option to calculate or display the remaining duration.</p>
+<h3 id="how-to-monitor-time-remaining">How to Monitor Time
+Remaining</h3>
+<p>If you need an accurate ETA while extracting large RAR archives,
+consider the following alternatives:</p>
+<h4 id="1-use-a-graphical-interface">1. Use a Graphical Interface</h4>
+<p>The desktop version of WinRAR (on Windows) or graphical archive
+managers on Linux (such as File Roller or Ark) automatically calculate
+extraction speed and provide a live "Time left" estimate based on the
+current disk write throughput.</p>
+<h4 id="2-use-7-zip-7z-in-the-terminal">2. Use 7-Zip (<code>7z</code>)
+in the Terminal</h4>
+<p>The 7-Zip command-line tool can extract RAR files and provides a
+slightly more detailed progress display in modern terminal versions.
+While it primarily relies on percentage progress, certain builds and
+wrappers can compute transfer speeds more reliably than legacy
+<code>unrar</code>.</p>
+<h4 id="3-monitor-process-io-with-system-tools">3. Monitor Process I/O
+with System Tools</h4>
+<p>On Linux and macOS, you can monitor the write speed and remaining
+data by using system inspection utilities:</p>
+<ul>
+<li><strong><code>iotop</code></strong>: Allows you to view the
+real-time disk write speed generated by the <code>unrar</code>
+process.</li>
+<li><strong>Calculating manually</strong>: By checking the total
+uncompressed size with <code>unrar l archive.rar</code> and dividing the
+remaining bytes by your current disk write speed from
+<code>iotop</code>, you can estimate the time remaining.</li>
+</ul>
+<p>While <code>unrar</code> remains a fast and dependable CLI tool for
+extracting RAR files, users requiring an automated time-remaining metric
+must use a graphical archive manager or external system monitoring tools
+to track the operation.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

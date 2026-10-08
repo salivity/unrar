@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Containerize Apps Using Unrar in Docker - unrar</title>
+    <meta name="description" content="Containerizing an application dependent on unrar requires managing specific package dependencies, balancing proprietary software licensing, and optimizing disk I/O performance. This guide outlines how to configure a Docker container to support the standa">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-containerize-apps-using-unrar-in-docker">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Containerize Apps Using Unrar in Docker - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-containerize-apps-using-unrar-in-docker" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Containerizing an application dependent on unrar requires managing specific package dependencies, balancing proprietary software licensing, and optimizing disk I/O performance. This guide outlines how to configure a Docker container to support the standa" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-containerize-apps-using-unrar-in-docker">How to
+Containerize Apps Using Unrar in Docker</h1>
+<p>Containerizing an application dependent on <code>unrar</code>
+requires managing specific package dependencies, balancing proprietary
+software licensing, and optimizing disk I/O performance. This guide
+outlines how to configure a Docker container to support the standard RAR
+extraction utility, covers the differences between package repositories,
+provides an optimized Dockerfile, and addresses performance and security
+best practices for handling compressed archives in containerized
+environments.</p>
+<h3 id="1-understanding-the-unrar-package-problem">1. Understanding the
+Unrar Package Problem</h3>
+<p>The primary challenge when containerizing an application that relies
+on <code>unrar</code> is package licensing. Most Linux distributions
+offer two variants:</p>
+<ul>
+<li><strong><code>unrar-free</code></strong>: An open-source
+implementation based on older code. It lacks support for RAR3, RAR4, and
+RAR5 archive formats, leading to extraction failures for modern
+archives.</li>
+<li><strong><code>unrar</code> (non-free)</strong>: The official
+freeware utility provided by RARLAB. It supports all RAR archive
+formats, password-protected files, and multi-part volumes.</li>
+</ul>
+<p>For reliable extraction in production, you must ensure your Docker
+environment installs the official, non-free <code>unrar</code>
+package.</p>
+<hr />
+<h3 id="2-installing-unrar-across-base-images">2. Installing Unrar
+Across Base Images</h3>
+<p>Depending on your base image, the method for installing the
+proprietary <code>unrar</code> binary differs.</p>
+<h4 id="debian-and-ubuntu-base-images">Debian and Ubuntu Base
+Images</h4>
+<p>Debian and Ubuntu place <code>unrar</code> in the
+<code>non-free</code> (Debian) or <code>multiverse</code> (Ubuntu)
+repositories.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Debian-based example</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> install <span class="at">-y</span> software-properties-common <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-add-repository</span> non-free <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> install <span class="at">-y</span> unrar <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span></span></code></pre></div>
+<h4 id="alpine-linux-base-images">Alpine Linux Base Images</h4>
+<p>Alpine Linux provides <code>unrar</code> via the community
+repository.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Alpine-based example</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apk</span> add <span class="at">--no-cache</span> unrar</span></code></pre></div>
+<hr />
+<h3 id="3-complete-dockerfile-implementation">3. Complete Dockerfile
+Implementation</h3>
+<p>Below is a complete, production-ready <code>Dockerfile</code> using
+an Ubuntu base image with a Node.js or Python application layout. It
+creates a dedicated non-root user for security, configures the
+repository, and installs <code>unrar</code>.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> ubuntu:22.04</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prevent interactive prompts during package installation</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">ENV</span> DEBIAN_FRONTEND=noninteractive</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Install dependencies and the official unrar binary</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> <span class="dt">\</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        software-properties-common <span class="dt">\</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        ca-certificates <span class="dt">\</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        curl <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="ex">add-apt-repository</span> multiverse <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> update <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> install <span class="at">-y</span> <span class="at">--no-install-recommends</span> unrar <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="ex">apt-get</span> clean <span class="kw">&amp;&amp;</span> <span class="dt">\</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span> <span class="at">-rf</span> /var/lib/apt/lists/<span class="pp">*</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a non-root application user</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">groupadd</span> <span class="at">-r</span> appuser <span class="kw">&amp;&amp;</span> <span class="ex">useradd</span> <span class="at">-r</span> <span class="at">-g</span> appuser <span class="at">-d</span> /home/appuser <span class="at">-m</span> appuser</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Set working directory</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="kw">WORKDIR</span> /app</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy application files and change ownership</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="kw">COPY</span> . /app</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="fu">chown</span> <span class="at">-R</span> appuser:appuser /app</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Switch to non-root user</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="kw">USER</span> appuser</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify unrar installation</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">unrar</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 2</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Entrypoint or command</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="kw">CMD</span> [<span class="st">&quot;./start.sh&quot;</span>]</span></code></pre></div>
+<hr />
+<h3 id="4-handling-storage-and-io-performance">4. Handling Storage and
+I/O Performance</h3>
+<p>Applications that extract large archives perform heavy disk
+input/output (I/O). Writing directly to the container's writable layer
+uses the storage driver (such as <code>overlay2</code>), which
+introduces significant performance overhead.</p>
+<ul>
+<li><strong>Use Volumes for Temp and Output Dirs</strong>: Mount Docker
+volumes or host directories for extraction targets to achieve native I/O
+speeds.
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-v</span> /host/data:/app/data <span class="at">-v</span> /host/temp:/tmp my-unrar-app</span></code></pre></div></li>
+<li><strong>Tmpfs Mounts</strong>: If dealing with small-to-medium files
+that need fast processing, extract them into a <code>tmpfs</code> (RAM)
+mount before persisting results:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--tmpfs</span> /tmp:rw,size=2g my-unrar-app</span></code></pre></div></li>
+</ul>
+<hr />
+<h3 id="5-security-best-practices">5. Security Best Practices</h3>
+<p>Extracting user-provided archives poses significant security risks,
+including directory traversal attacks (<code>../</code> paths) and
+compression bombs.</p>
+<ol type="1">
+<li><strong>Drop Root Privileges</strong>: Always run the container
+under a non-privileged <code>USER</code>. If a vulnerability in
+<code>unrar</code> is exploited, the attacker's access remains contained
+to non-root privileges.</li>
+<li><strong>Resource Constraints</strong>: Limit container CPU and
+memory to prevent denial-of-service (DoS) via zip bombs:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--memory</span><span class="op">=</span><span class="st">&quot;2g&quot;</span> <span class="at">--cpus</span><span class="op">=</span><span class="st">&quot;2&quot;</span> my-unrar-app</span></code></pre></div></li>
+<li><strong>Strict Extraction Flags</strong>: When invoking
+<code>unrar</code> via CLI from your application, use flags that enforce
+safe behavior:
+<ul>
+<li><code>-p-</code>: Suppress password queries to prevent script
+hangs.</li>
+<li><code>-o-</code>: Do not overwrite existing files.</li>
+<li><code>e</code> vs <code>x</code>: Use <code>e</code> to extract all
+files directly into the destination directory without creating internal
+directory paths, preventing directory traversal.</li>
+</ul></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

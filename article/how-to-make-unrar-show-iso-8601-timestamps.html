@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Make Unrar Show ISO 8601 Timestamps - unrar</title>
+    <meta name="description" content="By default, the standard unrar utility displays archive contents using a compact tabular format with localized or truncated two-digit year timestamps. To force unrar to output timestamps in the standardized ISO 8601 format (YYYY-MM-DD HH:MM:SS), you can">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-make-unrar-show-iso-8601-timestamps">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Make Unrar Show ISO 8601 Timestamps - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-make-unrar-show-iso-8601-timestamps" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="By default, the standard unrar utility displays archive contents using a compact tabular format with localized or truncated two-digit year timestamps. To force unrar to output timestamps in the standardized ISO 8601 format (YYYY-MM-DD HH:MM:SS), you can" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-make-unrar-show-iso-8601-timestamps">How to Make Unrar
+Show ISO 8601 Timestamps</h1>
+<p>By default, the standard <code>unrar</code> utility displays archive
+contents using a compact tabular format with localized or truncated
+two-digit year timestamps. To force <code>unrar</code> to output
+timestamps in the standardized ISO 8601 format
+(<code>YYYY-MM-DD HH:MM:SS</code>), you can utilize its built-in
+technical listing mode or pipe the output through standard command-line
+tools to reformat the data into a clean table.</p>
+<h3 id="method-1-use-the-technical-list-command-lt-or-vt">Method 1: Use
+the Technical List Command (<code>lt</code> or <code>vt</code>)</h3>
+<p>The default listing commands (<code>unrar l</code> and
+<code>unrar v</code>) use a fixed-width table that abbreviates dates
+(typically <code>DD-MM-YY</code> or <code>MM-DD-YY</code>). To view full
+four-digit years and standard date-time representations natively within
+<code>unrar</code>, append the <code>t</code> modifier:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lt archive.rar</span></code></pre></div>
+<p>or for the verbose technical list:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> vt archive.rar</span></code></pre></div>
+<p>In technical mode, <code>unrar</code> outputs file entries in a
+key-value block format rather than a compressed table. Each entry
+contains a timestamp formatted according to ISO 8601 standards:</p>
+<pre class="text"><code>Name: document.pdf
+Type: File
+Size: 1048576
+Packed size: 985200
+Ratio: 93%
+mtime: 2024-03-15 14:30:22
+Attributes: -rw-r--r--</code></pre>
+<h3 id="method-2-filter-technical-output-for-a-clean-list">Method 2:
+Filter Technical Output for a Clean List</h3>
+<p>If you need a concise, tabular view containing only the ISO 8601
+timestamp and the filename, parse the technical output using
+<code>awk</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lt archive.rar <span class="kw">|</span> <span class="fu">awk</span> <span class="at">-F</span><span class="st">&#39;: &#39;</span> <span class="st">&#39;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="st">  $1 == &quot;Name&quot;  { name = $2 }</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="st">  $1 == &quot;mtime&quot; { print $2, &quot;\t&quot;, name }</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="st">&#39;</span></span></code></pre></div>
+<p>This outputs:</p>
+<pre class="text"><code>2024-03-15 14:30:22      document.pdf
+2024-03-16 09:12:05      image.png</code></pre>
+<h3 id="method-3-use-7-zip-as-an-alternative-rar-reader">Method 3: Use
+7-Zip as an Alternative RAR Reader</h3>
+<p>Because the RARLAB <code>unrar</code> binary lacks a dedicated
+command-line flag to alter the column formatting of the standard
+<code>unrar l</code> table, an alternative approach is using
+<code>7z</code> (p7zip). 7-Zip natively lists RAR archive contents using
+ISO 8601 dates by default:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> l archive.rar</span></code></pre></div>
+<p>This produces a standard tabular layout with full timestamps:</p>
+<pre class="text"><code>   Date      Time    Attr         Size   Compressed  Name
+------------------- ----- ------------ ------------  ------------------------
+2024-03-15 14:30:22 ....A      1048576       985200  document.pdf
+------------------- ----- ------------ ------------  ------------------------</code></pre></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

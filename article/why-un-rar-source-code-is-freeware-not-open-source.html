@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why UnRAR Source Code Is Freeware Not Open Source - unrar</title>
+    <meta name="description" content="While the source code for the UnRAR extraction utility is freely available for anyone to download, inspect, and compile, its restrictive licensing prevents it from being classified as true open-source software. Although many developers assume that access">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/why-un-rar-source-code-is-freeware-not-open-source">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why UnRAR Source Code Is Freeware Not Open Source - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/why-un-rar-source-code-is-freeware-not-open-source" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="While the source code for the UnRAR extraction utility is freely available for anyone to download, inspect, and compile, its restrictive licensing prevents it from being classified as true open-source software. Although many developers assume that access" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="why-unrar-source-code-is-freeware-not-open-source">Why UnRAR
+Source Code Is Freeware Not Open Source</h1>
+<p>While the source code for the UnRAR extraction utility is freely
+available for anyone to download, inspect, and compile, its restrictive
+licensing prevents it from being classified as true open-source
+software. Although many developers assume that accessible source code
+automatically equals open source, the UnRAR license contains specific
+prohibitions on how the code can be utilized, placing it firmly in the
+category of proprietary freeware or "source-available" software.</p>
+<h3 id="source-available-vs-open-source">Source-Available vs. Open
+Source</h3>
+<p>For software to be considered "open source," it must comply with the
+Open Source Definition (OSD) maintained by the Open Source Initiative
+(OSI). The OSD requires that a license must not only allow the source
+code to be viewed and modified, but it must also allow derived works and
+must not restrict anyone from using the program in a specific field of
+endeavor.</p>
+<p>UnRAR fails these standards because the copyright holder, Alexander
+Roshal, provides the code under a bespoke license that intentionally
+limits how the logic inside it can be repurposed.</p>
+<h3 id="the-compression-algorithm-restriction">The Compression Algorithm
+Restriction</h3>
+<p>The defining factor that makes the UnRAR source code freeware rather
+than open source is an explicit restriction regarding RAR compression.
+The UnRAR license contains a clause stating:</p>
+<blockquote>
+<p>"The unrar utility and its source code are freeware, but you must not
+use the unrar source code to re-create the RAR compression algorithm,
+which is proprietary."</p>
+</blockquote>
+<p>This single clause directly violates multiple criteria of the Open
+Source Definition:</p>
+<ul>
+<li><strong>Restriction on Derived Works (OSD Criterion 3):</strong>
+Open-source licenses must permit modifications and derived works to be
+distributed under the same terms. By forbidding developers from using
+the decompression code to reverse-engineer or implement a RAR-compatible
+compressor, the license restricts derived works.</li>
+<li><strong>Discrimination Against Fields of Endeavor (OSD Criterion
+6):</strong> An open-source license cannot restrict anyone from using
+the code in a specific field. Barring developers from the field of RAR
+compression development violates this principle.</li>
+</ul>
+<h3 id="commercial-protection-for-winrar">Commercial Protection for
+WinRAR</h3>
+<p>The reason for this restriction is business-driven. The RAR format
+and its primary tool, WinRAR, are commercial products developed by
+RARLAB. While RARLAB benefits from wide adoption of the format by
+allowing third-party tools to decompress <code>.rar</code> archives,
+they maintain an exclusive monopoly over the official compression
+algorithm.</p>
+<p>Allowing third-party developers to study the UnRAR source code and
+create full-fledged, free RAR compressors would undermine the commercial
+viability of WinRAR licenses.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>Because you can obtain, compile, and distribute the UnRAR code at
+zero financial cost, it qualifies as freeware. However, because its
+license dictates what you can and cannot build with that logic, it lacks
+the legal freedoms required of open-source software. It remains a
+proprietary, source-available utility designed solely to enable file
+extraction while protecting the commercial interests of its creator.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

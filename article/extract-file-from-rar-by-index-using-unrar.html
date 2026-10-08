@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract File from RAR by Index Using Unrar - unrar</title>
+    <meta name="description" content="The standard unrar command-line utility does not have a native flag to extract files directly by their numerical archive index. However, you can achieve this by pairing unrar's bare-listing mode (vb) with shell filtering tools to select the file at a spe">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extract-file-from-rar-by-index-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract File from RAR by Index Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extract-file-from-rar-by-index-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The standard unrar command-line utility does not have a native flag to extract files directly by their numerical archive index. However, you can achieve this by pairing unrar's bare-listing mode (vb) with shell filtering tools to select the file at a spe" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-file-from-rar-by-index-using-unrar">Extract File from
+RAR by Index Using Unrar</h1>
+<p>The standard <code>unrar</code> command-line utility does not have a
+native flag to extract files directly by their numerical archive index.
+However, you can achieve this by pairing <code>unrar</code>'s
+bare-listing mode (<code>vb</code>) with shell filtering tools to select
+the file at a specific line number and pass its name back to
+<code>unrar</code> for extraction. This guide demonstrates how to
+accomplish this in both Linux/Unix and Windows environments.</p>
+<hr />
+<h3 id="step-1-identify-the-file-index">Step 1: Identify the File
+Index</h3>
+<p>Before extracting, list the archive contents in bare format. The
+<code>vb</code> command displays only the file paths, one per line,
+omitting headers, footers, and metadata:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> vb archive.rar</span></code></pre></div>
+<p>You can append line numbers to identify the exact numerical index of
+the target file:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> vb archive.rar <span class="kw">|</span> <span class="fu">nl</span></span></code></pre></div>
+<hr />
+<h3 id="step-2-extract-by-index-in-linux-or-macos-bash--zsh">Step 2:
+Extract by Index in Linux or macOS (Bash / Zsh)</h3>
+<p>Once you know the index number (for example, file index
+<code>3</code>), use <code>sed</code> to isolate that line and pass the
+filename back to <code>unrar</code>.</p>
+<h4 id="extract-to-current-directory-flat-extraction">Extract to Current
+Directory (Flat Extraction)</h4>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar <span class="st">&quot;</span><span class="va">$(</span><span class="ex">unrar</span> vb archive.rar <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;3p&#39;</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<h4 id="extract-with-full-directory-paths-preserved">Extract with Full
+Directory Paths Preserved</h4>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="st">&quot;</span><span class="va">$(</span><span class="ex">unrar</span> vb archive.rar <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;3p&#39;</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<h4 id="extract-to-a-specific-folder">Extract to a Specific Folder</h4>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="st">&quot;</span><span class="va">$(</span><span class="ex">unrar</span> vb archive.rar <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;3p&#39;</span><span class="va">)</span><span class="st">&quot;</span> /path/to/destination/</span></code></pre></div>
+<p><strong>How it works:</strong></p>
+<ul>
+<li><code>unrar vb archive.rar</code>: Outputs the archive's file list
+as raw filenames.</li>
+<li><code>sed -n '3p'</code>: Prints only the 3rd line of the
+output.</li>
+<li><code>$(...)</code>: Passes the resulting filename as an argument to
+the outer <code>unrar</code> extraction command.</li>
+</ul>
+<hr />
+<h3 id="step-3-extract-by-index-in-windows-powershell">Step 3: Extract
+by Index in Windows (PowerShell)</h3>
+<p>In Windows PowerShell, you can treat the bare listing as an array and
+index it directly. Keep in mind that PowerShell arrays use zero-based
+indexing, so file index <code>3</code> corresponds to index
+<code>[2]</code>:</p>
+<h4 id="extract-to-current-directory">Extract to Current Directory</h4>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="va">$index</span> <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">unrar</span> e archive<span class="op">.</span><span class="fu">rar</span> <span class="op">((</span>unrar vb archive<span class="op">.</span><span class="fu">rar</span><span class="op">)[</span><span class="va">$index</span><span class="op">])</span></span></code></pre></div>
+<h4 id="extract-with-full-directory-paths">Extract with Full Directory
+Paths</h4>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="va">$index</span> <span class="op">=</span> <span class="dv">2</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">unrar</span> x archive<span class="op">.</span><span class="fu">rar</span> <span class="op">((</span>unrar vb archive<span class="op">.</span><span class="fu">rar</span><span class="op">)[</span><span class="va">$index</span><span class="op">])</span></span></code></pre></div>
+<hr />
+<h3 id="handling-files-with-spaces-or-special-characters">Handling Files
+with Spaces or Special Characters</h3>
+<p>Because the filename is captured dynamically, filenames containing
+spaces or symbols can cause argument errors if unquoted. Always ensure
+the subshell expansion is wrapped in double quotes:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar <span class="st">&quot;</span><span class="va">$(</span><span class="ex">unrar</span> vb archive.rar <span class="kw">|</span> <span class="fu">sed</span> <span class="at">-n</span> <span class="st">&#39;5p&#39;</span><span class="va">)</span><span class="st">&quot;</span></span></code></pre></div>
+<p>This ensures the filename is read as a single argument regardless of
+whitespace or special characters inside the RAR archive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

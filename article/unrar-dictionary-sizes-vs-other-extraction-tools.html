@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Dictionary Sizes vs Other Extraction Tools - unrar</title>
+    <meta name="description" content="This article examines how the unrar utility manages compression dictionary sizes during file extraction and contrasts its resource handling with alternative tools such as 7-Zip, PeaZip, and standard Unix archiving utilities. Readers will gain a clear und">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-dictionary-sizes-vs-other-extraction-tools">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Dictionary Sizes vs Other Extraction Tools - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-dictionary-sizes-vs-other-extraction-tools" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines how the unrar utility manages compression dictionary sizes during file extraction and contrasts its resource handling with alternative tools such as 7-Zip, PeaZip, and standard Unix archiving utilities. Readers will gain a clear und" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-dictionary-sizes-vs-other-extraction-tools">Unrar
+Dictionary Sizes vs Other Extraction Tools</h1>
+<p>This article examines how the <code>unrar</code> utility manages
+compression dictionary sizes during file extraction and contrasts its
+resource handling with alternative tools such as 7-Zip, PeaZip, and
+standard Unix archiving utilities. Readers will gain a clear
+understanding of the decompression memory requirements of RAR formats,
+how <code>unrar</code> optimizes dictionary allocation, and the
+practical implications for system performance when decompressing modern,
+high-compression archives.</p>
+<h3 id="understanding-dictionary-size-in-archiving">Understanding
+Dictionary Size in Archiving</h3>
+<p>In data compression, the sliding dictionary is the buffer of recently
+processed data used by algorithms to locate matching patterns. A larger
+dictionary enables the compression algorithm to identify long-range
+redundancies across large files, yielding significantly better
+compression ratios. However, decompressing an archive requires the
+extraction tool to allocate sufficient Random Access Memory (RAM) to
+hold the entire dictionary window used during creation.</p>
+<h3 id="how-unrar-handles-dictionary-sizes">How <code>unrar</code>
+Handles Dictionary Sizes</h3>
+<p>The official <code>unrar</code> utility, developed by RARLAB,
+natively adheres to the RAR format specifications:</p>
+<ul>
+<li><strong>RAR4 vs. RAR5 Specifications:</strong> Legacy RAR4 archives
+capped dictionary sizes at 4 MB (and rarely 8 MB). The modern RAR5
+format expanded default dictionary limits to 1024 MB (1 GB), with recent
+versions of the RAR engine supporting dictionary sizes up to 64 GB for
+extreme compression tasks.</li>
+<li><strong>Strict Memory Allocation:</strong> During extraction,
+<code>unrar</code> inspects the archive header to read the required
+dictionary size and attempts to allocate that exact buffer in RAM
+immediately. If an archive was compressed using a 1 GB dictionary,
+<code>unrar</code> will demand slightly over 1 GB of physical memory
+solely for the dictionary buffer.</li>
+<li><strong>Failure Handling:</strong> If the host system lacks the
+available RAM to allocate the dictionary, <code>unrar</code> will fail
+directly with an "Out of Memory" or allocation error rather than falling
+back to slower, disk-based virtual swap buffers. On 32-bit
+architectures, <code>unrar</code> is physically constrained by address
+space limits and cannot unpack archives built with dictionaries larger
+than 2 GB.</li>
+</ul>
+<h3 id="comparison-with-7-zip-and-lzma-tools">Comparison with 7-Zip and
+LZMA Tools</h3>
+<p>7-Zip utilizes the LZMA and LZMA2 algorithms as its native format
+(<code>.7z</code>), which also heavily leverage massive dictionary
+sizes:</p>
+<ul>
+<li><strong>Native LZMA Handling:</strong> 7-Zip handles dictionary
+sizes up to 1 GB or larger easily when decompressing <code>.7z</code>
+archives, using roughly the dictionary size in memory for
+decompression.</li>
+<li><strong>RAR Extraction Support:</strong> When reading RAR archives,
+7-Zip does not use the official RARLAB code; it uses a
+reverse-engineered or clean-room implementation of the RAR uncompressed
+stream. While modern versions of 7-Zip support RAR5 archives with
+dictionaries up to 1 GB, 7-Zip historically experienced compatibility
+lag or out-of-memory errors on non-standard or extreme RAR dictionary
+configurations compared to the native <code>unrar</code> binary.</li>
+<li><strong>Memory Estimation:</strong> 7-Zip provides a clear benchmark
+interface and calculates decompression memory requirements in advance
+within its GUI, whereas the command-line <code>unrar</code> executes
+allocations automatically without interactive warnings.</li>
+</ul>
+<h3
+id="comparison-with-traditional-unix-tools-gzip-bzip2-tar">Comparison
+with Traditional Unix Tools (<code>gzip</code>, <code>bzip2</code>,
+<code>tar</code>)</h3>
+<p>Traditional Unix compression tools operate on vastly different
+dictionary models compared to <code>unrar</code>:</p>
+<ul>
+<li><strong><code>gzip</code> and <code>deflate</code>:</strong> The
+Deflate algorithm used by <code>gzip</code> uses a fixed 32 KB sliding
+dictionary. Because this size is negligible, memory consumption during
+<code>gzip</code> extraction is nearly zero, regardless of file
+size.</li>
+<li><strong><code>bzip2</code>:</strong> Rather than a sliding
+dictionary, <code>bzip2</code> uses block-sorting compression with
+maximum block sizes of 900 KB. Decompression memory overhead is small
+and strictly capped at roughly 4 MB.</li>
+<li><strong><code>zstandard</code> (<code>zstd</code>):</strong> Modern
+tools like <code>zstd</code> support sliding windows up to several
+gigabytes (similar to RAR5). However, <code>zstd</code> includes a
+built-in safety mechanism that rejects archives requiring more than a
+pre-configured memory limit (defaulting to 128 MB or 512 MB unless
+overridden by the user), protecting the host against memory exhaustion
+attacks. <code>unrar</code> does not impose this defensive ceiling by
+default and simply attempts the full allocation specified by the archive
+header.</li>
+</ul>
+<h3 id="summary-of-operational-differences">Summary of Operational
+Differences</h3>
+<p><code>unrar</code> is purpose-built to extract archives using exact,
+proprietary RAR specifications without dynamic buffer downscaling. While
+tools like <code>gzip</code> prioritize deterministic, ultra-low memory
+footprints and <code>zstd</code> emphasizes defensive memory limits,
+<code>unrar</code> prioritizes full compatibility with high-capacity
+dictionary structures—requiring users to ensure their host systems have
+adequate physical RAM matching the original compression profile.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

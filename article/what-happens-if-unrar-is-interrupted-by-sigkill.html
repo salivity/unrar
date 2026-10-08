@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Happens If Unrar Is Interrupted by SIGKILL? - unrar</title>
+    <meta name="description" content="When an unrar process is terminated with a SIGKILL signal (signal 9), the operating system immediately halts the process without giving it an opportunity to execute cleanup routines or close files cleanly. Consequently, the source RAR archive remains com">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-happens-if-unrar-is-interrupted-by-sigkill">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Happens If Unrar Is Interrupted by SIGKILL? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-happens-if-unrar-is-interrupted-by-sigkill" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When an unrar process is terminated with a SIGKILL signal (signal 9), the operating system immediately halts the process without giving it an opportunity to execute cleanup routines or close files cleanly. Consequently, the source RAR archive remains com" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-happens-if-unrar-is-interrupted-by-sigkill">What Happens If
+Unrar Is Interrupted by SIGKILL?</h1>
+<p>When an <code>unrar</code> process is terminated with a
+<code>SIGKILL</code> signal (signal 9), the operating system immediately
+halts the process without giving it an opportunity to execute cleanup
+routines or close files cleanly. Consequently, the source RAR archive
+remains completely undamaged, but the destination directory is typically
+left in a dirty, inconsistent state containing partially written,
+corrupted, or missing files.</p>
+<h2 id="the-nature-of-sigkill">The Nature of SIGKILL</h2>
+<p>Unlike signals such as <code>SIGINT</code> (Ctrl+C) or
+<code>SIGTERM</code>, <code>SIGKILL</code> cannot be caught, blocked, or
+handled by any user-space program. When the Linux or Unix kernel
+receives a <code>SIGKILL</code> directed at <code>unrar</code>:</p>
+<ul>
+<li>The kernel instantly revokes CPU execution from the process.</li>
+<li>All allocated virtual memory, file descriptors, and standard handles
+are reclaimed by the operating system.</li>
+<li><code>unrar</code> cannot run any signal handlers,
+<code>atexit</code> functions, or error-handling routines.</li>
+</ul>
+<h2 id="direct-effects-on-extracted-files">Direct Effects on Extracted
+Files</h2>
+<p>Because <code>unrar</code> is denied an exit routine, the extracted
+output reflects the exact millisecond the kill occurred:</p>
+<ul>
+<li><strong>Fully extracted files:</strong> Any files that completed
+extraction before the signal was received will remain intact and usable
+in the destination directory.</li>
+<li><strong>The active file:</strong> The specific file currently being
+decompressed and written at the moment of termination will remain
+truncated. It will be incomplete, likely failing file format checks or
+application reads.</li>
+<li><strong>Pending files:</strong> Any files scheduled for extraction
+later in the queue will not be created.</li>
+<li><strong>No automatic cleanup:</strong> Under normal conditions or
+graceful interruption, an extraction tool might attempt to delete the
+incomplete active file. With <code>SIGKILL</code>, the truncated file is
+permanently left on disk until manually removed.</li>
+</ul>
+<h2 id="state-of-the-source-archive">State of the Source Archive</h2>
+<p>The source <code>.rar</code> archive remains completely safe.
+Extraction is fundamentally a read operation. <code>unrar</code> reads
+blocks from the archive into memory, decompresses the data, and writes
+the stream to a separate output path. Because no write or modification
+operations are directed at the archive file itself, terminating the
+process—even abruptly via <code>SIGKILL</code>—will not corrupt the
+original archive.</p>
+<h2 id="how-to-recover-and-clean-up">How to Recover and Clean Up</h2>
+<p>After an abrupt termination, you must resolve the partial extraction
+before attempting to extract again:</p>
+<ol type="1">
+<li><strong>Verify Archive Integrity:</strong> Ensure the archive itself
+was not the cause of an issue by testing it:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t archive.rar</span></code></pre></div></li>
+<li><strong>Handle Incomplete Files:</strong> Manually delete the
+destination directory or partially extracted files to avoid leaving
+corrupted artifacts.</li>
+<li><strong>Restart the Extraction:</strong> Re-run the extraction
+command. You can pass the overwrite flag to replace any existing partial
+files automatically:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-o+</span> archive.rar</span></code></pre></div></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

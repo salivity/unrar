@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Read-Only Destination Errors - unrar</title>
+    <meta name="description" content="When extracting RAR archives using the unrar command-line utility, attempting to write to a read-only destination directory causes the tool to fail immediately with a permission error. This article outlines the exact behavior of unrar under these conditi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-read-only-destination-errors">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Read-Only Destination Errors - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-read-only-destination-errors" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting RAR archives using the unrar command-line utility, attempting to write to a read-only destination directory causes the tool to fail immediately with a permission error. This article outlines the exact behavior of unrar under these conditi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-read-only-destination-errors">How Unrar
+Handles Read-Only Destination Errors</h1>
+<p>When extracting RAR archives using the <code>unrar</code>
+command-line utility, attempting to write to a read-only destination
+directory causes the tool to fail immediately with a permission error.
+This article outlines the exact behavior of <code>unrar</code> under
+these conditions, including console output, process halting, exit codes,
+and how to resolve the issue.</p>
+<h3 id="immediate-console-output">Immediate Console Output</h3>
+<p>Because <code>unrar</code> requires write permissions to create new
+files or subdirectories, a read-only destination prevents the necessary
+system calls (such as <code>mkdir</code> or <code>open</code>) from
+succeeding. Upon encountering this restriction, <code>unrar</code>
+displays an explicit error message on the terminal:</p>
+<pre class="text"><code>Cannot create filename.ext
+Permission denied</code></pre>
+<p>If the archive contains nested folders that need to be generated
+within the read-only directory, the error indicates a directory creation
+failure instead:</p>
+<pre class="text"><code>Cannot create directory /path/to/folder
+Permission denied</code></pre>
+<h3 id="extraction-halting-and-interactive-prompts">Extraction Halting
+and Interactive Prompts</h3>
+<p>By default, in interactive mode, <code>unrar</code> may prompt the
+user asking whether to retry the operation, skip the file, or abort
+extraction. If the utility is running in non-interactive mode (such as
+via automated scripts using the <code>-y</code> or <code>-id</code>
+switches), it will fail to extract the affected file and continue to the
+next item or abort entirely, depending on whether subfolder creation is
+required. Any file that cannot be written is left unextracted;
+<code>unrar</code> will not attempt to bypass system permissions or
+redirect output automatically.</p>
+<h3 id="return-codes-and-exit-status">Return Codes and Exit Status</h3>
+<p>When a read-only directory prevents file creation, <code>unrar</code>
+terminates with a non-zero exit code. In standard implementations:</p>
+<ul>
+<li><strong>Exit Code 9 (Create file error):</strong> Indicates that
+<code>unrar</code> was completely unable to create the target file or
+directory due to filesystem permission restrictions or a write-protected
+medium.</li>
+<li><strong>Exit Code 1 (Non fatal error):</strong> May be returned in
+instances where some files were extracted elsewhere but specific
+read-only targets were skipped.</li>
+</ul>
+<p>Scripts monitoring extraction tasks should check for Exit Code 9 to
+detect permission issues automatically.</p>
+<h3 id="resolving-the-error">Resolving the Error</h3>
+<p>To allow <code>unrar</code> to proceed, you must grant write
+permissions to the user executing the command:</p>
+<ol type="1">
+<li><strong>Modify Permissions:</strong> Use <code>chmod</code> on
+Unix-like systems to add write access (e.g.,
+<code>chmod u+w /path/to/destination</code>).</li>
+<li><strong>Change Ownership:</strong> If the directory belongs to
+another user, update ownership using <code>chown</code> (e.g.,
+<code>chown $USER /path/to/destination</code>).</li>
+<li><strong>Change Destination:</strong> Alternatively, specify a
+different, writable target path at the command line:
+<code>unrar x archive.rar /path/to/writable/dir/</code>.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

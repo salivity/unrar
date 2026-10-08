@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Renamed Multi-Volume Archives? - unrar</title>
+    <meta name="description" content="This article explains whether the unrar utility can extract multi-volume RAR archives when individual parts have been renamed. While unrar strictly relies on predefined filename patterns to locate split volumes automatically, arbitrary renaming will brea">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-renamed-multi-volume-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Renamed Multi-Volume Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-renamed-multi-volume-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains whether the unrar utility can extract multi-volume RAR archives when individual parts have been renamed. While unrar strictly relies on predefined filename patterns to locate split volumes automatically, arbitrary renaming will brea" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-renamed-multi-volume-archives">Can Unrar
+Extract Renamed Multi-Volume Archives?</h1>
+<p>This article explains whether the <code>unrar</code> utility can
+extract multi-volume RAR archives when individual parts have been
+renamed. While <code>unrar</code> strictly relies on predefined filename
+patterns to locate split volumes automatically, arbitrary renaming will
+break automatic extraction. However, successful extraction is still
+possible either through manual CLI prompts or by restoring the
+sequential naming pattern required by the RAR format.</p>
+<h3 id="how-unrar-handles-multi-volume-archives">How <code>unrar</code>
+Handles Multi-Volume Archives</h3>
+<p>To extract split archives automatically, <code>unrar</code> depends
+on standard sequential naming conventions:</p>
+<ul>
+<li><strong>New naming scheme:</strong> <code>archive.part1.rar</code>,
+<code>archive.part2.rar</code>, <code>archive.part3.rar</code></li>
+<li><strong>Old naming scheme:</strong> <code>archive.rar</code>,
+<code>archive.r00</code>, <code>archive.r01</code></li>
+</ul>
+<p>When you begin extraction on the first volume, <code>unrar</code>
+reads the archive headers to determine that the file is part of a
+multi-volume set. It then mathematically increments the filename suffix
+to find and open the subsequent parts in the directory.</p>
+<h3 id="the-impact-of-renaming-archive-parts">The Impact of Renaming
+Archive Parts</h3>
+<p>If you rename subsequent volumes to arbitrary names (for example,
+renaming <code>archive.part2.rar</code> to
+<code>backup_data.rar</code>), the automatic search fails. Although each
+volume contains internal header flags identifying its volume number and
+archive ID, <code>unrar</code> does not scan the entire directory to
+match headers against random filenames. It strictly looks for the
+expected filename sequence.</p>
+<h3 id="can-it-still-extract-them">Can It Still Extract Them?</h3>
+<p>Yes, but with limitations depending on how you run the command:</p>
+<ol type="1">
+<li><strong>Interactive Prompting:</strong> If you run
+<code>unrar x archive.part1.rar</code> in an interactive terminal
+session without quiet or batch flags (such as <code>-y</code> or
+<code>-inul</code>), <code>unrar</code> will pause when it cannot find
+the second volume. It will display a prompt asking you to specify the
+path or name of the next volume. You can manually enter the renamed
+file's path to continue extraction.</li>
+<li><strong>Non-Interactive / Scripted Failure:</strong> If you run
+extraction non-interactively, in automated scripts, or with flags that
+suppress prompts, <code>unrar</code> will immediately abort with an
+error (typically <code>Cannot find volume</code> or
+<code>Unexpected end of archive</code>).</li>
+</ol>
+<h3 id="best-practices-for-renamed-volumes">Best Practices for Renamed
+Volumes</h3>
+<p>Relying on manual file entry for dozens of split parts is tedious and
+error-prone. The most reliable solution is to restore the original
+naming convention before running <code>unrar</code>:</p>
+<ul>
+<li>Inspect the file headers using
+<code>unrar lt &lt;filename&gt;</code> to identify the correct volume
+number and base archive name.</li>
+<li>Batch-rename the files back to <code>name.part1.rar</code>,
+<code>name.part2.rar</code>, and so on.</li>
+<li>Execute <code>unrar x name.part1.rar</code> to allow the extraction
+to proceed without interruption.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

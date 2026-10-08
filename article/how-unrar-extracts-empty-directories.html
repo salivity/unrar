@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Extracts Empty Directories - unrar</title>
+    <meta name="description" content="When extracting RAR archives, maintaining the original folder hierarchy is often critical for data integrity and application structure. This article explains how the unrar command-line utility handles empty directories during the extraction process, the">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-extracts-empty-directories">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Extracts Empty Directories - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-extracts-empty-directories" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting RAR archives, maintaining the original folder hierarchy is often critical for data integrity and application structure. This article explains how the unrar command-line utility handles empty directories during the extraction process, the" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-extracts-empty-directories">How Unrar Extracts Empty
+Directories</h1>
+<p>When extracting RAR archives, maintaining the original folder
+hierarchy is often critical for data integrity and application
+structure. This article explains how the <code>unrar</code> command-line
+utility handles empty directories during the extraction process, the
+behavioral differences between primary extraction commands, and the role
+archive metadata plays in whether empty folders are recreated on your
+system.</p>
+<h3 id="folder-metadata-in-rar-archives">Folder Metadata in RAR
+Archives</h3>
+<p>The RAR format treats directories as distinct entries within the
+archive file table, separate from the files they contain. When a folder
+is archived—even if it contains no files—the archiving tool creates a
+specific directory record that stores the folder's name, path,
+attributes, and timestamps. Because this metadata exists independently
+of file payloads, <code>unrar</code> has the necessary information to
+recreate empty directories upon extraction.</p>
+<h3 id="full-path-extraction-unrar-x">Full Path Extraction:
+<code>unrar x</code></h3>
+<p>To extract empty directories, you must use the full-path extraction
+command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div>
+<p>The <code>x</code> switch instructs <code>unrar</code> to unpack the
+archive while strictly preserving the internal directory hierarchy. When
+processing the archive stream, <code>unrar</code> reads the directory
+records and creates each folder on the target file system, regardless of
+whether any files reside inside it. Furthermore, <code>unrar</code> will
+attempt to restore the original timestamps and file permissions
+associated with the empty directory, provided the user running the
+command has sufficient system privileges.</p>
+<h3 id="flattened-extraction-unrar-e">Flattened Extraction:
+<code>unrar e</code></h3>
+<p>If you use the basic extract command instead:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar</span></code></pre></div>
+<p><code>unrar</code> extracts all files directly into the current
+working directory or a specified target directory, stripping away all
+subfolder paths. Under this mode, <code>unrar</code> completely ignores
+directory records that do not contain files. As a result, empty
+directories are omitted entirely and will not be created on the
+destination file system.</p>
+<h3 id="exceptions-and-archive-creation-caveats">Exceptions and Archive
+Creation Caveats</h3>
+<p>While <code>unrar x</code> naturally restores empty folders, there
+are scenarios where empty directories will not appear:</p>
+<ul>
+<li><strong>Excluded Paths During Compression:</strong> If the archive
+was created using compression options that intentionally exclude empty
+directories (such as specific flags in GUI tools or custom scripts), the
+directory metadata was never written to the archive. <code>unrar</code>
+cannot reconstruct directories that do not exist in the archive
+headers.</li>
+<li><strong>File System Permissions:</strong> If the user executing
+<code>unrar</code> lacks write permissions for the destination path, the
+utility will fail to create the directory and will return a
+permission-denied error.</li>
+<li><strong>Corrupted Archive Headers:</strong> If the directory header
+within the RAR file is damaged, <code>unrar</code> may skip the folder
+entry or terminate extraction with a checksum error.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

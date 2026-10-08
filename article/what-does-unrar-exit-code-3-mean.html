@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Does Unrar Exit Code 3 Mean? - unrar</title>
+    <meta name="description" content="When working with RAR archives via the command line, encountering Unrar exit code 3 indicates a CRC (Cyclic Redundancy Check) error. This exit code means that the unrar utility successfully opened the archive, but the extracted files failed data verifica">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-does-unrar-exit-code-3-mean">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Does Unrar Exit Code 3 Mean? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-does-unrar-exit-code-3-mean" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When working with RAR archives via the command line, encountering Unrar exit code 3 indicates a CRC (Cyclic Redundancy Check) error. This exit code means that the unrar utility successfully opened the archive, but the extracted files failed data verifica" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-does-unrar-exit-code-3-mean">What Does Unrar Exit Code 3
+Mean?</h1>
+<p>When working with RAR archives via the command line, encountering
+<strong>Unrar exit code 3</strong> indicates a <strong>CRC (Cyclic
+Redundancy Check) error</strong>. This exit code means that the
+<code>unrar</code> utility successfully opened the archive, but the
+extracted files failed data verification, indicating that the files
+inside are corrupt, incomplete, or were decrypted with an invalid
+password. This guide explains the exact mechanics behind this error, its
+primary causes, and how to resolve it.</p>
+<h3 id="the-meaning-of-exit-code-3">The Meaning of Exit Code 3</h3>
+<p>A Cyclic Redundancy Check (CRC) is an error-detecting code used
+during compression to ensure data integrity. When an archive is created,
+a CRC value is calculated for each file and stored in the archive
+headers. During extraction, <code>unrar</code> calculates the CRC value
+of the extracted data and compares it against the stored value.</p>
+<p>If the two checksums do not match, <code>unrar</code> flags the
+operation as compromised and terminates with exit code 3. This safety
+mechanism prevents you from using partially damaged or invalid files
+without warning.</p>
+<h3 id="common-causes">Common Causes</h3>
+<ol type="1">
+<li><strong>Incomplete or Damaged Downloads:</strong> The most frequent
+cause is a download that was interrupted or corrupted during network
+transit, leaving missing bits inside the archive.</li>
+<li><strong>Incorrect Decryption Password:</strong> If an archive uses
+encrypted file data rather than encrypted file headers,
+<code>unrar</code> may attempt to unpack the files using an incorrect
+password. Because symmetric encryption with the wrong key yields
+pseudo-random garbage data, the resulting checksum fails, throwing exit
+code 3.</li>
+<li><strong>Storage or Media Errors:</strong> Bad sectors on hard
+drives, failing flash storage, or faulty RAM can alter bits of the
+archive either while stored on disk or while loaded into memory.</li>
+<li><strong>Multipart Archive Desynchronization:</strong> In split
+archives (e.g., <code>.part1.rar</code>, <code>.part2.rar</code>), if
+one part is from an older or modified version, the overall extraction
+will fail with a CRC mismatch.</li>
+</ol>
+<h3 id="how-to-resolve-unrar-exit-code-3">How to Resolve Unrar Exit Code
+3</h3>
+<ul>
+<li><strong>Verify the Password:</strong> If the archive is
+password-protected, verify that the password provided to the
+<code>-p</code> switch is correct.</li>
+<li><strong>Redownload the Archive:</strong> If the archive was fetched
+over the internet, obtain a fresh copy. When available, compare the MD5
+or SHA-256 hash of your downloaded file against the source file.</li>
+<li><strong>Attempt Archive Repair:</strong> If the original archive
+included recovery records, you can attempt to repair it using the
+<code>r</code> command:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rar</span> r archive_name.rar</span></code></pre></div>
+This creates a <code>fixed.archive_name.rar</code> file that can often
+reconstruct damaged data blocks.</li>
+<li><strong>Force Extraction (Ignore Broken Files):</strong> If the data
+cannot be repaired but you still need access to whatever partial data
+exists, use the <code>-kb</code> (Keep Broken extracted files) flag:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive_name.rar</span></code></pre></div>
+While this still logs exit code 3, it prevents <code>unrar</code> from
+automatically deleting the damaged files after extraction.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

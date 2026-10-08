@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparing Unrar and Historical ARJ Extraction Tools - unrar</title>
+    <meta name="description" content="This article examines the technical and operational differences between the modern unrar utility and historical ARJ extraction tools like UNARJ. During the MS-DOS and early internet eras, Robert Jung's ARJ format was the benchmark for multi-volume compre">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/comparing-unrar-and-historical-arj-extraction-tools">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Comparing Unrar and Historical ARJ Extraction Tools - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/comparing-unrar-and-historical-arj-extraction-tools" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines the technical and operational differences between the modern unrar utility and historical ARJ extraction tools like UNARJ. During the MS-DOS and early internet eras, Robert Jung's ARJ format was the benchmark for multi-volume compre" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="comparing-unrar-and-historical-arj-extraction-tools">Comparing
+Unrar and Historical ARJ Extraction Tools</h1>
+<p>This article examines the technical and operational differences
+between the modern unrar utility and historical ARJ extraction tools
+like UNARJ. During the MS-DOS and early internet eras, Robert Jung's ARJ
+format was the benchmark for multi-volume compression and floppy-disk
+spanning. As computing moved toward larger storage, higher memory
+availability, and stronger encryption needs, Eugene Roshal’s RAR format
+and the unrar utility superseded ARJ. Below is a direct comparison of
+their architecture, compression algorithms, feature sets, and modern
+utility.</p>
+<h3 id="compression-algorithms-and-resource-overhead">Compression
+Algorithms and Resource Overhead</h3>
+<p>The original ARJ extraction utilities were designed around the strict
+hardware limitations of 16-bit MS-DOS environments. ARJ utilized an
+LZ77-based sliding dictionary combined with Huffman coding, typically
+using a 26 KB or 32 KB sliding dictionary. Because of this small
+footprint, tools like <code>UNARJ.EXE</code> required minimal
+conventional memory (under 640 KB) and could extract files rapidly on
+low-frequency x86 processors.</p>
+<p>In contrast, <code>unrar</code> supports algorithms developed across
+several generations of the RAR standard (from RAR 1.5 up to RAR 5.x).
+Modern RAR archives use dictionary sizes ranging from 128 KB up to
+several gigabytes. The unrar utility uses these massive dictionary
+windows along with advanced heuristics, delta filtering, and PPMd
+audio/text compression algorithms. While unrar requires significantly
+more RAM and CPU cycles to reconstruct data than UNARJ ever did, it
+achieves vastly superior compression ratios on modern data types.</p>
+<h3 id="multi-volume-archive-handling">Multi-Volume Archive
+Handling</h3>
+<p>ARJ gained widespread adoption on Bulletin Board Systems (BBS)
+primarily due to its reliable multi-volume spanning. Using command-line
+flags, ARJ allowed users to split single files across sets of 1.44 MB or
+720 KB floppy disks. Extraction tools like <code>ARJ x -v</code>
+prompted users sequentially to insert the next physical disk.</p>
+<p>The <code>unrar</code> tool expanded on this concept for
+network-based transmission. Instead of physical media prompts, modern
+<code>unrar</code> handles multi-part archives (.part01.rar,
+.part02.rar) automatically when placed in the same directory.
+Furthermore, unrar integrates with RAR’s dedicated recovery volume
+system (.rev files), allowing users to reconstruct missing or corrupt
+archive parts using Reed-Solomon error correction—a feature completely
+absent in historical ARJ tools.</p>
+<h3 id="security-and-data-integrity">Security and Data Integrity</h3>
+<p>Security represents one of the starkest divides between the two
+tools:</p>
+<ul>
+<li><strong>ARJ:</strong> Offered only basic XOR-based password
+protection and a proprietary encryption scheme. By modern standards, ARJ
+encryption is trivial to break using standard brute-force or
+known-plaintext attacks. Integrity verification relied strictly on
+standard 32-bit CRC checksums.</li>
+<li><strong>unrar:</strong> Implements industry-standard 128-bit (RAR4)
+and 256-bit (RAR5) AES encryption. Password verification in unrar
+incorporates secure key derivation via PBKDF2 with HMAC-SHA256,
+protecting against modern GPU-accelerated dictionary attacks. For
+integrity, RAR5 allows optional cryptographic BLAKE2sp hashes alongside
+standard CRC32.</li>
+</ul>
+<h3 id="metadata-unicode-and-file-systems">Metadata, Unicode, and File
+Systems</h3>
+<p>ARJ was created primarily for the FAT16 file system, restricting it
+to 8.3 filename conventions and standard DOS file attributes (Archive,
+Hidden, Read-Only, System). While later 32-bit variants added support
+for Windows 95 long file names (LFN), extraction tools frequently broke
+directory trees when ported across non-DOS platforms.</p>
+<p>The unrar utility was engineered for modern operating systems. It
+natively handles full UTF-8/Unicode character encoding, extended file
+permissions (POSIX/NTFS ACLs), symbolic links, alternate data streams
+(ADS), and 64-bit file sizes well beyond the 2 GB/4 GB boundaries that
+often constrained ARJ archives.</p>
+<h3 id="current-usability-and-platform-support">Current Usability and
+Platform Support</h3>
+<p>Today, ARJ extraction tools exist primarily as historical curiosities
+or lightweight open-source utilities like <code>unarj</code> ported to
+POSIX systems for digital preservation. The original ARJ software is
+16-bit legacy code that cannot run natively on 64-bit Windows
+environments without virtualization.</p>
+<p>The <code>unrar</code> command-line utility remains actively
+maintained, cross-platform, multithreaded, and standard in Linux, macOS,
+and Windows environments, maintaining backward compatibility to unpack
+legacy RAR formats while supporting contemporary data workloads.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

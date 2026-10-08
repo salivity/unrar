@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract RAR Split Across Multiple Discs Using Unrar - unrar</title>
+    <meta name="description" content="Extracting a multi-volume RAR archive spanning several optical discs (CDs, DVDs, or Blu-rays) using the command-line utility unrar can be achieved in two ways: extracting directly from the optical drive with manual disc swapping, or copying all volume fi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extract-rar-split-across-multiple-discs-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract RAR Split Across Multiple Discs Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extract-rar-split-across-multiple-discs-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting a multi-volume RAR archive spanning several optical discs (CDs, DVDs, or Blu-rays) using the command-line utility unrar can be achieved in two ways: extracting directly from the optical drive with manual disc swapping, or copying all volume fi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-rar-split-across-multiple-discs-using-unrar">Extract RAR
+Split Across Multiple Discs Using Unrar</h1>
+<p>Extracting a multi-volume RAR archive spanning several optical discs
+(CDs, DVDs, or Blu-rays) using the command-line utility
+<code>unrar</code> can be achieved in two ways: extracting directly from
+the optical drive with manual disc swapping, or copying all volume files
+to a local storage drive first. This guide explains how to properly
+execute the <code>unrar</code> command for multi-disc archives, navigate
+disc-swapping prompts, and avoid common optical drive mounting
+issues.</p>
+<h3 id="method-1-extract-directly-from-the-optical-drive">Method 1:
+Extract Directly from the Optical Drive</h3>
+<p>You can extract the archive directly without using extra hard drive
+space for the compressed parts. <code>unrar</code> will pause and prompt
+you whenever it requires the next volume.</p>
+<ol type="1">
+<li><strong>Insert the First Disc:</strong> Insert the disc containing
+the first volume (e.g., <code>archive.part01.rar</code> or
+<code>archive.r00</code>) into your drive and ensure it is mounted.</li>
+<li><strong>Run the Extraction Command:</strong> Open your terminal and
+run the extraction command, pointing to the archive on the disc and
+specifying an output directory on your local drive:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x /media/username/DISC1/archive.part01.rar /path/to/destination/</span></code></pre></div>
+<em>Note: Always use <code>x</code> instead of <code>e</code> to
+preserve the original directory structure of the files.</em></li>
+<li><strong>Swap Discs When Prompted:</strong> When <code>unrar</code>
+finishes reading the first volume, it will display a message stating
+that the next volume is required:
+<pre class="text"><code>Cannot find volume /media/username/DISC1/archive.part02.rar
+Insert disk with this volume and press Enter or type the new path:</code></pre></li>
+<li><strong>Eject and Mount the Next Disc:</strong> Eject the current
+disc, insert the next disc, and wait for the system to mount it.</li>
+<li><strong>Provide the New Path:</strong> If the mount point changes
+(for example, if the second disc has a different label like
+<code>DISC2</code>), type the full path to the next file (e.g.,
+<code>/media/username/DISC2/archive.part02.rar</code>) and press
+<strong>Enter</strong>. If the mount path remains identical, simply
+press <strong>Enter</strong>.</li>
+<li>Repeat this process until all discs have been processed and the
+extraction is complete.</li>
+</ol>
+<hr />
+<h3 id="method-2-copy-files-to-a-local-directory-recommended">Method 2:
+Copy Files to a Local Directory (Recommended)</h3>
+<p>Extracting directly from optical media can fail if your operating
+system locks the drive tray during active process execution. The most
+reliable method is staging the archive files locally:</p>
+<ol type="1">
+<li><strong>Create a Temporary Folder:</strong> Create a single
+directory on your hard drive or SSD:
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> ~/rar_temp</span></code></pre></div></li>
+<li><strong>Copy All Parts:</strong> Insert each disc sequentially and
+copy all the RAR volume files (<code>.part01.rar</code>,
+<code>.part02.rar</code>, etc.) into that single temporary folder.</li>
+<li><strong>Extract the Archive:</strong> Navigate to the folder and run
+<code>unrar</code> on the first volume:
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/rar_temp</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part01.rar /path/to/destination/</span></code></pre></div>
+<code>unrar</code> will automatically detect and process every
+subsequent volume in the folder without pausing.</li>
+<li><strong>Clean Up:</strong> Delete the temporary directory once the
+extraction is verified:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span> <span class="at">-r</span> ~/rar_temp</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="handling-locked-drive-trays-on-linux">Handling Locked Drive
+Trays on Linux</h3>
+<p>If using Method 1 on Linux, your system may prevent you from ejecting
+the disc while <code>unrar</code> is waiting. If the drive is
+locked:</p>
+<ol type="1">
+<li>Open a second terminal window.</li>
+<li>Force an unmount using:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> umount <span class="at">-l</span> /media/username/DISC1</span></code></pre></div></li>
+<li>Eject the disc:
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">eject</span></span></code></pre></div></li>
+<li>Insert the new disc, mount it, and return to the first terminal to
+continue extraction.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

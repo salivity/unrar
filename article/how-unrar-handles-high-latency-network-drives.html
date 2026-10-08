@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles High Latency Network Drives - unrar</title>
+    <meta name="description" content="Extracting RAR archives directly to a high-latency network drive using unrar often leads to severe performance degradation due to the way the utility manages file I/O operations. This article explains the technical mechanics behind how unrar processes ne">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-high-latency-network-drives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles High Latency Network Drives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-high-latency-network-drives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting RAR archives directly to a high-latency network drive using unrar often leads to severe performance degradation due to the way the utility manages file I/O operations. This article explains the technical mechanics behind how unrar processes ne" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-high-latency-network-drives">How Unrar Handles
+High Latency Network Drives</h1>
+<p>Extracting RAR archives directly to a high-latency network drive
+using <code>unrar</code> often leads to severe performance degradation
+due to the way the utility manages file I/O operations. This article
+explains the technical mechanics behind how <code>unrar</code> processes
+network writes, why high round-trip time (RTT) amplifies transfer
+delays, and the most effective methods to circumvent these
+bottlenecks.</p>
+<h3 id="synchronous-io-and-network-round-trips">Synchronous I/O and
+Network Round-Trips</h3>
+<p>The <code>unrar</code> utility relies on standard, synchronous file
+system APIs provided by the host operating system. When extracting an
+archive, the program reads the compressed data, decompresses it into a
+memory buffer, and writes the uncompressed blocks sequentially to the
+destination path.</p>
+<p>On a local drive, synchronous write calls execute almost
+instantaneously. On a network-attached storage (NAS) volume or a remote
+share mounted via protocols like SMB or NFS, every I/O call requires a
+network round-trip. Because <code>unrar</code> waits for the destination
+file system to acknowledge each write before proceeding to the next
+block, high network latency directly stalls the decompression pipeline.
+The decompression engine sits idle while waiting for network
+acknowledgments.</p>
+<h3 id="the-metadata-and-small-file-penalty">The Metadata and Small-File
+Penalty</h3>
+<p>The performance impact is most pronounced when extracting archives
+containing numerous small files or deep directory structures. Each file
+in a RAR archive requires several distinct remote operations:</p>
+<ol type="1">
+<li>Checking if the target path exists.</li>
+<li>Creating the new file handle.</li>
+<li>Sending the decompressed payload in sequential chunks.</li>
+<li>Setting file attributes, timestamps, and permissions.</li>
+<li>Flushing buffers and closing the file handle.</li>
+</ol>
+<p>Over a connection with 50 to 100 milliseconds of latency, performing
+these transactional metadata calls for thousands of individual files
+causes extraction times to increase exponentially, regardless of
+available network bandwidth.</p>
+<h3 id="absence-of-built-in-latency-mitigation">Absence of Built-in
+Latency Mitigation</h3>
+<p>The standard <code>unrar</code> command-line utility does not
+incorporate mechanisms designed to combat network latency:</p>
+<ul>
+<li><strong>No Asynchronous Pipelining:</strong> It does not use
+advanced asynchronous I/O frameworks (such as <code>io_uring</code> on
+Linux or overlapped I/O on Windows) to queue multiple write operations
+simultaneously.</li>
+<li><strong>No Multi-threaded File Writing:</strong> While modern
+versions of <code>unrar</code> can utilize multiple CPU threads to
+accelerate the decompression algorithm itself, file output remains
+single-threaded per file. It cannot write multiple files in parallel to
+saturate high-latency links.</li>
+<li><strong>Standard Buffer Sizes:</strong> The internal write buffers
+in <code>unrar</code> are optimized for local disk block sizes rather
+than wide-area network (WAN) window sizes.</li>
+</ul>
+<h3 id="recommended-workarounds">Recommended Workarounds</h3>
+<p>To avoid the performance penalties of extracting directly across
+high-latency connections, consider the following workflows:</p>
+<ul>
+<li><strong>Extract Locally, Then Transfer:</strong> Extract the archive
+entirely on the local machine or on the remote host itself. Once
+extracted, transfer the files using tools optimized for high latency,
+such as <code>rclone</code>, <code>rsync</code>, or multi-threaded copy
+utilities that pipeline data and aggregate metadata operations.</li>
+<li><strong>Remote Extraction:</strong> If SSH or remote management
+access is available on the machine hosting the network storage, execute
+<code>unrar</code> directly on the remote server. This confines all read
+and write operations to the local bus of the storage system.</li>
+<li><strong>Mount Caching:</strong> If direct network extraction is
+unavoidable, configure the network client mount with aggressive
+write-back caching (such as asynchronous NFS mounts or SMB client-side
+caching), allowing the local operating system to buffer write operations
+before committing them over the network.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

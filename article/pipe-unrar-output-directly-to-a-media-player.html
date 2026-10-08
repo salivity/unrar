@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipe Unrar Output Directly to a Media Player - unrar</title>
+    <meta name="description" content="Streaming video directly from a compressed RAR archive allows you to watch media without waiting for a full extraction or using extra disk space. By using the command-line utility unrar to send file data to standard output (stdout), you can pipe the unco">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/pipe-unrar-output-directly-to-a-media-player">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Pipe Unrar Output Directly to a Media Player - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/pipe-unrar-output-directly-to-a-media-player" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Streaming video directly from a compressed RAR archive allows you to watch media without waiting for a full extraction or using extra disk space. By using the command-line utility unrar to send file data to standard output (stdout), you can pipe the unco" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="pipe-unrar-output-directly-to-a-media-player">Pipe Unrar Output
+Directly to a Media Player</h1>
+<p>Streaming video directly from a compressed RAR archive allows you to
+watch media without waiting for a full extraction or using extra disk
+space. By using the command-line utility <code>unrar</code> to send file
+data to standard output (stdout), you can pipe the uncompressed stream
+straight into the standard input (stdin) of media players such as VLC,
+MPV, or MPlayer.</p>
+<h3 id="the-basic-command-structure">The Basic Command Structure</h3>
+<p>To pipe a media file from a RAR archive into a player, use the
+<code>p</code> (print) command combined with the <code>-inul</code>
+(inhibit messages) switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<h3 id="command-breakdown">Command Breakdown</h3>
+<ul>
+<li><strong><code>unrar</code></strong>: Invokes the command-line
+extraction tool.</li>
+<li><strong><code>p</code></strong>: Instructs <code>unrar</code> to
+output the contents of the compressed file directly to standard output
+(stdout) instead of writing it to disk.</li>
+<li><strong><code>-inul</code></strong>: Suppresses all status messages,
+headers, and copyright banners. This is crucial because any text mixed
+into the video stream will corrupt the playback.</li>
+<li><strong><code>archive.rar</code></strong>: The path to your target
+RAR archive.</li>
+<li><strong><code>|</code></strong>: The pipe operator, which redirects
+stdout of the left command to stdin of the right command.</li>
+<li><strong><code>mpv -</code></strong>: The media player command. The
+trailing hyphen (<code>-</code>) explicitly tells the media player to
+read the video stream from standard input rather than looking for a
+local file.</li>
+</ul>
+<h3 id="examples-for-common-media-players">Examples for Common Media
+Players</h3>
+<p>Depending on your preferred video player, you can adjust the
+receiving end of the command:</p>
+<h4 id="using-mpv">Using MPV</h4>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> movie.rar <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<h4 id="using-vlc">Using VLC</h4>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> movie.rar <span class="kw">|</span> <span class="ex">vlc</span> <span class="at">-</span></span></code></pre></div>
+<h4 id="using-mplayer">Using MPlayer</h4>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> movie.rar <span class="kw">|</span> <span class="ex">mplayer</span> <span class="at">-cache</span> 8192 <span class="at">-</span></span></code></pre></div>
+<p><em>(Adding a cache buffer to MPlayer helps prevent playback
+stuttering.)</em></p>
+<h3 id="handling-multi-part-archives">Handling Multi-Part Archives</h3>
+<p>If your media file is split across multiple RAR files (e.g.,
+<code>movie.part01.rar</code>, <code>movie.part02.rar</code>), specify
+only the first volume in the sequence. <code>unrar</code> will
+automatically read the sequential volumes and stream the file
+continuously:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> movie.part01.rar <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<h3 id="specifying-a-file-in-multi-file-archives">Specifying a File in
+Multi-File Archives</h3>
+<p>If the archive contains multiple files (such as sample clips, text
+files, or subtitles), specify the exact filename of the video you want
+to play at the end of the <code>unrar</code> command:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> release.rar <span class="st">&quot;video.mkv&quot;</span> <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<p>If you do not know the exact filename, run
+<code>unrar l archive.rar</code> first to list the contents of the
+archive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

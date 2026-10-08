@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Invalid Volume Sequence Numbers - unrar</title>
+    <meta name="description" content="When extracting split multi-volume RAR sets, the unrar utility relies on internal header flags and volume counters to assemble spanned data in the correct order. If an archive presents an invalid or unexpected volume sequence number, unrar interrupts the">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-invalid-volume-sequence-numbers">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Invalid Volume Sequence Numbers - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-invalid-volume-sequence-numbers" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting split multi-volume RAR sets, the unrar utility relies on internal header flags and volume counters to assemble spanned data in the correct order. If an archive presents an invalid or unexpected volume sequence number, unrar interrupts the" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-invalid-volume-sequence-numbers">How Unrar
+Handles Invalid Volume Sequence Numbers</h1>
+<p>When extracting split multi-volume RAR sets, the <code>unrar</code>
+utility relies on internal header flags and volume counters to assemble
+spanned data in the correct order. If an archive presents an invalid or
+unexpected volume sequence number, <code>unrar</code> interrupts the
+continuous decompression stream to prevent data corruption. This article
+explains how <code>unrar</code> validates volume headers, how it behaves
+in interactive versus non-interactive modes when sequence errors occur,
+and the impact of out-of-order volumes on the extraction of individual
+files.</p>
+<h3 id="volume-header-verification">Volume Header Verification</h3>
+<p>Multi-volume RAR sets include specialized header blocks—such as the
+Archive Header and Main Header—that define volume properties. Within
+these headers, specific flags denote whether an archive is part of a
+multi-volume set, whether it is the first volume, and which sequential
+index it occupies.</p>
+<p>During extraction, <code>unrar</code> maintains an internal state
+machine that tracks the expected next volume number. As each new volume
+is loaded, the utility parses the volume header before decompressing any
+payload. If the header’s volume number does not match the expected
+integer (for example, reading volume 3 immediately after volume 1),
+<code>unrar</code> flags the archive as an out-of-sequence or missing
+volume rather than parsing corrupted data blocks.</p>
+<h3 id="interactive-prompting-vs-batch-execution">Interactive Prompting
+vs. Batch Execution</h3>
+<p>How <code>unrar</code> reacts to an invalid sequence number depends
+largely on the execution environment and command-line switches:</p>
+<ul>
+<li><strong>Interactive Mode:</strong> If <code>unrar</code> is run in
+an interactive terminal without automation flags, encountering an
+invalid sequence number triggers a prompt. The utility asks the user to
+manually locate or insert the correct archive volume (e.g., displaying
+<code>Cannot find volume [name]</code> or prompting for a new file
+path). If the user provides a file with the valid matching sequence
+number, extraction resumes seamlessly.</li>
+<li><strong>Non-Interactive Mode:</strong> In batch environments, or
+when switches such as <code>-y</code> (assume yes) or <code>-inul</code>
+(disable messages) are active, <code>unrar</code> cannot prompt for user
+input. In this scenario, it aborts the process, reports a non-zero exit
+code indicating a missing or corrupt volume, and halts
+decompression.</li>
+</ul>
+<h3 id="impact-on-spanned-vs-self-contained-files">Impact on Spanned vs.
+Self-Contained Files</h3>
+<p>The compression dictionary in RAR files can span across multiple
+volumes. An invalid sequence number affects individual files differently
+depending on their location in the archive:</p>
+<ul>
+<li><strong>Files Spanning Volumes:</strong> If a single file begins in
+a valid volume but continues across a missing or out-of-sequence
+boundary, extraction fails completely. Because the sliding compression
+dictionary requires continuous byte streams, any jump or missing link
+invalidates the decompressor state, resulting in a CRC mismatch or an
+unexpected end-of-archive error.</li>
+<li><strong>Self-Contained Files:</strong> Files that start and finish
+entirely within the volumes processed prior to the sequence error are
+extracted normally and remain intact on disk. However, unless forced
+with specific switches such as <code>-kb</code> (keep broken extracted
+files), <code>unrar</code> defaults to deleting partially extracted
+files that were in the middle of being reconstructed when the sequence
+error occurred.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

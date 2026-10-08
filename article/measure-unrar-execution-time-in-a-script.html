@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measure Unrar Execution Time in a Script - unrar</title>
+    <meta name="description" content="Measuring the execution time of an unrar extraction command is essential for benchmarking file decompression performance, identifying system bottlenecks, and optimizing automated backup workflows. This guide covers how to track unrar execution duration p">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/measure-unrar-execution-time-in-a-script">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Measure Unrar Execution Time in a Script - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/measure-unrar-execution-time-in-a-script" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Measuring the execution time of an unrar extraction command is essential for benchmarking file decompression performance, identifying system bottlenecks, and optimizing automated backup workflows. This guide covers how to track unrar execution duration p" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="measure-unrar-execution-time-in-a-script">Measure Unrar
+Execution Time in a Script</h1>
+<p>Measuring the execution time of an <code>unrar</code> extraction
+command is essential for benchmarking file decompression performance,
+identifying system bottlenecks, and optimizing automated backup
+workflows. This guide covers how to track <code>unrar</code> execution
+duration precisely across different scripting environments, including
+Linux Bash scripts, Windows PowerShell, and cross-platform Python
+scripts.</p>
+<h3 id="1-using-bash-linux--macos">1. Using Bash (Linux / macOS)</h3>
+<p>In Bash, you can measure execution time using built-in timestamp
+calculation or the <code>time</code> utility.</p>
+<h4 id="method-a-nanosecond-calculation-with-date">Method A: Nanosecond
+Calculation with <code>date</code></h4>
+<p>This approach captures timestamps immediately before and after the
+extraction command, making it easy to store the result in a variable for
+logging.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="va">archive</span><span class="op">=</span><span class="st">&quot;archive.rar&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">destination</span><span class="op">=</span><span class="st">&quot;./extracted/&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture start time in nanoseconds</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="va">start_time</span><span class="op">=</span><span class="va">$(</span><span class="fu">date</span> +%s%N<span class="va">)</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute the extraction</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-inul</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$destination</span><span class="st">&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Capture end time in nanoseconds</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="va">end_time</span><span class="op">=</span><span class="va">$(</span><span class="fu">date</span> +%s%N<span class="va">)</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate duration in milliseconds</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="va">elapsed_ms</span><span class="op">=</span><span class="va">$((</span> (<span class="va">end_time</span> <span class="op">-</span> <span class="va">start_time</span>) <span class="op">/</span> <span class="dv">1000000</span> <span class="va">))</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Extraction completed in </span><span class="va">${elapsed_ms}</span><span class="st"> ms.&quot;</span></span></code></pre></div>
+<p><em>Note: The <code>-inul</code> flag suppresses standard
+<code>unrar</code> messages to keep logs clean.</em></p>
+<h4 id="method-b-the-gnu-time-utility">Method B: The GNU
+<code>time</code> Utility</h4>
+<p>To measure CPU usage alongside wall-clock time without modifying
+script logic heavily, use the standalone <code>/usr/bin/time</code>
+binary:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/bin/time</span> <span class="at">-f</span> <span class="st">&quot;Elapsed: %E (Real), User: %U, Sys: %S&quot;</span> unrar x <span class="at">-inul</span> archive.rar</span></code></pre></div>
+<hr />
+<h3 id="2-using-windows-powershell">2. Using Windows PowerShell</h3>
+<p>Windows environments typically use PowerShell's
+<code>Measure-Command</code> cmdlet or
+<code>[System.Diagnostics.Stopwatch]</code>.</p>
+<h4 id="method-a-measure-command">Method A:
+<code>Measure-Command</code></h4>
+<p><code>Measure-Command</code> executes a script block and outputs an
+object detailing the duration.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">$archive</span> <span class="op">=</span> <span class="st">&quot;archive.rar&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">$destination</span> <span class="op">=</span> <span class="st">&quot;C:\Extracted\&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="va">$duration</span> <span class="op">=</span> <span class="fu">Measure-Command</span> <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Start-Process</span> <span class="op">-</span>FilePath <span class="st">&quot;unrar.exe&quot;</span> <span class="op">-</span>ArgumentList <span class="st">&quot;x -inul </span><span class="ch">`&quot;</span><span class="va">$archive</span><span class="ch">`&quot;</span><span class="st"> </span><span class="ch">`&quot;</span><span class="va">$destination</span><span class="ch">`&quot;</span><span class="st">&quot;</span> <span class="op">-</span>Wait <span class="op">-</span>NoNewWindow</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">Write-Output</span> <span class="st">&quot;Extraction took </span><span class="op">$(</span><span class="va">$duration</span><span class="op">.</span><span class="fu">TotalSeconds</span><span class="op">)</span><span class="st"> seconds.&quot;</span></span></code></pre></div>
+<h4 id="method-b-net-stopwatch">Method B: .NET
+<code>Stopwatch</code></h4>
+<p>For higher precision and easier logging within complex scripts:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">$stopwatch</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">Diagnostics</span><span class="op">.</span><span class="fu">Stopwatch</span><span class="op">]::</span>StartNew<span class="op">()</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">&amp;</span> unrar<span class="op">.</span><span class="fu">exe</span> x <span class="op">-</span>inul archive<span class="op">.</span><span class="fu">rar</span> C<span class="op">:</span>\Extracted\</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="va">$stopwatch</span><span class="op">.</span><span class="fu">Stop</span><span class="op">()</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">Write-Output</span> <span class="st">&quot;Elapsed Time: </span><span class="op">$(</span><span class="va">$stopwatch</span><span class="op">.</span><span class="fu">Elapsed</span><span class="op">.</span><span class="fu">TotalMilliseconds</span><span class="op">)</span><span class="st"> ms&quot;</span></span></code></pre></div>
+<hr />
+<h3 id="3-using-python">3. Using Python</h3>
+<p>If you manage extractions in a platform-independent workflow, use
+Python's <code>time.perf_counter()</code> alongside
+<code>subprocess</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>archive <span class="op">=</span> <span class="st">&quot;archive.rar&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>destination <span class="op">=</span> <span class="st">&quot;./extracted/&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>start_time <span class="op">=</span> time.perf_counter()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> subprocess.run(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    [<span class="st">&quot;unrar&quot;</span>, <span class="st">&quot;x&quot;</span>, <span class="st">&quot;-inul&quot;</span>, archive, destination],</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    capture_output<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    text<span class="op">=</span><span class="va">True</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>end_time <span class="op">=</span> time.perf_counter()</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>elapsed <span class="op">=</span> end_time <span class="op">-</span> start_time</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> result.returncode <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Unrar finished successfully in </span><span class="sc">{</span>elapsed<span class="sc">:.4f}</span><span class="ss"> seconds.&quot;</span>)</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Extraction failed: </span><span class="sc">{</span>result<span class="sc">.</span>stderr<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

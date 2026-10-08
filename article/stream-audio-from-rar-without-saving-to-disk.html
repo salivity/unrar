@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream Audio from RAR Without Saving to Disk - unrar</title>
+    <meta name="description" content="Extracting audio files from a RAR archive directly into memory without saving them to your hard drive or SSD is entirely possible using the standard unrar utility. By directing the extracted audio stream straight to standard output (stdout), you can pipe">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/stream-audio-from-rar-without-saving-to-disk">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Stream Audio from RAR Without Saving to Disk - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/stream-audio-from-rar-without-saving-to-disk" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting audio files from a RAR archive directly into memory without saving them to your hard drive or SSD is entirely possible using the standard unrar utility. By directing the extracted audio stream straight to standard output (stdout), you can pipe" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="stream-audio-from-rar-without-saving-to-disk">Stream Audio from
+RAR Without Saving to Disk</h1>
+<p>Extracting audio files from a RAR archive directly into memory
+without saving them to your hard drive or SSD is entirely possible using
+the standard <code>unrar</code> utility. By directing the extracted
+audio stream straight to standard output (<code>stdout</code>), you can
+pipe the binary data directly into media players or audio processing
+tools in real time. This guide covers how this process works, the exact
+commands required, and practical playback examples.</p>
+<h2 id="how-in-memory-extraction-works">How In-Memory Extraction
+Works</h2>
+<p>By default, <code>unrar</code> extracts compressed files directly to
+a destination directory on your physical storage. However,
+<code>unrar</code> provides a print command (<code>p</code>) that
+directs the extracted file data to the terminal's standard output
+instead of creating a file on disk.</p>
+<p>When you combine the print command with switches to suppress status
+messages and banners, the resulting output is a clean, raw binary stream
+of the audio file. This stream can be piped immediately into any media
+software that accepts input from standard input
+(<code>stdin</code>).</p>
+<h2 id="the-command-syntax">The Command Syntax</h2>
+<p>To extract an audio file to standard output cleanly, use the
+following syntax:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar <span class="st">&quot;song.mp3&quot;</span></span></code></pre></div>
+<p>Here is a breakdown of the essential flags:</p>
+<ul>
+<li><strong><code>p</code></strong>: Prints the extracted file to
+<code>stdout</code> instead of saving it to disk.</li>
+<li><strong><code>-inul</code></strong>: Disables all informational
+messages, headers, and copyright notices. Without this switch, console
+text will mix into your audio stream, corrupting the file and preventing
+playback.</li>
+<li><strong><code>archive.rar</code></strong>: The path to your target
+RAR archive.</li>
+<li><strong><code>"song.mp3"</code></strong>: The specific file name
+inside the archive. Specifying the file name ensures only the intended
+track is streamed.</li>
+</ul>
+<h2 id="streaming-directly-to-media-players">Streaming Directly to Media
+Players</h2>
+<p>You can pipe the decompressed output directly into command-line media
+players without generating any temporary files on disk.</p>
+<h3 id="using-mpv">Using MPV</h3>
+<p>MPV natively supports reading from standard input using a hyphen
+(<code>-</code>):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> music_archive.rar <span class="st">&quot;track01.flac&quot;</span> <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<h3 id="using-vlc">Using VLC</h3>
+<p>VLC can read from standard input using the <code>fd://0</code> (file
+descriptor 0) argument:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> music_archive.rar <span class="st">&quot;track01.mp3&quot;</span> <span class="kw">|</span> <span class="ex">vlc</span> fd://0</span></code></pre></div>
+<h3 id="using-ffplay">Using FFplay</h3>
+<p>FFplay (part of FFmpeg) also uses the hyphen syntax to accept piped
+audio:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> music_archive.rar <span class="st">&quot;track01.wav&quot;</span> <span class="kw">|</span> <span class="ex">ffplay</span> <span class="at">-nodisp</span> <span class="at">-autoexit</span> <span class="at">-</span></span></code></pre></div>
+<h2 id="handling-encrypted-archives">Handling Encrypted Archives</h2>
+<p>If the RAR archive is password-protected, you must supply the
+password on the command line to prevent interactive prompts from
+breaking the pipeline:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> <span class="at">-p</span><span class="st">&quot;YourPassword&quot;</span> archive.rar <span class="st">&quot;track01.mp3&quot;</span> <span class="kw">|</span> <span class="ex">mpv</span> <span class="at">-</span></span></code></pre></div>
+<h2 id="limitations-to-consider">Limitations to Consider</h2>
+<ul>
+<li><strong>Seeking Restrictions:</strong> Because the audio is streamed
+via a standard unidirectional pipe, seeking forward or backward may be
+restricted or unavailable in the media player, depending on the format
+and the player's buffering capabilities.</li>
+<li><strong>Single Track Output:</strong> Streaming works best on a
+per-file basis. Attempting to output an entire multi-track album into a
+single pipe will merge multiple discrete audio streams into one
+continuous data flow, which can confuse decoders.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

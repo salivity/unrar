@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Compile unrar from Source on Unix - unrar</title>
+    <meta name="description" content="Compiling unrar from source code on a Unix-based operating system ensures you have the latest official release and full control over binary optimizations for your specific architecture. This guide provides a straightforward walkthrough detailing how to i">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-compile-unrar-from-source-on-unix">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Compile unrar from Source on Unix - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-compile-unrar-from-source-on-unix" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Compiling unrar from source code on a Unix-based operating system ensures you have the latest official release and full control over binary optimizations for your specific architecture. This guide provides a straightforward walkthrough detailing how to i" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-compile-unrar-from-source-on-unix">How to Compile unrar
+from Source on Unix</h1>
+<p>Compiling <code>unrar</code> from source code on a Unix-based
+operating system ensures you have the latest official release and full
+control over binary optimizations for your specific architecture. This
+guide provides a straightforward walkthrough detailing how to install
+the required build dependencies, download the official source tarball
+from RARLAB, build the executable using standard compilation tools, and
+install the resulting binary directly into your system PATH.</p>
+<h3 id="1-install-required-build-tools">1. Install Required Build
+Tools</h3>
+<p>Before compiling, ensure your system has a C++ compiler (such as GCC
+or Clang) and the <code>make</code> utility installed.</p>
+<p>On Debian or Ubuntu:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install build-essential</span></code></pre></div>
+<p>On Fedora, CentOS, or RHEL:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf groupinstall <span class="st">&quot;Development Tools&quot;</span></span></code></pre></div>
+<p>On macOS (via Homebrew or Xcode Command Line Tools):</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">xcode-select</span> <span class="at">--install</span></span></code></pre></div>
+<h3 id="2-download-and-extract-the-source-code">2. Download and Extract
+the Source Code</h3>
+<p>RARLAB hosts the official source code packages for
+<code>unrar</code>. Use <code>wget</code> or <code>curl</code> to
+download the latest source archive:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://www.rarlab.com/rar/unrarsrc-6.2.12.tar.gz</span></code></pre></div>
+<p><em>Note: You can check
+<code>https://www.rarlab.com/rar_add.htm</code> to substitute the
+version number with the most current release.</em></p>
+<p>Extract the downloaded archive and enter the newly created
+directory:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzvf</span> unrarsrc-<span class="pp">*</span>.tar.gz</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> unrar</span></code></pre></div>
+<h3 id="3-compile-the-binary">3. Compile the Binary</h3>
+<p>The extracted directory includes a pre-configured
+<code>makefile</code>. Compile the source code by invoking
+<code>make</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span></span></code></pre></div>
+<p>If you prefer to build a shared library (<code>libunrar.so</code>)
+instead of the standalone utility, you can run:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> lib</span></code></pre></div>
+<h3 id="4-install-the-executable">4. Install the Executable</h3>
+<p>Once compilation completes without errors, install the
+<code>unrar</code> binary into a standard system directory, such as
+<code>/usr/local/bin</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> make install</span></code></pre></div>
+<p>Alternatively, if the makefile install target does not match your
+directory layout, copy the binary manually:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> install <span class="at">-m</span> 755 unrar /usr/local/bin/</span></code></pre></div>
+<h3 id="5-verify-the-installation">5. Verify the Installation</h3>
+<p>Check that the system recognizes the newly installed utility and
+displays the proper version information:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div>
+<p>The output will display the program version, copyright information,
+and a list of available extraction commands and switches.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

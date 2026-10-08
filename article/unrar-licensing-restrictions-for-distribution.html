@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Licensing Restrictions for Distribution - unrar</title>
+    <meta name="description" content="Before distributing the unrar utility or its source code, developers and system administrators must navigate several critical licensing constraints. Although the source code for unrar is publicly accessible and free to download, it is distributed under a">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-licensing-restrictions-for-distribution">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Licensing Restrictions for Distribution - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-licensing-restrictions-for-distribution" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Before distributing the unrar utility or its source code, developers and system administrators must navigate several critical licensing constraints. Although the source code for unrar is publicly accessible and free to download, it is distributed under a" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-licensing-restrictions-for-distribution">Unrar Licensing
+Restrictions for Distribution</h1>
+<p>Before distributing the <code>unrar</code> utility or its source
+code, developers and system administrators must navigate several
+critical licensing constraints. Although the source code for
+<code>unrar</code> is publicly accessible and free to download, it is
+distributed under a proprietary, non-open-source license written by
+Alexander Roshal. Key restrictions include an explicit prohibition
+against reverse-engineering the RAR compression algorithm,
+incompatibility with standard copyleft licenses like the GNU General
+Public License (GPL), and strict stipulations regarding redistribution
+in commercial environments.</p>
+<h3 id="the-non-free-nature-of-the-license">The Non-Free Nature of the
+License</h3>
+<p>The <code>unrar</code> license is neither Open Source Initiative
+(OSI) approved nor compliant with the Debian Free Software Guidelines
+(DFSG). While it grants permission to view, compile, and distribute the
+unrar code for decompression purposes, it fails the standard definition
+of Free and Open Source Software (FOSS) because it places deliberate
+limits on how the software may be used and studied. Consequently, major
+Linux distributions package official <code>unrar</code> binaries in
+restricted or "non-free" repositories rather than their core
+distributions.</p>
+<h3
+id="prohibition-against-re-creating-the-compression-algorithm">Prohibition
+Against Re-Creating the Compression Algorithm</h3>
+<p>The most critical clause in the <code>unrar</code> source license is
+the restriction on reverse-engineering the compression engine:</p>
+<ul>
+<li><strong>No Compression Development:</strong> The license explicitly
+states that the source code may not be used to re-create the RAR
+compression algorithm, reverse-engineer it, or create third-party tools
+that generate RAR-compatible archives.</li>
+<li><strong>Decompression Only:</strong> Derived works and modifications
+are strictly restricted to expanding, extracting, and decompressing RAR
+archives.</li>
+</ul>
+<p>Distributing software that uses modified <code>unrar</code> code to
+write or modify RAR archives constitutes a direct violation of the
+author's intellectual property rights.</p>
+<h3
+id="incompatibility-with-the-gpl-and-copyleft-licenses">Incompatibility
+with the GPL and Copyleft Licenses</h3>
+<p>Because the <code>unrar</code> license imposes restrictions on
+modification and usage that go beyond the permissions granted by the GNU
+General Public License (GPL), the two licenses are legally
+incompatible.</p>
+<ul>
+<li><strong>Static or Dynamic Linking:</strong> You cannot link
+<code>unrar</code> source code directly into a GPL-licensed application
+and distribute the resulting binary. Doing so breaches the GPL's
+requirement that no additional restrictions be placed on the downstream
+user.</li>
+<li><strong>Separation Requirements:</strong> Projects that require both
+GPL code and RAR extraction must either invoke the standalone
+<code>unrar</code> executable via an external sub-process or use an
+independently written, clean-room reverse-engineered alternative such as
+<code>unrar-free</code> (which only supports older RAR formats).</li>
+</ul>
+<h3 id="commercial-redistribution-considerations">Commercial
+Redistribution Considerations</h3>
+<p>Distributing compiled binaries versus integrating the source code
+carries distinct requirements:</p>
+<ul>
+<li><strong>Unmodified Binaries:</strong> Distributing the official,
+unmodified <code>unrar</code> binary alongside commercial software as a
+standalone utility is generally permitted under freeware terms, provided
+the original copyright notice and license documentation remain
+intact.</li>
+<li><strong>Bundling and Integration:</strong> Embedding
+<code>unrar</code> code directly into proprietary commercial
+applications or altering it for integration requires strict adherence to
+the copyright notice conditions. If custom integration blurs the line
+between standalone decompression and unauthorized implementation of RAR
+technologies, explicit licensing permission must be obtained from the
+copyright holder.</li>
+</ul>
+<h3 id="copyright-and-attribution-requirements">Copyright and
+Attribution Requirements</h3>
+<p>Any legal distribution of <code>unrar</code>—whether as source code
+or a compiled binary—requires retaining all original copyright notices,
+the author's name (Alexander Roshal), and the full text of the license
+agreement. You may not claim authorship or remove the disclaimer of
+warranty.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

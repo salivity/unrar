@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Use Find and Unrar to Extract Specific Files - unrar</title>
+    <meta name="description" content="You can combine the Linux find utility with unrar to search an entire filesystem for RAR archives and extract only specific file types, such as documents, audio tracks, or images. By pairing the locating power of find with the pattern-matching extraction">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-use-find-and-unrar-to-extract-specific-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Use Find and Unrar to Extract Specific Files - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-use-find-and-unrar-to-extract-specific-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="You can combine the Linux find utility with unrar to search an entire filesystem for RAR archives and extract only specific file types, such as documents, audio tracks, or images. By pairing the locating power of find with the pattern-matching extraction" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-use-find-and-unrar-to-extract-specific-files">How to Use
+Find and Unrar to Extract Specific Files</h1>
+<p>You can combine the Linux <code>find</code> utility with
+<code>unrar</code> to search an entire filesystem for RAR archives and
+extract only specific file types, such as documents, audio tracks, or
+images. By pairing the locating power of <code>find</code> with the
+pattern-matching extraction syntax of <code>unrar</code>, administrators
+and users can automate batch extractions without manually opening each
+archive or unpacking unwanted data.</p>
+<h3 id="the-basic-command-structure">The Basic Command Structure</h3>
+<p>The command uses <code>find</code> to locate <code>.rar</code> files
+and passes each matched archive to <code>unrar</code> via the
+<code>-exec</code> parameter:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /path/to/search <span class="at">-type</span> f <span class="at">-name</span> <span class="st">&quot;*.rar&quot;</span> <span class="at">-exec</span> unrar e {} <span class="st">&quot;*.pdf&quot;</span> /destination/dir/ <span class="dt">\;</span></span></code></pre></div>
+<p>In this command:</p>
+<ul>
+<li><code>find /path/to/search</code>: Specifies where the search begins
+(use <code>/</code> to scan the whole system).</li>
+<li><code>-type f</code>: Restricts the search strictly to regular
+files.</li>
+<li><code>-name "*.rar"</code>: Matches all files with the
+<code>.rar</code> extension.</li>
+<li><code>-exec ... \;</code>: Executes the specified command for every
+archive found.</li>
+<li><code>{}</code>: Acts as a placeholder replaced by the path of each
+found RAR file.</li>
+</ul>
+<h3 id="understanding-unrar-extraction-options">Understanding
+<code>unrar</code> Extraction Options</h3>
+<p>The <code>unrar</code> utility supports selective extraction natively
+by accepting target file masks at the end of the command:</p>
+<ul>
+<li><strong><code>e</code> (Extract without paths):</strong> Unpacks all
+matching files into a single flat directory, ignoring internal folder
+structures:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar <span class="st">&quot;*.jpg&quot;</span> /target/folder/</span></code></pre></div></li>
+<li><strong><code>x</code> (Extract with full paths):</strong> Recreates
+the internal archive directory tree at the destination:
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="st">&quot;*.jpg&quot;</span> /target/folder/</span></code></pre></div></li>
+</ul>
+<p>Always enclose file masks like <code>"*.jpg"</code> or
+<code>"*.txt"</code> in quotes. Quoting prevents the shell from
+expanding the wildcard before passing the pattern to
+<code>unrar</code>.</p>
+<h3 id="practical-examples">Practical Examples</h3>
+<h4 id="1-extract-specific-file-types-into-a-central-directory">1.
+Extract Specific File Types into a Central Directory</h4>
+<p>To search your entire home directory for RAR archives and extract
+only <code>.docx</code> files into a central folder named
+<code>/home/user/Documents/Extracted</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /home/user <span class="at">-type</span> f <span class="at">-name</span> <span class="st">&quot;*.rar&quot;</span> <span class="at">-exec</span> unrar e <span class="at">-o-</span> {} <span class="st">&quot;*.docx&quot;</span> /home/user/Documents/Extracted/ <span class="dt">\;</span></span></code></pre></div>
+<p>The <code>-o-</code> switch ensures <code>unrar</code> skips files
+that already exist in the destination folder rather than prompting for
+overwrite confirmation, preventing the automated loop from stalling.</p>
+<h4 id="2-extract-multiple-specific-file-extensions">2. Extract Multiple
+Specific File Extensions</h4>
+<p>You can pass multiple patterns to <code>unrar</code> to extract
+multiple file formats in a single operation:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> /media/storage <span class="at">-type</span> f <span class="at">-name</span> <span class="st">&quot;*.rar&quot;</span> <span class="at">-exec</span> unrar e <span class="at">-y</span> {} <span class="st">&quot;*.png&quot;</span> <span class="st">&quot;*.jpg&quot;</span> <span class="st">&quot;*.jpeg&quot;</span> /media/storage/photos/ <span class="dt">\;</span></span></code></pre></div>
+<p>The <code>-y</code> flag automatically answers "yes" to all internal
+queries.</p>
+<h4 id="3-extract-in-place-while-preserving-paths">3. Extract In-Place
+While Preserving Paths</h4>
+<p>To extract <code>.csv</code> files from archives found system-wide,
+unpacking them directly into the directory where each RAR file resides
+while preserving internal folder hierarchies:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> / <span class="at">-type</span> f <span class="at">-name</span> <span class="st">&quot;*.rar&quot;</span> <span class="at">-execdir</span> unrar x <span class="at">-o-</span> {} <span class="st">&quot;*.csv&quot;</span> <span class="dt">\;</span></span></code></pre></div>
+<p>Using <code>-execdir</code> runs the <code>unrar</code> process from
+the directory containing the matched archive rather than the directory
+where you initiated the command.</p>
+<h3 id="key-considerations">Key Considerations</h3>
+<ul>
+<li><strong>System-Wide Permissions:</strong> When searching the root
+filesystem (<code>/</code>), prepend <code>sudo</code> to avoid
+"Permission denied" errors on restricted directories.</li>
+<li><strong>Non-Interactive Execution:</strong> Always supply an
+overwrite switch like <code>-o+</code> (overwrite all) or
+<code>-o-</code> (skip existing) so batch scripts do not pause waiting
+for terminal input.</li>
+<li><strong>Archive Integrity:</strong> Archives with passwords will
+prompt for input unless bypassed or provided using the
+<code>-p&lt;password&gt;</code> flag directly within the command
+string.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracting RAR Files to FAT32 Drives with Unrar - unrar</title>
+    <meta name="description" content="Extracting a RAR archive onto a FAT32 drive using the unrar utility works seamlessly for standard archives, but it frequently fails when encountering large files or modern file attributes. Because FAT32 is an older file system, running unrar against it c">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extracting-rar-files-to-fat-32-drives-with-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extracting RAR Files to FAT32 Drives with Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extracting-rar-files-to-fat-32-drives-with-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting a RAR archive onto a FAT32 drive using the unrar utility works seamlessly for standard archives, but it frequently fails when encountering large files or modern file attributes. Because FAT32 is an older file system, running unrar against it c" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extracting-rar-files-to-fat32-drives-with-unrar">Extracting RAR
+Files to FAT32 Drives with Unrar</h1>
+<p>Extracting a RAR archive onto a FAT32 drive using the
+<code>unrar</code> utility works seamlessly for standard archives, but
+it frequently fails when encountering large files or modern file
+attributes. Because FAT32 is an older file system, running
+<code>unrar</code> against it can trigger write errors, truncate or
+overwrite conflicting file names, and discard file permissions due to
+inherent architectural limits.</p>
+<h3 id="the-4-gb-individual-file-size-limit">The 4 GB Individual File
+Size Limit</h3>
+<p>The most common issue when using <code>unrar</code> on a FAT32 volume
+is the 4 GB file size barrier. FAT32 cannot store any individual file
+larger than 4,294,967,295 bytes (4 GiB minus 1 byte).</p>
+<p>If a RAR archive contains a single file that exceeds 4 GB upon
+decompression:</p>
+<ul>
+<li><code>unrar</code> will begin extracting the data until the written
+file reaches the 4 GB threshold.</li>
+<li>The operating system rejects further write operations.</li>
+<li><code>unrar</code> halts and returns a failure message, typically
+stating:
+<code>Write error: only NTFS file system supports files larger than 4 GB</code>
+or a generic <code>File write error / disk full</code>.</li>
+<li>The resulting extracted file on the drive remains incomplete and
+corrupted.</li>
+</ul>
+<p>Note that this limit applies to the <em>uncompressed</em> size of
+individual files inside the archive, not the combined size of the
+archive itself. An archive containing twenty 1 GB files will extract
+successfully, while an archive containing one 5 GB file will always
+fail.</p>
+<h3 id="incompatible-file-names-and-case-sensitivity">Incompatible File
+Names and Case Sensitivity</h3>
+<p>FAT32 is a case-preserving but case-insensitive file system, and it
+restricts certain characters in file names. When extracting an archive
+created on systems like Linux or macOS:</p>
+<ul>
+<li><strong>Name Collisions:</strong> If the archive contains two files
+with the same name in different cases (e.g., <code>README.txt</code> and
+<code>readme.txt</code>), <code>unrar</code> will either overwrite the
+first file with the second or prompt for overwrite confirmation.</li>
+<li><strong>Illegal Characters:</strong> FAT32 prohibits characters such
+as <code>\</code>, <code>/</code>, <code>:</code>, <code>*</code>,
+<code>?</code>, <code>"</code>, <code>&lt;</code>, <code>&gt;</code>,
+and <code>|</code>. If archive file names include these symbols,
+<code>unrar</code> will fail to create the file or replace the invalid
+characters, depending on the tool's version and operating
+environment.</li>
+</ul>
+<h3 id="loss-of-unix-permissions-and-symbolic-links">Loss of Unix
+Permissions and Symbolic Links</h3>
+<p>FAT32 does not support POSIX-compliant permissions, file ownership
+(UID/GID), or symbolic links. When you use <code>unrar</code> on a Linux
+or macOS machine to unpack files onto a FAT32 drive:</p>
+<ul>
+<li>File permissions (such as read/write/execute flags) are lost and
+replaced with the default mount permissions of the FAT32 volume.</li>
+<li>Symbolic links and hard links cannot be recreated natively, causing
+<code>unrar</code> to either skip them or report an error.</li>
+</ul>
+<h3 id="how-to-resolve-fat32-extraction-issues">How to Resolve FAT32
+Extraction Issues</h3>
+<p>To successfully extract files that exceed FAT32 constraints, choose
+one of the following solutions:</p>
+<ol type="1">
+<li><strong>Reformat the Drive to exFAT:</strong> exFAT retains
+cross-platform compatibility across Windows, macOS, and modern Linux
+systems while supporting virtually unlimited file sizes.</li>
+<li><strong>Reformat to NTFS or ext4:</strong> Use NTFS for Windows
+environments or ext4 for Linux environments to retain full file
+attribute and permission support.</li>
+<li><strong>Extract Locally First:</strong> Extract the RAR archive to
+an internal drive using a modern file system, and then split the
+resulting files into chunks under 4 GB before transferring them to the
+FAT32 volume.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

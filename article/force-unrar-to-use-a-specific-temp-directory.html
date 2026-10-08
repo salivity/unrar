@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Unrar to Use a Specific Temp Directory - unrar</title>
+    <meta name="description" content="When extracting large RAR archives on systems with limited space on the default root or drive partition, redirecting temporary files is essential to avoid out-of-disk-space errors. This guide explains how to force the unrar command-line utility to use a">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/force-unrar-to-use-a-specific-temp-directory">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Force Unrar to Use a Specific Temp Directory - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/force-unrar-to-use-a-specific-temp-directory" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting large RAR archives on systems with limited space on the default root or drive partition, redirecting temporary files is essential to avoid out-of-disk-space errors. This guide explains how to force the unrar command-line utility to use a" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="force-unrar-to-use-a-specific-temp-directory">Force Unrar to Use
+a Specific Temp Directory</h1>
+<p>When extracting large RAR archives on systems with limited space on
+the default root or drive partition, redirecting temporary files is
+essential to avoid out-of-disk-space errors. This guide explains how to
+force the <code>unrar</code> command-line utility to use a designated
+temporary or working directory instead of the system default, ensuring
+seamless extraction and better disk management.</p>
+<h2 id="using-the--w-switch">Using the <code>-w</code> Switch</h2>
+<p>The most direct way to specify a temporary directory in
+<code>unrar</code> is with the <code>-w&lt;path&gt;</code> switch. This
+command tells the extraction tool to assign a custom work directory for
+unpacking intermediate files.</p>
+<p>The syntax requires appending your target directory directly to the
+flag:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-w</span>/path/to/custom_temp archive.rar</span></code></pre></div>
+<p>On Windows, the command structure remains identical with Windows
+paths:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>unrar x <span class="at">-wC:</span>\CustomTemp archive.rar</span></code></pre></div>
+<p>Ensure there is no space between the <code>-w</code> flag and the
+path, and verify that the target directory already exists and has the
+appropriate write permissions.</p>
+<h2 id="using-the-tmpdir-environment-variable-linuxmacos">Using the
+<code>TMPDIR</code> Environment Variable (Linux/macOS)</h2>
+<p>If you are using a build of <code>unrar</code> that relies on
+standard system libraries to generate temporary files, setting the
+temporary environment variable for the execution session will redirect
+temporary data.</p>
+<p>Run the extraction with <code>TMPDIR</code> prepended to the
+command:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">TMPDIR</span><span class="op">=</span>/path/to/custom_temp <span class="ex">unrar</span> x archive.rar</span></code></pre></div>
+<p>This overrides the default <code>/tmp</code> location for the
+duration of that specific command without altering system-wide
+environment variables.</p>
+<h2 id="using-the-temp-environment-variable-windows">Using the
+<code>TEMP</code> Environment Variable (Windows)</h2>
+<p>On Windows, command-line utilities frequently pull their temporary
+workspace location from the <code>TEMP</code> or <code>TMP</code>
+environment variables. You can redirect this in a Command Prompt
+session:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="va">TEMP</span>=D:\CustomTemp</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="va">TMP</span>=D:\CustomTemp</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>unrar x archive.rar</span></code></pre></div>
+<p>This ensures that any operations requiring temporary staging utilize
+the designated drive rather than filling up your primary <code>C:</code>
+drive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using UnRAR in Commercial Closed-Source Software - unrar</title>
+    <meta name="description" content="You can legally use UnRAR in commercial, closed-source software, but your usage must strictly comply with the specific terms of the UnRAR license. The source code provided by RARLAB allows developers to incorporate the decompression engine into proprieta">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/using-un-rar-in-commercial-closed-source-software">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Using UnRAR in Commercial Closed-Source Software - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/using-un-rar-in-commercial-closed-source-software" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="You can legally use UnRAR in commercial, closed-source software, but your usage must strictly comply with the specific terms of the UnRAR license. The source code provided by RARLAB allows developers to incorporate the decompression engine into proprieta" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="using-unrar-in-commercial-closed-source-software">Using UnRAR in
+Commercial Closed-Source Software</h1>
+<p>You can legally use UnRAR in commercial, closed-source software, but
+your usage must strictly comply with the specific terms of the UnRAR
+license. The source code provided by RARLAB allows developers to
+incorporate the decompression engine into proprietary applications free
+of charge, provided the code is solely used to decompress RAR archives
+and not to recreate or reverse-engineer the proprietary RAR compression
+algorithm.</p>
+<h3 id="the-unrar-license-explained">The UnRAR License Explained</h3>
+<p>UnRAR is distributed under a custom freeware license written by
+Alexander Roshal, the author of WinRAR. Unlike open-source licenses such
+as the MIT or Apache licenses, the UnRAR license contains specific usage
+restrictions that exclude it from the Open Source Initiative (OSI)
+definition of open source. However, it explicitly grants permission for
+commercial integration.</p>
+<p>The license states that the UnRAR source code may be used in any
+software to handle RAR archives without limitations and free of charge.
+This means you do not need to pay royalties, purchase a commercial
+license, or open-source your own proprietary codebase simply because you
+integrated the UnRAR source.</p>
+<h3 id="essential-legal-requirements-and-restrictions">Essential Legal
+Requirements and Restrictions</h3>
+<p>To remain legally compliant when embedding UnRAR into a closed-source
+product, you must adhere to the following conditions:</p>
+<ul>
+<li><strong>Decompression Only:</strong> The code cannot be used to
+develop a RAR-compatible compressor. The RAR compression algorithm
+remains proprietary intellectual property. Using the decompression logic
+to reconstruct a compression algorithm is a direct breach of the
+license.</li>
+<li><strong>Copyright and Attribution:</strong> You must retain the
+original copyright notice in the source files and include the RARLAB
+copyright acknowledgement in your product’s documentation or legal
+notices.</li>
+<li><strong>Modifications:</strong> If you modify the UnRAR source code,
+you must clearly document those changes and indicate that the code has
+been altered from the original RARLAB release.</li>
+</ul>
+<h3
+id="integration-methods-source-library-vs-binary-execution">Integration
+Methods: Source Library vs. Binary Execution</h3>
+<p>There are two primary ways to incorporate UnRAR into a commercial
+application:</p>
+<ol type="1">
+<li><strong>Compiling the UnRAR Source Code (or
+<code>libunrar</code>):</strong> Compiling the UnRAR C++ source files
+directly into your application or linking against <code>libunrar</code>
+is the most common integration method. This is fully permissible under
+the source license for extraction purposes without requiring you to
+disclose your own proprietary source code.</li>
+<li><strong>Bundling or Calling the Standalone Executable:</strong> If
+you distribute the precompiled <code>unrar</code> command-line
+executable alongside your software and call it via subprocesses, you
+must ensure that you redistribute the binary unaltered, alongside its
+accompanying license documentation. Alternatively, requiring end-users
+to provide their own installation of the UnRAR binary bypasses
+redistribution liabilities entirely.</li>
+</ol>
+<h3 id="summary-checklist-for-developers">Summary Checklist for
+Developers</h3>
+<p>Before releasing commercial, closed-source software using UnRAR,
+ensure that your implementation only reads and extracts RAR archives,
+includes the original copyright notice in your legal credits, and
+contains no code derived from UnRAR aimed at writing or creating RAR
+files. Consulting with your organization's legal counsel to review the
+exact UnRAR license version bundled with your build is recommended to
+ensure complete compliance.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Use Unrar Directly From PHP - unrar</title>
+    <meta name="description" content="PHP web applications can invoke unrar directly, either by executing the command-line utility through system execution functions or by using the official PECL extension. This article explains both implementation methods, configuration prerequisites, and t">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-use-unrar-directly-from-php">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Use Unrar Directly From PHP - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-use-unrar-directly-from-php" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="PHP web applications can invoke unrar directly, either by executing the command-line utility through system execution functions or by using the official PECL extension. This article explains both implementation methods, configuration prerequisites, and t" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-use-unrar-directly-from-php">How to Use Unrar Directly
+From PHP</h1>
+<p>PHP web applications can invoke <code>unrar</code> directly, either
+by executing the command-line utility through system execution functions
+or by using the official PECL extension. This article explains both
+implementation methods, configuration prerequisites, and the security
+measures required to safely extract RAR archives in a web
+environment.</p>
+<h3 id="method-1-the-pecl-rar-extension">Method 1: The PECL RAR
+Extension</h3>
+<p>The cleanest and most secure approach is using the native PECL
+<code>rar</code> extension, which embeds the UnRAR library directly into
+the PHP runtime. This eliminates the need to execute shell commands.</p>
+<ol type="1">
+<li><strong>Installation:</strong> Install the extension via PECL or
+your system package manager (e.g., <code>pecl install rar</code>).
+Ensure <code>extension=rar.so</code> is enabled in your
+<code>php.ini</code>.</li>
+<li><strong>Implementation:</strong> Use the <code>RarArchive</code>
+class to inspect and extract contents:</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="va">$archive</span> <span class="op">=</span> RarArchive::open(<span class="st">&#39;/path/to/archive.rar&#39;</span>)<span class="ot">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="va">$archive</span> <span class="op">===</span> <span class="kw">false</span>) {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">die</span>(<span class="st">&quot;Failed to open archive.&quot;</span>)<span class="ot">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="va">$entries</span> <span class="op">=</span> <span class="va">$archive</span>-&gt;getEntries()<span class="ot">;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="cf">foreach</span> (<span class="va">$entries</span> <span class="kw">as</span> <span class="va">$entry</span>) {</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="va">$entry</span>-&gt;<span class="fu">extract</span>(<span class="st">&#39;/path/to/destination/&#39;</span>)<span class="ot">;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="va">$archive</span>-&gt;close()<span class="ot">;</span></span></code></pre></div>
+<p>This approach bypasses system execution constraints and operates
+entirely within PHP memory and file system streams.</p>
+<h3 id="method-2-system-execution-functions">Method 2: System Execution
+Functions</h3>
+<p>If the PECL extension is not an option, you can invoke the system's
+<code>unrar</code> binary directly using execution functions like
+<code>exec()</code>, <code>shell_exec()</code>, or
+<code>proc_open()</code>.</p>
+<ol type="1">
+<li><strong>Prerequisites:</strong>
+<ul>
+<li>The <code>unrar</code> binary must be installed on the host
+operating system (e.g., <code>apt install unrar</code>).</li>
+<li>Functions like <code>exec</code> must not be listed under
+<code>disable_functions</code> in <code>php.ini</code>.</li>
+</ul></li>
+<li><strong>Implementation:</strong></li>
+</ol>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode php"><code class="sourceCode php"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="va">$archivePath</span> <span class="op">=</span> <span class="fu">escapeshellarg</span>(<span class="st">&#39;/path/to/archive.rar&#39;</span>)<span class="ot">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="va">$destination</span> <span class="op">=</span> <span class="fu">escapeshellarg</span>(<span class="st">&#39;/path/to/destination/&#39;</span>)<span class="ot">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">// &quot;x&quot; extracts with full path structure; &quot;-o+&quot; overwrites existing files</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="va">$command</span> <span class="op">=</span> <span class="st">&quot;unrar x -o+ </span>{<span class="va">$archivePath</span>}<span class="st"> </span>{<span class="va">$destination</span>}<span class="st">&quot;</span><span class="ot">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">exec</span>(<span class="va">$command</span><span class="ot">,</span> <span class="va">$output</span><span class="ot">,</span> <span class="va">$returnCode</span>)<span class="ot">;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="va">$returnCode</span> <span class="op">===</span> <span class="dv">0</span>) {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;Extraction successful.&quot;</span><span class="ot">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">echo</span> <span class="st">&quot;Extraction failed with code: &quot;</span> <span class="op">.</span> <span class="va">$returnCode</span><span class="ot">;</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="essential-considerations-and-security">Essential Considerations
+and Security</h3>
+<p>When invoking <code>unrar</code> from a web application, several
+factors must be handled:</p>
+<ul>
+<li><strong>File Permissions:</strong> The web server user (such as
+<code>www-data</code> or <code>nginx</code>) must have read permissions
+for the RAR file, execute permissions for the <code>unrar</code> binary,
+and write permissions for the destination directory.</li>
+<li><strong>Command Injection:</strong> Always wrap file paths and
+arguments in <code>escapeshellarg()</code> if using shell functions to
+prevent malicious command execution from user-supplied file names.</li>
+<li><strong>Decompression Bombs (Zip Bombs):</strong> Maliciously
+crafted small archives can unpack into hundreds of gigabytes, consuming
+disk space and CPU. Implement limits on maximum extracted file size and
+enforce execution timeouts via <code>set_time_limit()</code>.</li>
+<li><strong>Path Traversal:</strong> Validate the destination directory
+to ensure archives containing relative paths (such as
+<code>../../</code>) do not overwrite sensitive system files outside the
+designated target folder.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

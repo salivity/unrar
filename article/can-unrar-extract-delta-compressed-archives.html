@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Extract Delta Compressed Archives? - unrar</title>
+    <meta name="description" content="Yes, the official unrar utility can extract archives that use the delta compression algorithm. RAR archives utilize delta compression as a preprocessing filter to improve compression ratios on raw audio, RGB images, and structured binary data. As long as">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-delta-compressed-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Extract Delta Compressed Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-delta-compressed-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, the official unrar utility can extract archives that use the delta compression algorithm. RAR archives utilize delta compression as a preprocessing filter to improve compression ratios on raw audio, RGB images, and structured binary data. As long as" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-delta-compressed-archives">Can unrar Extract
+Delta Compressed Archives?</h1>
+<p>Yes, the official <code>unrar</code> utility can extract archives
+that use the delta compression algorithm. RAR archives utilize delta
+compression as a preprocessing filter to improve compression ratios on
+raw audio, RGB images, and structured binary data. As long as you are
+using the official freeware <code>unrar</code> tool distributed by
+RARLAB, all proprietary compression filters, including delta compression
+across RAR4 and RAR5 formats, are fully supported during extraction.</p>
+<h3 id="delta-compression-in-rar-archives">Delta Compression in RAR
+Archives</h3>
+<p>Delta compression in RAR works by recording the differences between
+consecutive bytes or records rather than the raw values themselves. This
+technique drastically reduces redundancy in continuous streams, such as
+uncompressed PCM audio or bitmap graphics. Once the delta transform is
+applied, standard LZ-based compression (like LZMA or RAR's proprietary
+dictionary algorithms) compresses the resulting byte stream far more
+efficiently.</p>
+<h3 id="official-unrar-vs-unrar-free">Official unrar vs. unrar-free</h3>
+<p>Compatibility issues generally arise not from the format itself, but
+from the specific software package installed on your system:</p>
+<ul>
+<li><strong>Official RARLAB <code>unrar</code>:</strong> This package
+includes the complete decompression codebase maintained by Alexander
+Roshal. It supports all legacy and modern RAR features, including
+multimedia delta algorithms (RAR 3.x/4.x) and the byte-level delta
+filter introduced in RAR 5.x. If you run
+<code>unrar x archive.rar</code>, delta-compressed data extracts without
+issue.</li>
+<li><strong>Open-source alternatives (<code>unrar-free</code>,
+<code>unar</code>, or older <code>libarchive</code>):</strong> Many
+Linux distributions offer <code>unrar-free</code> in their default
+open-source repositories. This tool is often based on older,
+reverse-engineered implementations that lack full support for advanced
+RAR filters. Attempting to unpack an archive with delta compression
+using these utilities often results in errors such as "unsupported
+compression method" or corrupted output.</li>
+</ul>
+<h3 id="verifying-your-unrar-installation">Verifying Your unrar
+Installation</h3>
+<p>To guarantee successful extraction of archives with delta
+compression, check which version of the utility is installed in your
+terminal:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div>
+<p>If the header displays <strong>"UNRAR [version] freeware copyright
+(c) 1993-202X Alexander Roshal"</strong>, you have the official utility
+capable of handling delta-compressed streams. If the output indicates
+the GNU project or <code>unrar-free</code>, replace it with the official
+<code>unrar</code> package from your distribution's non-free
+repositories or directly from RARLAB.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

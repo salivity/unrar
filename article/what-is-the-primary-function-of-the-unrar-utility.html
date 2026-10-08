@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is the Primary Function of the Unrar Utility? - unrar</title>
+    <meta name="description" content="The unrar utility is a command-line tool engineered specifically to decompress, extract, and inspect files stored within RAR archive formats. While many operating systems natively handle ZIP archives, the proprietary RAR compression format requires speci">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-is-the-primary-function-of-the-unrar-utility">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is the Primary Function of the Unrar Utility? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-is-the-primary-function-of-the-unrar-utility" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The unrar utility is a command-line tool engineered specifically to decompress, extract, and inspect files stored within RAR archive formats. While many operating systems natively handle ZIP archives, the proprietary RAR compression format requires speci" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-is-the-primary-function-of-the-unrar-utility">What Is the
+Primary Function of the Unrar Utility?</h1>
+<p>The unrar utility is a command-line tool engineered specifically to
+decompress, extract, and inspect files stored within RAR archive
+formats. While many operating systems natively handle ZIP archives, the
+proprietary RAR compression format requires specialized software to
+unpack its contents. This article explains the primary function of
+unrar, distinguishes it from the standard RAR utility, and details its
+most common operations, including full directory extraction, archive
+integrity testing, and password handling.</p>
+<p>The primary function of the unrar utility is the extraction and
+decompression of files from <code>.rar</code> archives. Unlike the full
+<code>rar</code> program, unrar is typically distributed as a freeware,
+extraction-only tool. It cannot create new RAR archives or modify
+existing ones; its entire operational scope is restricted to reading,
+unpacking, and verifying data packaged inside the RAR format.</p>
+<p>When working with RAR archives, unrar provides several critical
+capabilities:</p>
+<ul>
+<li><strong>Full Path Extraction (<code>unrar x</code>):</strong> The
+primary and most frequently used operation extracts files while strictly
+preserving the original directory tree and folder hierarchy stored
+inside the archive.</li>
+<li><strong>Flat Extraction (<code>unrar e</code>):</strong> This
+operation unpacks all files from an archive directly into the current
+working directory, deliberately ignoring any internal directory
+structure.</li>
+<li><strong>Archive Inspection (<code>unrar l</code> or
+<code>unrar v</code>):</strong> Users can view the contents, file sizes,
+attributes, and compression ratios of an archive without needing to
+unpack it first.</li>
+<li><strong>Integrity Testing (<code>unrar t</code>):</strong> Unrar
+computes and validates checksums against the archive data to detect
+corruption, transmission errors, or missing segments before attempting
+an extraction.</li>
+</ul>
+<p>In addition to standard single-file extractions, the unrar utility
+natively handles advanced features of the RAR format. It automatically
+reassembles multi-part (split) archives—such as <code>.part1.rar</code>,
+<code>.part2.rar</code>, or older <code>.r00</code>, <code>.r01</code>
+numbering schemes—provided the first volume is targeted. Furthermore, it
+supports cryptographic decryption, prompting the user for a passphrase
+or accepting it via command-line arguments to access password-protected
+files.</p>
+<p>Because of its lightweight footprint and absence of graphical user
+interface dependencies, unrar is the standard mechanism for handling RAR
+archives on Linux distributions, macOS terminals, headless servers, and
+automated script workflows.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

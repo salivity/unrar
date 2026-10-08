@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Corrupted Dictionary in Solid Archives - unrar</title>
+    <meta name="description" content="Solid RAR archives compress multiple files into a continuous data stream that relies on a shared sliding dictionary to achieve high compression ratios. When data corruption occurs within this dictionary or the compressed stream feeding it, the decompress">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-corrupted-dictionary-in-solid-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Corrupted Dictionary in Solid Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-corrupted-dictionary-in-solid-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Solid RAR archives compress multiple files into a continuous data stream that relies on a shared sliding dictionary to achieve high compression ratios. When data corruption occurs within this dictionary or the compressed stream feeding it, the decompress" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-corrupted-dictionary-in-solid-archives">Unrar Corrupted
+Dictionary in Solid Archives</h1>
+<p>Solid RAR archives compress multiple files into a continuous data
+stream that relies on a shared sliding dictionary to achieve high
+compression ratios. When data corruption occurs within this dictionary
+or the compressed stream feeding it, the decompression engine faces
+broken back-references that disrupt the extraction of subsequent files.
+This article explains how the <code>unrar</code> utility detects
+dictionary corruption in solid archives, why the failure cascades across
+multiple files, and how the tool behaves during extraction attempts.</p>
+<h3 id="how-solid-dictionaries-work-in-rar-archives">How Solid
+Dictionaries Work in RAR Archives</h3>
+<p>In a non-solid archive, each file is compressed independently with
+its own dictionary that resets upon completion. In a solid archive, the
+compression algorithm treats the entire set of files as one continuous
+sequence of bytes. The sliding dictionary—which can range from a few
+megabytes in RAR4 to several gigabytes in RAR5—stores recently
+decompressed data. Subsequent files reference byte patterns located in
+this shared history buffer. If File B references data patterns
+decompressed during the processing of File A, the integrity of File B
+directly depends on the exact state of File A's decompressed output.</p>
+<h3 id="detection-of-corrupted-dictionaries">Detection of Corrupted
+Dictionaries</h3>
+<p>The <code>unrar</code> utility does not run a dedicated "dictionary
+validator" prior to unpacking; instead, it detects corruption
+dynamically as the decompression stream is parsed:</p>
+<ol type="1">
+<li><strong>Decoding Violations:</strong> If corruption alters
+compressed data tokens, <code>unrar</code> encounters invalid Huffman
+codes, illegal run-lengths, or distance offsets pointing beyond the
+boundaries of the sliding dictionary. This immediately triggers a
+"Corrupt packed data" or "Checksum error" message.</li>
+<li><strong>Checksum Failures:</strong> Each file stored in a RAR
+archive possesses an individual checksum (CRC32 in RAR4; CRC32 or
+BLAKE2sp in RAR5). Even if a corrupted dictionary reference does not
+crash the decompressor, the decompressed output will contain incorrect
+bytes, causing the file's post-extraction checksum calculation to
+fail.</li>
+</ol>
+<h3 id="the-cascading-failure-effect">The Cascading Failure Effect</h3>
+<p>Because a solid archive relies on an uninterrupted sliding window,
+dictionary corruption produces a cascading failure:</p>
+<ul>
+<li><strong>State Desynchronization:</strong> If byte sequence <span
+class="math inline">\(X\)</span> is corrupted, the dictionary state
+becomes invalid. Even a single bit flip alters the sliding history
+buffer.</li>
+<li><strong>Loss of Downstream Files:</strong> Once the dictionary state
+diverges from the original state recorded at compression time, every
+following file that references that window will decompress into garbage
+data or trigger fatal decoding exceptions.</li>
+<li><strong>Reset Points:</strong> Solid archives may occasionally reset
+the dictionary at predefined boundaries if configured during creation,
+but standard solid archives maintain the chain until the entire solid
+block ends.</li>
+</ul>
+<h3 id="unrar-execution-behavior-and-recovery-options">Unrar Execution
+Behavior and Recovery Options</h3>
+<p>When <code>unrar</code> encounters a corrupted dictionary during
+solid extraction, it behaves according to specific operational
+rules:</p>
+<ul>
+<li><strong>Default Termination:</strong> By default, when a
+decompression error occurs in a solid archive, <code>unrar</code> halts
+extraction for the damaged file, reports the error, and automatically
+deletes the partially unpacked output. For subsequent files in the same
+solid block, <code>unrar</code> will often fail immediately because the
+sliding history required to decode them is missing or invalid.</li>
+<li><strong>Keeping Broken Files (<code>-kb</code>):</strong> Supplying
+the <code>-kb</code> (Keep Broken) switch forces <code>unrar</code> to
+retain whatever data it successfully unpacked before the corruption
+event occurred. While this preserves partial data from the corrupted
+file, it does not repair the dictionary for the files that follow.</li>
+<li><strong>Recovery Records:</strong> If the archive was created with a
+built-in recovery record (<code>.rev</code> files or parity sectors
+embedded using Reed-Solomon codes), <code>unrar</code> or
+<code>rar repair</code> (<code>rar r archive.rar</code>) can reconstruct
+the missing or damaged sectors <em>prior</em> to extraction. This
+restores the raw bitstream, thereby repairing the dictionary state
+before the decompression pipeline ever runs.</li>
+<li><strong>Absence of Mid-Stream Resynchronization:</strong> Unlike raw
+audio or video streams that contain synchronization markers, solid
+LZ-based compression streams cannot simply "skip ahead" to the next file
+within a damaged solid block without the correct dictionary context.
+Without parity-based repair data, recovery of subsequent files dependent
+on that dictionary is mathematically impossible.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

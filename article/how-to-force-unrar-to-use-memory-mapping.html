@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Force Unrar to Use Memory Mapping - unrar</title>
+    <meta name="description" content="This guide explains how to enable memory-mapped file access when extracting archives with Unrar. Because the official RARLAB Unrar binary does not provide a native command-line switch for memory mapping (mmap), standard extraction relies on conventional">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-force-unrar-to-use-memory-mapping">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Force Unrar to Use Memory Mapping - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-force-unrar-to-use-memory-mapping" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to enable memory-mapped file access when extracting archives with Unrar. Because the official RARLAB Unrar binary does not provide a native command-line switch for memory mapping (mmap), standard extraction relies on conventional" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-force-unrar-to-use-memory-mapping">How to Force Unrar to
+Use Memory Mapping</h1>
+<p>This guide explains how to enable memory-mapped file access when
+extracting archives with Unrar. Because the official RARLAB Unrar binary
+does not provide a native command-line switch for memory mapping
+(<code>mmap</code>), standard extraction relies on conventional buffered
+file I/O. To bypass this limitation and force memory-mapped behavior,
+you must leverage operating system mechanisms such as page cache
+locking, memory-backed filesystems, custom I/O wrappers, or source-level
+modifications.</p>
+<hr />
+<h3 id="understanding-unrars-file-io-architecture">Understanding Unrar's
+File I/O Architecture</h3>
+<p>The standard Unrar utility uses synchronous stream-based I/O
+primitives—specifically <code>ReadFile</code> on Windows and standard
+POSIX <code>read()</code>/<code>write()</code> calls on Unix-like
+platforms. There is no built-in flag (such as <code>--mmap</code> or
+<code>-io</code>) to toggle memory mapping directly from the CLI.</p>
+<p>To achieve the performance benefits and random-access speeds
+associated with memory mapping, choose one of the implementation
+strategies below.</p>
+<hr />
+<h3 id="method-1-preload-and-map-files-using-vmtouch-linux">Method 1:
+Preload and Map Files Using <code>vmtouch</code> (Linux)</h3>
+<p>If your goal is to eliminate disk read latency and map the archive
+into system memory prior to extraction, use <code>vmtouch</code>. This
+utility forces the Linux kernel to map the archive into the page
+cache.</p>
+<ol type="1">
+<li><p><strong>Install <code>vmtouch</code>:</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install vmtouch   <span class="co"># Debian/Ubuntu</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-S</span> vmtouch     <span class="co"># Arch Linux</span></span></code></pre></div></li>
+<li><p><strong>Map and lock the archive into memory:</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vmtouch</span> <span class="at">-tl</span> archive.rar</span></code></pre></div>
+<ul>
+<li><code>-t</code> issues an <code>mmap()</code> call and reads each
+page to bring the file into cache.</li>
+<li><code>-l</code> locks the mapped pages in memory using
+<code>mlock()</code>, preventing the kernel from paging them out.</li>
+</ul></li>
+<li><p><strong>Extract using Unrar:</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+<li><p><strong>Release locked memory when done:</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">vmtouch</span> <span class="at">-e</span> archive.rar</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="method-2-use-memory-backed-filesystems-tmpfs--ram-disk">Method
+2: Use Memory-Backed Filesystems (<code>tmpfs</code> / RAM Disk)</h3>
+<p>The most robust way to force Unrar to execute operations strictly
+within memory is to stage the archive inside a memory-mapped RAM
+filesystem.</p>
+<h4 id="on-linux-tmpfs">On Linux (<code>tmpfs</code>):</h4>
+<p>A <code>tmpfs</code> mount is directly backed by the Linux virtual
+memory manager and page cache.</p>
+<ol type="1">
+<li>Create a mount point and mount a temporary memory filesystem:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkdir <span class="at">-p</span> /mnt/ramdisk</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mount <span class="at">-t</span> tmpfs <span class="at">-o</span> size=8G tmpfs /mnt/ramdisk</span></code></pre></div></li>
+<li>Move the target archive into <code>/mnt/ramdisk</code> and extract:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> archive.rar /mnt/ramdisk/</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /mnt/ramdisk</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+</ol>
+<h4 id="on-windows">On Windows:</h4>
+<p>Use a virtual RAM disk driver (such as ImDisk) to allocate a drive
+letter directly from RAM, copy the RAR archive to that drive, and
+execute <code>unrar.exe</code> against the mounted volume.</p>
+<hr />
+<h3 id="method-3-intercept-io-via-an-ld_preload-wrapper">Method 3:
+Intercept I/O via an <code>LD_PRELOAD</code> Wrapper</h3>
+<p>On Unix systems, you can intercept the standard <code>read</code> and
+<code>open</code> system calls invoked by <code>unrar</code> and
+redirect them through an <code>mmap</code> interface using dynamic
+linker hooking.</p>
+<ol type="1">
+<li>Write a minimal C wrapper that intercepts calls to
+<code>open()</code> and <code>read()</code>. When Unrar opens the target
+file, call <code>mmap()</code> on the file descriptor:
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode c"><code class="sourceCode c"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">// mmap_wrapper.c</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#define </span><span class="ot">_GNU_SOURCE</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdio.h&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;stdlib.h&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;dlfcn.h&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/mman.h&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;sys/stat.h&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;fcntl.h&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">// Intercept standard open/read routines and route file buffers via mmap</span></span></code></pre></div></li>
+<li>Compile into a shared library:
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gcc</span> <span class="at">-Wall</span> <span class="at">-fPIC</span> <span class="at">-shared</span> <span class="at">-o</span> libmmap_wrap.so mmap_wrapper.c <span class="at">-ldl</span></span></code></pre></div></li>
+<li>Run Unrar with the library preloaded:
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="va">LD_PRELOAD</span><span class="op">=</span>./libmmap_wrap.so <span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+</ol>
+<hr />
+<h3 id="method-4-patch-the-source-code">Method 4: Patch the Source
+Code</h3>
+<p>Because RARLAB publishes the portable Unrar source code, you can
+permanently implement memory mapping by altering how archive files are
+opened.</p>
+<ol type="1">
+<li>Download the Unrar source code package from RARLAB.</li>
+<li>Open <code>file.cpp</code> (or <code>os.cpp</code>).</li>
+<li>Locate the <code>File::Open</code> and <code>File::Read</code>
+routines.</li>
+<li>Replace the underlying <code>read()</code> or
+<code>ReadFile()</code> calls:
+<ul>
+<li><strong>Linux:</strong> Use
+<code>mmap(NULL, FileSize, PROT_READ, MAP_SHARED, Handle, 0)</code>.
+Advance a memory pointer inside <code>File::Read</code> instead of
+issuing synchronous read operations.</li>
+<li><strong>Windows:</strong> Use <code>CreateFileMapping()</code> and
+<code>MapViewOfFile()</code> to map the entire archive into the
+process's address space.</li>
+</ul></li>
+<li>Recompile the binary using <code>make -f makefile</code> and use the
+resulting executable for extraction.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

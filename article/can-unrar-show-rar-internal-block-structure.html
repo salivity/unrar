@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Show RAR Internal Block Structure? - unrar</title>
+    <meta name="description" content="Standard command-line versions of the unrar utility cannot fully display the raw, low-level internal block structure of a RAR archive, but they can display extended technical header information. While unrar provides detailed file-level metadata using spe">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-show-rar-internal-block-structure">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Show RAR Internal Block Structure? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-show-rar-internal-block-structure" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Standard command-line versions of the unrar utility cannot fully display the raw, low-level internal block structure of a RAR archive, but they can display extended technical header information. While unrar provides detailed file-level metadata using spe" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-show-rar-internal-block-structure">Can unrar Show RAR
+Internal Block Structure?</h1>
+<p>Standard command-line versions of the <code>unrar</code> utility
+cannot fully display the raw, low-level internal block structure of a
+RAR archive, but they can display extended technical header information.
+While <code>unrar</code> provides detailed file-level metadata using
+specific technical listing commands, inspecting actual binary block
+sequences—such as marker blocks, main archive headers, and raw service
+block offsets—requires specialized archive analysis tools or hex
+editors.</p>
+<h3 id="native-unrar-capabilities">Native <code>unrar</code>
+Capabilities</h3>
+<p>The standard <code>unrar</code> utility provided by RARLAB includes
+commands to inspect archive contents, but its output is designed for
+file management rather than binary debugging.</p>
+<p>Using the technical listing flags:</p>
+<ul>
+<li><code>unrar lt &lt;archive.rar&gt;</code>: Displays a technical list
+showing individual file attributes, compression methods, dictionary
+sizes, host OS details, and packing versions.</li>
+<li><code>unrar vt &lt;archive.rar&gt;</code>: Displays a verbose
+technical list with similar extended metadata.</li>
+</ul>
+<p>While these commands expose technical parameters stored inside
+individual file and service headers, they abstract away the underlying
+layout. <code>unrar</code> does not output the raw sequence of internal
+blocks, header flags, byte offsets, or the markers (such as
+<code>MARK_HEAD</code> or <code>MAIN_HEAD</code>) that define the
+physical structure of RAR4 or RAR5 containers.</p>
+<h3 id="limitations-for-low-level-analysis">Limitations for Low-Level
+Analysis</h3>
+<p>If your goal is forensic analysis, archive corruption diagnosis, or
+format debugging, <code>unrar</code> falls short in several areas:</p>
+<ol type="1">
+<li><strong>No Block-by-Block Output:</strong> It does not report where
+one block ends and another begins.</li>
+<li><strong>Missing Marker Headers:</strong> Fundamental signature
+blocks like the 7-byte or 8-byte RAR signature and main archive headers
+are parsed silently and omitted from terminal output.</li>
+<li><strong>No Offset Information:</strong> It does not report the
+starting byte offsets or header sizes of archive blocks.</li>
+<li><strong>Encrypted Headers:</strong> If an archive uses encrypted
+headers (RAR filename encryption), <code>unrar</code> will not parse any
+structural blocks until the correct decryption key is supplied.</li>
+</ol>
+<h3 id="tools-for-viewing-rar-block-structures">Tools for Viewing RAR
+Block Structures</h3>
+<p>To analyze the true internal block hierarchy of a RAR archive, you
+must use tools designed for structural parsing:</p>
+<ul>
+<li><strong>7-Zip (<code>7z l -slt &lt;archive.rar&gt;</code>):</strong>
+Often provides deeper insight into embedded streams, physical sizes, and
+error locations than standard <code>unrar</code>.</li>
+<li><strong>010 Editor (with RAR Template):</strong> A binary editor
+that maps the official RAR specification directly onto the file,
+visually highlighting each internal block, variable-length integer, CRC
+checksum, and payload field.</li>
+<li><strong>Python Libraries (<code>rarfile</code> or custom
+parsers):</strong> Python's <code>rarfile</code> library allows you to
+inspect header flags programmatically. Alternatively, writing a custom
+parser using the open RAR format technical specification allows direct
+access to the byte-level block tree.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

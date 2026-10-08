@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Files Requiring Elevation - unrar</title>
+    <meta name="description" content="When extracting archives to protected directories, unrar does not possess built-in privilege escalation mechanisms. Instead, the utility strictly inherits the security permissions of the terminal or process that launched it, resulting in write-permission">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-files-requiring-elevation">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Files Requiring Elevation - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-files-requiring-elevation" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives to protected directories, unrar does not possess built-in privilege escalation mechanisms. Instead, the utility strictly inherits the security permissions of the terminal or process that launched it, resulting in write-permission" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-files-requiring-elevation">How Unrar Handles
+Files Requiring Elevation</h1>
+<p>When extracting archives to protected directories, <code>unrar</code>
+does not possess built-in privilege escalation mechanisms. Instead, the
+utility strictly inherits the security permissions of the terminal or
+process that launched it, resulting in write-permission errors if
+elevated rights are required but not provided beforehand.</p>
+<h3 id="security-context-and-privilege-inheritance">Security Context and
+Privilege Inheritance</h3>
+<p>The <code>unrar</code> command-line utility operates entirely within
+the security context of the invoking user. Unlike graphical installers
+or administrative tools that dynamically invoke User Account Control
+(UAC) on Windows or request root privileges on POSIX systems,
+<code>unrar</code> runs as a standard user process by default. It cannot
+independently prompt for administrative or root credentials
+mid-extraction.</p>
+<h3 id="behavior-on-windows-systems">Behavior on Windows Systems</h3>
+<p>When extracting to protected locations—such as
+<code>C:\Program Files</code>, <code>C:\Windows</code>, or
+system-restricted directories—without elevated rights:</p>
+<ul>
+<li><strong>Access Denied Errors:</strong> The extraction aborts or
+skips protected files, returning a
+<code>Cannot create [filename] - Access is denied</code> error.</li>
+<li><strong>Lack of UAC Integration:</strong> The standalone
+command-line executable (<code>unrar.exe</code>) does not trigger the
+Windows UAC consent or credential prompt.</li>
+<li><strong>Exit Codes:</strong> The tool terminates with an exit code
+indicating a write failure (typically Exit Code 6, representing an open
+or create error).</li>
+</ul>
+<h3 id="behavior-on-linux-and-macos">Behavior on Linux and macOS</h3>
+<p>On Unix-like operating systems, directory access relies on standard
+POSIX user, group, and other (UGO) permissions:</p>
+<ul>
+<li><strong>Permission Denied Errors:</strong> If the extraction target
+requires root privileges (such as <code>/usr/local/bin</code> or
+<code>/etc</code>), <code>unrar</code> immediately reports a write
+failure or permission denied error for each blocked file.</li>
+<li><strong>No Sudo Integration:</strong> The utility does not trigger a
+password prompt or invoke <code>sudo</code> autonomously.</li>
+</ul>
+<h3 id="how-to-resolve-elevation-requirements">How to Resolve Elevation
+Requirements</h3>
+<p>To extract archives into directories that require elevated
+permissions, the host environment must provide those privileges prior to
+running the command:</p>
+<ol type="1">
+<li><strong>Run as Administrator (Windows):</strong> Open Command Prompt
+or PowerShell with the "Run as Administrator" option before executing
+the <code>unrar</code> command.</li>
+<li><strong>Use Sudo (Linux/macOS):</strong> Prefix the extraction
+command with <code>sudo</code> (e.g.,
+<code>sudo unrar x archive.rar /protected/destination/</code>).</li>
+<li><strong>Two-Step Extraction:</strong> Extract the archive into a
+non-protected user directory (such as a temporary folder or the user
+profile), then use standard elevated file management commands to copy or
+move the extracted files into the target destination.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

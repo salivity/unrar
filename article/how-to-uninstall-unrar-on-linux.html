@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Uninstall Unrar on Linux - unrar</title>
+    <meta name="description" content="This guide provides straightforward instructions for removing or uninstalling the unrar utility from a Linux machine. Depending on the distribution you use—such as Ubuntu, Debian, Fedora, Arch Linux, or openSUSE—or whether it was installed from sourc">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-uninstall-unrar-on-linux">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Uninstall Unrar on Linux - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-uninstall-unrar-on-linux" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides straightforward instructions for removing or uninstalling the unrar utility from a Linux machine. Depending on the distribution you use—such as Ubuntu, Debian, Fedora, Arch Linux, or openSUSE—or whether it was installed from sourc" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-uninstall-unrar-on-linux">How to Uninstall Unrar on
+Linux</h1>
+<p>This guide provides straightforward instructions for removing or
+uninstalling the <code>unrar</code> utility from a Linux machine.
+Depending on the distribution you use—such as Ubuntu, Debian, Fedora,
+Arch Linux, or openSUSE—or whether it was installed from source, the
+exact command varies slightly. Follow the specific section below that
+corresponds to your package manager to clean up the utility and any
+associated configuration files.</p>
+<h2 id="debian-ubuntu-and-linux-mint-apt">Debian, Ubuntu, and Linux Mint
+(APT)</h2>
+<p>To remove <code>unrar</code> using the Advanced Package Tool (APT),
+open your terminal and run:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt remove unrar</span></code></pre></div>
+<p>If you also want to remove unused dependencies and configuration
+files associated with the package, run:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt purge unrar</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt autoremove</span></code></pre></div>
+<p><em>Note: If you installed the open-source alternative package
+<code>unrar-free</code>, replace <code>unrar</code> with
+<code>unrar-free</code> in the commands above.</em></p>
+<h2 id="fedora-rhel-and-centos-dnfyum">Fedora, RHEL, and CentOS
+(DNF/YUM)</h2>
+<p>On Fedora or RHEL-based systems using DNF, execute:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf remove unrar</span></code></pre></div>
+<p>On older systems using YUM:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> yum remove unrar</span></code></pre></div>
+<h2 id="arch-linux-and-manjaro-pacman">Arch Linux and Manjaro
+(Pacman)</h2>
+<p>To remove <code>unrar</code> on Arch-based distributions, use
+<code>pacman</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-R</span> unrar</span></code></pre></div>
+<p>To remove the package along with its unneeded dependencies:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-Rs</span> unrar</span></code></pre></div>
+<h2 id="opensuse-zypper">openSUSE (Zypper)</h2>
+<p>To remove <code>unrar</code> from openSUSE systems, run:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> zypper remove unrar</span></code></pre></div>
+<h2 id="removing-manually-installed-or-compiled-unrar">Removing Manually
+Installed or Compiled Unrar</h2>
+<p>If you installed <code>unrar</code> by downloading a pre-compiled
+binary or building it from source, package managers will not detect it.
+You must delete the executable manually.</p>
+<ol type="1">
+<li><p>Locate the installation path of the binary:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> unrar</span></code></pre></div>
+<p>Typical output is <code>/usr/local/bin/unrar</code> or
+<code>/usr/bin/unrar</code>.</p></li>
+<li><p>Delete the file using root permissions:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> rm /usr/local/bin/unrar</span></code></pre></div></li>
+</ol>
+<h2 id="verifying-the-removal">Verifying the Removal</h2>
+<p>To confirm that <code>unrar</code> has been completely removed from
+your system, run:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div>
+<p>If the removal was successful, your shell will return an output such
+as <code>bash: unrar: command not found</code>.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

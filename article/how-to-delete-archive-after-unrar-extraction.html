@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Delete Archive After Unrar Extraction - unrar</title>
+    <meta name="description" content="The unrar command-line utility does not include a native flag to automatically delete source archives upon extraction. However, you can safely delete the archive file immediately after a successful extraction by using shell conditional operators. This gu">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-delete-archive-after-unrar-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Delete Archive After Unrar Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-delete-archive-after-unrar-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The unrar command-line utility does not include a native flag to automatically delete source archives upon extraction. However, you can safely delete the archive file immediately after a successful extraction by using shell conditional operators. This gu" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-delete-archive-after-unrar-extraction">How to Delete
+Archive After Unrar Extraction</h1>
+<p>The <code>unrar</code> command-line utility does not include a native
+flag to automatically delete source archives upon extraction. However,
+you can safely delete the archive file immediately after a successful
+extraction by using shell conditional operators. This guide explains how
+to chain the extraction and cleanup commands across Linux, macOS, and
+Windows environments, ensuring archives are removed only when the
+extraction finishes without errors.</p>
+<hr />
+<h3 id="the-standard-command-conditional-execution">The Standard
+Command: Conditional Execution</h3>
+<p>Because <code>unrar</code> returns an exit code of <code>0</code>
+when an extraction completes successfully, you can pair it with your
+shell's logical <code>AND</code> operator (<code>&amp;&amp;</code>). If
+the extraction encounters errors, the cleanup command will not execute,
+protecting your data from accidental loss.</p>
+<h4 id="linux-and-macos-bash--zsh">Linux and macOS (Bash / Zsh)</h4>
+<p>For a single archive:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> archive.rar</span></code></pre></div>
+<p>For multi-part archives (e.g., <code>archive.part1.rar</code>,
+<code>archive.part2.rar</code>):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part1.rar <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> archive.part<span class="pp">*</span>.rar</span></code></pre></div>
+<p><em>Note: Use <code>x</code> instead of <code>e</code> to preserve
+the original directory structure within the archive.</em></p>
+<h4 id="windows-command-prompt-cmd">Windows Command Prompt (CMD)</h4>
+<p>For a single archive:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>unrar x archive.rar <span class="kw">&amp;&amp;</span> <span class="bu">del</span> archive.rar</span></code></pre></div>
+<p>For multi-part archives:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>unrar x archive.part1.rar <span class="kw">&amp;&amp;</span> <span class="bu">del</span> archive.part*.rar</span></code></pre></div>
+<h4 id="windows-powershell">Windows PowerShell</h4>
+<p>In PowerShell, execute the extraction and check the process exit
+code:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>unrar x archive<span class="op">.</span><span class="fu">rar</span><span class="op">;</span> <span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span> <span class="fu">Remove-Item</span> archive<span class="op">.</span><span class="fu">rar</span> <span class="op">}</span></span></code></pre></div>
+<p>For multi-part archives:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>unrar x archive<span class="op">.</span><span class="fu">part1</span><span class="op">.</span><span class="fu">rar</span><span class="op">;</span> <span class="cf">if</span> <span class="op">(</span><span class="va">$LASTEXITCODE</span> <span class="op">-eq</span> <span class="dv">0</span><span class="op">)</span> <span class="op">{</span> <span class="fu">Remove-Item</span> archive<span class="op">.</span><span class="fu">part</span><span class="op">*.</span><span class="fu">rar</span> <span class="op">}</span></span></code></pre></div>
+<hr />
+<h3 id="batch-processing-multiple-archives">Batch Processing Multiple
+Archives</h3>
+<p>To process and clean up multiple RAR files in a directory on Linux or
+macOS, use a <code>for</code> loop:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> <span class="pp">*</span>.rar<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">unrar</span> x <span class="st">&quot;</span><span class="va">$f</span><span class="st">&quot;</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="st">&quot;</span><span class="va">$f</span><span class="st">&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p>For Windows Command Prompt:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="er">%f</span> <span class="er">in</span> <span class="er">(*.rar)</span> <span class="er">do</span> <span class="er">unrar</span> <span class="er">x</span> <span class="er">&quot;%f&quot;</span> <span class="er">&amp;&amp;</span> <span class="er">del</span> <span class="er">&quot;%f&quot;</span></span></code></pre></div>
+<hr />
+<h3 id="how-exit-codes-protect-your-data">How Exit Codes Protect Your
+Data</h3>
+<p>The <code>&amp;&amp;</code> operator checks the exit code of
+<code>unrar</code> before proceeding to deletion. The primary exit codes
+for <code>unrar</code> include:</p>
+<ul>
+<li><strong>0</strong>: Successful operation (archive is deleted).</li>
+<li><strong>1</strong>: Non-fatal error occurred (archive is
+preserved).</li>
+<li><strong>2</strong>: A fatal error occurred (archive is
+preserved).</li>
+<li><strong>3</strong>: CRC error / corrupted archive (archive is
+preserved).</li>
+<li><strong>4</strong>: Attempt to modify a locked archive (archive is
+preserved).</li>
+<li><strong>5</strong>: Write error to destination disk (archive is
+preserved).</li>
+</ul>
+<p>Because deletion is gated behind exit code <code>0</code>, incomplete
+or corrupted extractions will never result in the loss of your original
+archive files.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

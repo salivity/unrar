@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Multi-Volume Extraction Behavior Explained - unrar</title>
+    <meta name="description" content="When extracting a file that spans across three distinct RAR volumes, the unrar utility processes the data as a single continuous stream, reading each volume sequentially until the file is fully reassembled. This process involves automatic volume detectio">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-multi-volume-extraction-behavior-explained">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Multi-Volume Extraction Behavior Explained - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-multi-volume-extraction-behavior-explained" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting a file that spans across three distinct RAR volumes, the unrar utility processes the data as a single continuous stream, reading each volume sequentially until the file is fully reassembled. This process involves automatic volume detectio" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-multi-volume-extraction-behavior-explained">Unrar
+Multi-Volume Extraction Behavior Explained</h1>
+<p>When extracting a file that spans across three distinct RAR volumes,
+the <code>unrar</code> utility processes the data as a single continuous
+stream, reading each volume sequentially until the file is fully
+reassembled. This process involves automatic volume detection,
+continuous stream writing to the destination disk, interactive prompts
+if a volume is missing, and a final integrity verification once the file
+reaches completion in the third volume.</p>
+<h3 id="sequential-volume-traversal">Sequential Volume Traversal</h3>
+<p>To begin extraction, you point the <code>unrar</code> command to the
+first archive in the sequence (such as <code>archive.part1.rar</code> or
+<code>archive.rar</code>). The utility reads the archive header, detects
+the multi-volume split flag, and begins decompressing the file from the
+first volume directly to the target destination.</p>
+<p>When the decompressor reaches the end of the first volume, it does
+not close the output file. Instead, it reads the continuation flag
+embedded in the volume's end block, identifies the exact file name
+required for the next segment (e.g., <code>archive.part2.rar</code>),
+and automatically opens it if it resides in the same directory. This
+transition occurs entirely in memory; the partially extracted file
+remains open on the filesystem while data from the second volume
+continues appending to it. The exact same transition takes place moving
+from the second volume to the third volume.</p>
+<h3 id="missing-or-relocated-volumes">Missing or Relocated Volumes</h3>
+<p>If <code>unrar</code> cannot locate the second or third volume
+automatically in the current working directory, it halts processing and
+prompts the user via the terminal:</p>
+<pre class="text"><code>Cannot find archive.part2.rar
+Insert disk with this volume and press Enter or enter the correct path:</code></pre>
+<p>The process will wait indefinitely for user intervention. If the
+correct path is provided, extraction resumes without loss of previously
+extracted data. If the extraction is aborted manually or terminated due
+to an error, <code>unrar</code> by default deletes the incomplete output
+file from the disk to prevent corrupted data from remaining, unless the
+<code>-kb</code> (keep broken extracted files) switch was explicitly
+enabled when running the command.</p>
+<h3 id="checksum-verification-and-finalization">Checksum Verification
+and Finalization</h3>
+<p>A file spanning multiple volumes contains only one master checksum
+(CRC32 or BLAKE2) stored across the split set. Because of this
+architecture, <code>unrar</code> cannot verify the integrity of the
+individual segments within the first or second volume on a per-file
+basis.</p>
+<p>The integrity check occurs only after the final byte of the file is
+decompressed from the third volume. At that point, <code>unrar</code>
+calculates the total checksum of the output file and compares it to the
+original checksum stored in the archive headers. If the checksum
+matches, <code>unrar</code> applies the original file attributes and
+timestamps, closes the file handle, and marks the extraction as
+successful. If there is a checksum mismatch, <code>unrar</code> alerts
+the user to a CRC error and deletes the file unless instructed
+otherwise.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

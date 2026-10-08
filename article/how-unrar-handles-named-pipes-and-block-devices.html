@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Named Pipes and Block Devices - unrar</title>
+    <meta name="description" content="This article explains how the unrar utility processes special Unix file types, specifically named pipes (FIFOs) and block devices, during archive extraction. While standard Unix archiving tools like tar preserve system-specific special nodes, unrar handl">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-named-pipes-and-block-devices">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Named Pipes and Block Devices - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-named-pipes-and-block-devices" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the unrar utility processes special Unix file types, specifically named pipes (FIFOs) and block devices, during archive extraction. While standard Unix archiving tools like tar preserve system-specific special nodes, unrar handl" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-named-pipes-and-block-devices">How Unrar
+Handles Named Pipes and Block Devices</h1>
+<p>This article explains how the <code>unrar</code> utility processes
+special Unix file types, specifically named pipes (FIFOs) and block
+devices, during archive extraction. While standard Unix archiving tools
+like <code>tar</code> preserve system-specific special nodes,
+<code>unrar</code> handles them differently due to format limitations,
+portability constraints, and operating system security safeguards.</p>
+<h3 id="default-archive-and-extraction-support">Default Archive and
+Extraction Support</h3>
+<p>The official <code>unrar</code> utility (maintained by RARLAB) does
+not support the creation or extraction of block devices, character
+devices, or named pipes. The RAR format is designed primarily as a
+cross-platform data compression standard rather than a low-level Unix
+system backup tool.</p>
+<p>When extracting an archive:</p>
+<ul>
+<li><strong>Symbolic and Hard Links:</strong> Modern versions of
+<code>unrar</code> can extract symbolic and hard links on Unix-like
+operating systems if the appropriate command-line flags (such as
+<code>-ol</code>) are specified.</li>
+<li><strong>Named Pipes (FIFOs):</strong> <code>unrar</code> contains no
+internal routines to call <code>mkfifo()</code>. If a FIFO was somehow
+encapsulated into a RAR archive, <code>unrar</code> does not reconstruct
+it as a special pipe node.</li>
+<li><strong>Block Devices:</strong> <code>unrar</code> does not invoke
+<code>mknod()</code> to recreate device nodes (such as disk drives or
+partitions).</li>
+</ul>
+<h3 id="how-unrar-treats-special-nodes">How <code>unrar</code> Treats
+Special Nodes</h3>
+<p>If you attempt to extract an archive that references or attempts to
+mimic special system files, <code>unrar</code> behaves in one of the
+following ways:</p>
+<ol type="1">
+<li><strong>Skipping Unsupported Entries:</strong> If the archive header
+specifies an unsupported or unrecognized file type, <code>unrar</code>
+typically skips the entry entirely, outputting an extraction warning or
+error to the terminal.</li>
+<li><strong>Extraction as Regular Files:</strong> If the archive tool
+that generated the RAR file read the special file as a stream (such as
+reading from a device or pipe at the time of archiving),
+<code>unrar</code> simply sees standard file data. It will extract this
+data as a normal, regular file rather than recreating the device node or
+pipe.</li>
+</ol>
+<h3 id="security-and-operating-system-restrictions">Security and
+Operating System Restrictions</h3>
+<p>The lack of device node recreation in <code>unrar</code> also serves
+as a crucial security safeguard:</p>
+<ul>
+<li><strong>Privilege Requirements:</strong> Creating block or character
+devices on modern Unix systems requires elevated privileges (the
+<code>CAP_MKNOD</code> capability, typically restricted to
+<code>root</code>). Regular users cannot create device nodes.</li>
+<li><strong>Attack Prevention:</strong> Allowing an unarchiving tool to
+create arbitrary block devices could lead to severe security
+vulnerabilities, such as a malicious archive creating direct interfaces
+to physical storage or memory without the administrator's
+knowledge.</li>
+</ul>
+<h3 id="recommended-alternative-for-special-files">Recommended
+Alternative for Special Files</h3>
+<p>To store and extract named pipes, block devices, or other special
+filesystem nodes, package the items using <code>tar</code> first, which
+natively supports special device metadata via standard POSIX
+headers:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a tar archive preserving devices and FIFOs, then compress with rar</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">--same-owner</span> <span class="at">-cpf</span> devices.tar /path/to/special/files</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">rar</span> a devices.rar devices.tar</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extraction</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x devices.rar</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> tar <span class="at">-xpf</span> devices.tar</span></code></pre></div>
+<p>Using this two-step process allows <code>unrar</code> to manage data
+compression while delegating the restoration of devices and pipes to a
+utility designed for system-level node recreation.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

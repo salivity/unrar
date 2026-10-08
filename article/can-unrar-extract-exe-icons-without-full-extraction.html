@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract EXE Icons Without Full Extraction? - unrar</title>
+    <meta name="description" content="This article examines whether the unrar command-line utility can retrieve an icon embedded within an executable file inside a RAR archive without decompressing the executable itself. The standard unrar tool cannot perform this operation directly because">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-exe-icons-without-full-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract EXE Icons Without Full Extraction? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-exe-icons-without-full-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines whether the unrar command-line utility can retrieve an icon embedded within an executable file inside a RAR archive without decompressing the executable itself. The standard unrar tool cannot perform this operation directly because" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-exe-icons-without-full-extraction">Can Unrar
+Extract EXE Icons Without Full Extraction?</h1>
+<p>This article examines whether the <code>unrar</code> command-line
+utility can retrieve an icon embedded within an executable file inside a
+RAR archive without decompressing the executable itself. The standard
+<code>unrar</code> tool cannot perform this operation directly because
+it operates solely at the file-container level rather than parsing
+internal binary resources. The following sections explain the technical
+reasons for this limitation and present the standard methods for
+retrieving executable icons from an archive.</p>
+<h3 id="why-unrar-cannot-extract-binary-icons">Why Unrar Cannot Extract
+Binary Icons</h3>
+<p>The <code>unrar</code> utility is designed to manage compressed file
+archives. Its internal functionality is limited to reading archive
+headers, unpacking directory structures, and decompressing raw file byte
+streams.</p>
+<p>An application icon is not stored as an independent file inside a
+Windows executable (<code>.exe</code>). Instead, it is embedded within
+the Portable Executable (PE) format, specifically inside the
+<code>.rsrc</code> (resource) section. To isolate an icon, a utility
+must:</p>
+<ol type="1">
+<li>Parse the PE header.</li>
+<li>Locate the resource directory table.</li>
+<li>Find the <code>RT_GROUP_ICON</code> and <code>RT_ICON</code>
+entries.</li>
+<li>Convert those entries into an <code>.ico</code> file structure.</li>
+</ol>
+<p>Because <code>unrar</code> does not include a PE parser, it treats an
+<code>.exe</code> file as an opaque sequence of bytes and cannot access
+internal components like icons, manifests, or version information.</p>
+<h3 id="piping-output-as-an-in-memory-alternative">Piping Output as an
+In-Memory Alternative</h3>
+<p>While <code>unrar</code> cannot extract the icon by itself, you do
+not necessarily have to save the full <code>.exe</code> file to your
+storage drive to access the icon. You can decompress the file directly
+to standard output (stdout) and pipe the data to a tool capable of
+parsing PE resources in memory.</p>
+<p>Using the print command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar program.exe <span class="kw">|</span> <span class="ex">your_resource_parser</span></span></code></pre></div>
+<ul>
+<li><code>p</code>: Directs <code>unrar</code> to print the decompressed
+file content to stdout.</li>
+<li><code>-inul</code>: Suppresses technical messages and banner text,
+ensuring the output stream contains only pure binary data.</li>
+</ul>
+<h3 id="the-recommended-workflow">The Recommended Workflow</h3>
+<p>To extract an icon from an archived executable, use a two-step
+process:</p>
+<ol type="1">
+<li><strong>Extract the file:</strong> Extract the specific
+<code>.exe</code> file using
+<code>unrar e archive.rar target.exe</code>.</li>
+<li><strong>Extract the icon:</strong> Use a dedicated resource
+extractor on the extracted file:
+<ul>
+<li><strong>Linux:</strong> Use <code>wrestool</code> (part of the
+<code>icoutils</code> package) via
+<code>wrestool -x -t 14 target.exe -o icon.ico</code>.</li>
+<li><strong>Windows:</strong> Use tools such as Resource Hacker,
+PowerShell scripts leveraging the .NET <code>System.Drawing.Icon</code>
+class, or command-line PE extraction tools.</li>
+</ul></li>
+<li><strong>Clean up:</strong> Delete the extracted <code>.exe</code>
+file, leaving only the generated <code>.ico</code> file.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

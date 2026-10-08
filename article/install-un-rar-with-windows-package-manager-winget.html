@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install UnRAR with Windows Package Manager (winget) - unrar</title>
+    <meta name="description" content="Windows Package Manager (winget) allows you to install archive extraction tools directly from the command line, including utilities that provide UnRAR functionality. While RARLAB does not maintain an isolated, standalone "unrar-only" package on the defau">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/install-un-rar-with-windows-package-manager-winget">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Install UnRAR with Windows Package Manager (winget) - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/install-un-rar-with-windows-package-manager-winget" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Windows Package Manager (winget) allows you to install archive extraction tools directly from the command line, including utilities that provide UnRAR functionality. While RARLAB does not maintain an isolated, standalone "unrar-only" package on the defau" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="install-unrar-with-windows-package-manager-winget">Install UnRAR
+with Windows Package Manager (winget)</h1>
+<p>Windows Package Manager (<code>winget</code>) allows you to install
+archive extraction tools directly from the command line, including
+utilities that provide UnRAR functionality. While RARLAB does not
+maintain an isolated, standalone "unrar-only" package on the default
+winget repository, you can readily install the official WinRAR
+package—which bundles the official <code>UnRAR.exe</code> command-line
+utility—or install open-source alternatives like 7-Zip that can extract
+RAR archives.</p>
+<h3 id="installing-winrar-via-winget">Installing WinRAR via winget</h3>
+<p>To get the official RARLAB <code>UnRAR.exe</code> executable, install
+the WinRAR package using PowerShell or Command Prompt:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>winget install -<span class="at">-id</span> RARLab.WinRAR</span></code></pre></div>
+<p>Once installed, the command-line utility <code>UnRAR.exe</code> is
+located in the WinRAR installation directory, typically:</p>
+<pre class="text"><code>C:\Program Files\WinRAR\UnRAR.exe</code></pre>
+<p>To use <code>unrar</code> from any command prompt window without
+specifying the full path, add <code>C:\Program Files\WinRAR</code> to
+your Windows system <code>PATH</code> environment variable.</p>
+<h3 id="alternative-extracting-rar-files-with-7-zip">Alternative:
+Extracting RAR Files with 7-Zip</h3>
+<p>If you only need to extract <code>.rar</code> files from the command
+line and do not strictly require the proprietary RARLAB binary, 7-Zip is
+a fully supported alternative available directly via winget:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>winget install -<span class="at">-id</span> 7zip.7zip</span></code></pre></div>
+<p>After installation, you can extract RAR archives using the
+<code>7z</code> command:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>7z x archive.rar</span></code></pre></div>
+<h3 id="verifying-the-installation">Verifying the Installation</h3>
+<p>To verify that the installation succeeded, open a new terminal window
+and run:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>unrar</span></code></pre></div>
+<p>If the PATH variable is configured correctly, this command will
+output the UnRAR version and a list of supported extraction commands and
+switches.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

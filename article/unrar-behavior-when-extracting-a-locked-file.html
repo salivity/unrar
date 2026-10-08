@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Behavior When Extracting a Locked File - unrar</title>
+    <meta name="description" content="When unrar attempts to extract an archive to a destination where a target file already exists and is locked by another running process, the extraction cannot proceed normally due to operating system access controls. This article explains the exact errors">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-behavior-when-extracting-a-locked-file">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Behavior When Extracting a Locked File - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-behavior-when-extracting-a-locked-file" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When unrar attempts to extract an archive to a destination where a target file already exists and is locked by another running process, the extraction cannot proceed normally due to operating system access controls. This article explains the exact errors" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-behavior-when-extracting-a-locked-file">Unrar Behavior
+When Extracting a Locked File</h1>
+<p>When <code>unrar</code> attempts to extract an archive to a
+destination where a target file already exists and is locked by another
+running process, the extraction cannot proceed normally due to operating
+system access controls. This article explains the exact errors generated
+by <code>unrar</code>, how the extraction process behaves interactively
+versus via command-line automation, and the state in which the files are
+left.</p>
+<h3 id="file-system-access-denied">File System Access Denied</h3>
+<p>To extract an archive, <code>unrar</code> requests write permissions
+from the operating system to create or overwrite the target file. If
+another process has an exclusive lock on that file (common in Windows
+sharing violations or Unix processes holding exclusive write locks via
+<code>flock</code>), the operating system rejects the write request.</p>
+<p>Because <code>unrar</code> cannot obtain a file handle with write
+access, it immediately halts write operations for that specific
+file.</p>
+<h3 id="error-messages-and-interactive-prompts">Error Messages and
+Interactive Prompts</h3>
+<p>The resulting behavior depends on whether <code>unrar</code> is run
+in interactive mode or automated via flags:</p>
+<ul>
+<li><strong>Interactive Mode:</strong> If run manually in a terminal
+without automatic overwrite flags, <code>unrar</code> typically displays
+an error message such as <code>Cannot create [filename]</code> followed
+by <code>Access is denied</code> or a sharing violation warning. The
+utility will then pause and prompt the user with choices, usually
+including options to retry the operation, skip the file, rename the
+destination file, or abort the entire extraction.</li>
+<li><strong>Non-Interactive / Scripted Mode:</strong> If run with batch
+flags like <code>-y</code> (assume yes to all queries) or
+<code>-o+</code> (overwrite without prompt), <code>unrar</code> cannot
+prompt for user input. It marks the operation for that file as failed,
+prints the access error to the standard error stream, and moves on to
+extract any remaining files in the archive.</li>
+</ul>
+<h3 id="integrity-of-the-target-and-archive-files">Integrity of the
+Target and Archive Files</h3>
+<p>When this conflict occurs:</p>
+<ul>
+<li><strong>The locked file remains untouched:</strong> Because the
+operating system refused write access before <code>unrar</code> could
+modify the disk sectors, the original file currently in use by the other
+process is not modified, truncated, or corrupted.</li>
+<li><strong>Partial extraction files:</strong> <code>unrar</code>
+typically decompresses data to a temporary stream or directly to the
+target. If the file was locked prior to opening, no temporary data is
+written to the destination path. If a lock is somehow placed
+mid-extraction, <code>unrar</code> aborts and discards or leaves an
+incomplete temporary file depending on the file system state.</li>
+</ul>
+<h3 id="process-exit-codes">Process Exit Codes</h3>
+<p>Once <code>unrar</code> finishes processing the archive, it
+terminates with a non-zero exit code to signal that an error occurred.
+In standard WinRAR/unrar implementations:</p>
+<ul>
+<li>An exit code of <strong>1</strong> indicates a non-fatal error (such
+as a locked file that was skipped while others succeeded).</li>
+<li>An exit code of <strong>6</strong> indicates an open error, meaning
+a file could not be opened or created.</li>
+<li>An exit code of <strong>255</strong> indicates that the user
+manually aborted the process when prompted.</li>
+</ul>
+<h3 id="how-to-bypass-the-lock">How to Bypass the Lock</h3>
+<p>To successfully extract an archive containing a locked file, you
+can:</p>
+<ol type="1">
+<li><strong>Identify and close the locking process:</strong> Terminate
+the application holding the handle using tools like Resource Monitor or
+<code>lsof</code>.</li>
+<li><strong>Extract to a different directory:</strong> Use the
+<code>-op&lt;path&gt;</code> switch to unpack the contents to an
+alternate directory where no file locks exist.</li>
+<li><strong>Rename during extraction:</strong> Extract the file with a
+new name if running <code>unrar</code> interactively.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

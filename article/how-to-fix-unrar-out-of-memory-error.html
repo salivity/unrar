@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Fix unrar Out of Memory Error - unrar</title>
+    <meta name="description" content="Encountering an "Out of memory" error when extracting RAR archives with unrar typically points to 32-bit binary memory limitations, massive dictionary sizes used during compression, corrupted archive headers, or actual system resource exhaustion. This gu">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-fix-unrar-out-of-memory-error">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Fix unrar Out of Memory Error - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-fix-unrar-out-of-memory-error" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Encountering an "Out of memory" error when extracting RAR archives with unrar typically points to 32-bit binary memory limitations, massive dictionary sizes used during compression, corrupted archive headers, or actual system resource exhaustion. This gu" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-fix-unrar-out-of-memory-error">How to Fix unrar Out of
+Memory Error</h1>
+<p>Encountering an "Out of memory" error when extracting RAR archives
+with <code>unrar</code> typically points to 32-bit binary memory
+limitations, massive dictionary sizes used during compression, corrupted
+archive headers, or actual system resource exhaustion. This guide
+details the primary causes of this error and provides clear, actionable
+steps to resolve it on both Linux and Windows environments.</p>
+<h3 id="1-upgrade-to-a-64-bit-version-of-unrar">1. Upgrade to a 64-Bit
+Version of unrar</h3>
+<p>The most common cause of this error is running a 32-bit build of
+<code>unrar</code>. A 32-bit process can address a maximum of 2 GB to 4
+GB of virtual memory. Modern RAR5 archives can use large compression
+dictionaries that exceed this limit during extraction.</p>
+<ul>
+<li><p><strong>Linux (Debian/Ubuntu):</strong> Ensure your package
+manager pulls the 64-bit version:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install unrar</span></code></pre></div>
+<p>Check the binary architecture:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">file</span> <span class="va">$(</span><span class="fu">which</span> unrar<span class="va">)</span></span></code></pre></div>
+<p>It should indicate <code>x86-64</code> or
+<code>aarch64</code>.</p></li>
+<li><p><strong>Windows:</strong> Download the official 64-bit
+command-line or GUI version of WinRAR/UnRAR from the official developer
+distribution rather than relying on legacy 32-bit portable
+utilities.</p></li>
+</ul>
+<h3 id="2-increase-available-virtual-memory-swap-space">2. Increase
+Available Virtual Memory (Swap Space)</h3>
+<p>If your system physically runs low on RAM, the OS kernel will deny
+memory allocation requests. Adding temporary swap space on Linux
+prevents the allocation failure.</p>
+<ol type="1">
+<li>Create a 4 GB swap file:
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> fallocate <span class="at">-l</span> 4G /swapfile</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod 600 /swapfile</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkswap /swapfile</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> swapon /swapfile</span></code></pre></div></li>
+<li>Verify the swap is active:
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">free</span> <span class="at">-h</span></span></code></pre></div></li>
+<li>Retry the extraction command.</li>
+</ol>
+<p>On Windows, increase the paging file size under <strong>System
+Properties &gt; Advanced &gt; Performance Settings &gt; Advanced &gt;
+Virtual Memory</strong>.</p>
+<h3 id="3-verify-archive-integrity">3. Verify Archive Integrity</h3>
+<p>A corrupted archive header can report an absurdly high memory
+allocation requirement to the unrar utility, triggering an immediate
+"Out of memory" crash even on systems with abundant RAM.</p>
+<ul>
+<li>Test the archive for errors without extracting:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t archive.rar</span></code></pre></div></li>
+<li>Attempt a repair if errors are detected:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> r archive.rar</span></code></pre></div></li>
+<li>If downloaded from the internet, verify the file's MD5 or SHA256
+checksum against the source to confirm the file is not incomplete.</li>
+</ul>
+<h3 id="4-switch-to-alternative-extraction-tools">4. Switch to
+Alternative Extraction Tools</h3>
+<p>If the proprietary <code>unrar</code> binary fails, open-source
+alternatives often manage memory streaming differently and can handle
+problematic archives.</p>
+<ul>
+<li><p><strong>Using 7-Zip:</strong> 7-Zip frequently handles
+high-dictionary RAR archives with lower memory overhead.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Linux</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install p7zip-full p7zip-rar</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x archive.rar</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Modern 7-Zip package on newer distros</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install 7zip</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="ex">7zz</span> x archive.rar</span></code></pre></div></li>
+<li><p><strong>Using unar (The Unarchiver):</strong> <code>unar</code>
+is designed to be resilient against non-standard archive metadata.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install unar</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unar</span> archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="5-check-system-ulimits-linux">5. Check System Ulimits
+(Linux)</h3>
+<p>Ensure that your user shell is not restricted by artificial memory
+caps via <code>ulimit</code>.</p>
+<ol type="1">
+<li>Check your current virtual memory limit:
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">ulimit</span> <span class="at">-v</span></span></code></pre></div></li>
+<li>If it returns a numerical value instead of <code>unlimited</code>,
+remove the cap for your current session:
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">ulimit</span> <span class="at">-v</span> unlimited</span></code></pre></div></li>
+<li>Run <code>unrar x archive.rar</code> again.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

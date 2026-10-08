@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Extract to Directory with Trailing Space - unrar</title>
+    <meta name="description" content="Extracting an archive with unrar to a directory ending with a space depends directly on the host operating system, the command-line shell interpretation, and built-in path sanitization rules. While modern POSIX systems natively support trailing spaces in">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-extract-to-directory-with-trailing-space">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Extract to Directory with Trailing Space - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-extract-to-directory-with-trailing-space" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting an archive with unrar to a directory ending with a space depends directly on the host operating system, the command-line shell interpretation, and built-in path sanitization rules. While modern POSIX systems natively support trailing spaces in" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-extract-to-directory-with-trailing-space">Unrar Extract to
+Directory with Trailing Space</h1>
+<p>Extracting an archive with <code>unrar</code> to a directory ending
+with a space depends directly on the host operating system, the
+command-line shell interpretation, and built-in path sanitization rules.
+While modern POSIX systems natively support trailing spaces in directory
+names, Windows and certain versions of <code>unrar</code> enforce path
+normalization that strips or rejects trailing whitespace to prevent
+filesystem errors and security vulnerabilities.</p>
+<h3 id="shell-escaping-and-argument-parsing">Shell Escaping and Argument
+Parsing</h3>
+<p>When passing a destination path containing a trailing space via the
+command line, the terminal shell requires proper escaping or quoting. If
+quotes or escape characters are omitted, the shell treats the trailing
+space as an argument delimiter rather than part of the path name.</p>
+<p>To direct <code>unrar</code> to extract into a directory named
+<code>my_folder </code>, the path must be enclosed in quotation marks or
+escaped with a backslash:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># On Linux/macOS</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="st">&quot;my_folder /&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar my_folder\ /</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># On Windows Command Prompt / PowerShell</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar <span class="st">&quot;my_folder </span><span class="dt">\&quot;</span></span></code></pre></div>
+<h3 id="behavior-on-windows">Behavior on Windows</h3>
+<p>Windows filesystems (NTFS and FAT) support trailing spaces
+internally, but the Win32 subsystem standardizes paths by automatically
+trimming trailing spaces and dots.</p>
+<p>When running <code>unrar.exe</code> or <code>WinRAR</code> on
+Windows:</p>
+<ul>
+<li><strong>Argument Trimming:</strong> If you specify a target
+directory like <code>"output "</code>, the Win32 API strips the trailing
+space, resolving the path to <code>output</code>.</li>
+<li><strong>Path Sanitization:</strong> Due to historical path traversal
+vulnerabilities and system instability caused by inaccessible folders,
+<code>unrar</code> actively sanitizes paths. It removes trailing
+whitespace from folder names defined both on the command line and within
+the internal RAR archive structure.</li>
+<li><strong>Extraction Result:</strong> Files are extracted into a
+standard folder without the trailing space.</li>
+</ul>
+<h3 id="behavior-on-linux-and-macos-posix-systems">Behavior on Linux and
+macOS (POSIX Systems)</h3>
+<p>POSIX-compliant filesystems treat spaces like any other valid byte in
+a filename (except for null and <code>/</code>).</p>
+<p>When running command-line <code>unrar</code> on Unix-like
+environments:</p>
+<ul>
+<li><strong>Literal Name Preservation:</strong> If the destination path
+is quoted correctly, <code>unrar</code> creates the directory with the
+trailing space intact.</li>
+<li><strong>Archive Content Extraction:</strong> If the RAR archive
+itself contains paths with trailing spaces, Unix versions of
+<code>unrar</code> will create those directories literally on disk,
+retaining the whitespace.</li>
+<li><strong>Navigating the Result:</strong> The resulting directory must
+be accessed using quotes or escapes in subsequent commands (e.g.,
+<code>cd "my_folder "</code>).</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

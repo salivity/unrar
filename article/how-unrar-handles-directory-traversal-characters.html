@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Directory Traversal Characters - unrar</title>
+    <meta name="description" content="When extracting archives, unrar inspects and sanitizes file paths to prevent directory traversal attacks, commonly known as "Zip Slip" vulnerabilities. Instead of blindly writing files to the locations declared inside a RAR file, modern versions of unrar">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-directory-traversal-characters">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Directory Traversal Characters - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-directory-traversal-characters" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives, unrar inspects and sanitizes file paths to prevent directory traversal attacks, commonly known as "Zip Slip" vulnerabilities. Instead of blindly writing files to the locations declared inside a RAR file, modern versions of unrar" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-directory-traversal-characters">How Unrar
+Handles Directory Traversal Characters</h1>
+<p>When extracting archives, <code>unrar</code> inspects and sanitizes
+file paths to prevent directory traversal attacks, commonly known as
+"Zip Slip" vulnerabilities. Instead of blindly writing files to the
+locations declared inside a RAR file, modern versions of
+<code>unrar</code> normalize internal path names, strip leading slashes
+and drive letters, and neutralize <code>../</code> sequences to ensure
+extracted contents cannot write outside the designated extraction
+folder.</p>
+<h3 id="path-sanitization-and-normalization">Path Sanitization and
+Normalization</h3>
+<p>Archive formats store relative or absolute file paths as text
+metadata inside the archive headers. Malicious archives often craft
+paths such as <code>../../../../etc/shadow</code> or
+<code>..\..\..\Windows\System32\malicious.dll</code> to overwrite
+sensitive files.</p>
+<p>To prevent this, <code>unrar</code> applies strict path validation
+routines before creating directories or writing files:</p>
+<ul>
+<li><strong>Removal of Absolute Roots:</strong> <code>unrar</code>
+strips leading slashes (<code>/</code> or <code>\</code>) as well as
+Windows drive letters (e.g., <code>C:</code>) from paths. An absolute
+path such as <code>/usr/bin/tool</code> is converted into a relative
+path like <code>usr/bin/tool</code> inside the target directory.</li>
+<li><strong>Neutralization of Parent Directory Tokens
+(<code>..</code>):</strong> During path parsing, <code>unrar</code>
+collapses redundant relative path elements (such as <code>./</code>) and
+checks for <code>..</code> tokens. If a path attempts to navigate higher
+than the target destination directory, <code>unrar</code> either removes
+the traversal tokens, skips the offending file, or halts the extraction
+with an error.</li>
+</ul>
+<h3 id="symbolic-link-protection">Symbolic Link Protection</h3>
+<p>Directory traversal attacks can also leverage symbolic links
+(symlinks) to create a link to an external directory (such as
+<code>/tmp</code> pointing to <code>/etc</code>) and subsequently
+extract a file through that link.</p>
+<p><code>unrar</code> mitigates symlink-based traversal by:</p>
+<ol type="1">
+<li>Tracking the root target directory and verifying that symlink
+creation does not create shortcuts that point outside the
+destination.</li>
+<li>Refusing to follow intermediate symlinks created during the
+extraction process if they resolve to an absolute path or escape the
+target boundary.</li>
+</ol>
+<h3 id="historical-bypasses-and-current-hardening">Historical Bypasses
+and Current Hardening</h3>
+<p>While path sanitization has long been part of <code>unrar</code>,
+historical security flaws—most notably CVE-2022-30333—demonstrated that
+edge cases in Unix-like implementations could bypass validation
+routines. In that vulnerability, specific character sequences and
+symlink handling allowed remote attackers to bypass path checks and
+write arbitrary files outside the working directory on Linux
+systems.</p>
+<p>Modern releases of <code>unrar</code> have hardened this
+behavior:</p>
+<ul>
+<li>Hard links and symbolic links are strictly validated against
+canonical target paths.</li>
+<li>Path canonicalization is performed before any system calls
+(<code>open()</code>, <code>mkdir()</code>, or <code>symlink()</code>)
+are executed.</li>
+<li>Invalid characters, null bytes, and non-canonical path encodings
+that could mislead the operating system's filesystem APIs are stripped
+or rejected.</li>
+</ul>
+<h3 id="command-line-overrides">Command-Line Overrides</h3>
+<p>Users can alter path extraction behavior using specific command-line
+switches:</p>
+<ul>
+<li><strong><code>unrar e</code> (Extract without paths):</strong>
+Ignores all path information entirely, dumping all files directly into
+the destination directory. This eliminates directory traversal risks by
+discarding directory tokens completely.</li>
+<li><strong><code>unrar x</code> (Extract with full paths):</strong>
+Recreates the stored directory structure, applying the full security
+parsing and traversal checks to keep the created tree inside the target
+boundary.</li>
+<li><strong><code>-ep3</code> (Expand paths with drive
+letters):</strong> An administrative switch that explicitly permits full
+paths, including drive letters. Because this flag intentionally bypasses
+traversal safety mechanisms, it should only be used with fully trusted
+archives.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

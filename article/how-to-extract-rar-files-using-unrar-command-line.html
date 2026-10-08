@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Extract RAR Files Using Unrar Command Line - unrar</title>
+    <meta name="description" content="This guide provides a straightforward tutorial on extracting .rar archives using the unrar command-line utility. You will learn how to install the tool on various operating systems, execute basic and advanced extraction commands, extract archives to spec">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-extract-rar-files-using-unrar-command-line">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Extract RAR Files Using Unrar Command Line - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-extract-rar-files-using-unrar-command-line" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides a straightforward tutorial on extracting .rar archives using the unrar command-line utility. You will learn how to install the tool on various operating systems, execute basic and advanced extraction commands, extract archives to spec" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-extract-rar-files-using-unrar-command-line">How to
+Extract RAR Files Using Unrar Command Line</h1>
+<p>This guide provides a straightforward tutorial on extracting
+<code>.rar</code> archives using the <code>unrar</code> command-line
+utility. You will learn how to install the tool on various operating
+systems, execute basic and advanced extraction commands, extract
+archives to specific directories, handle password-protected files, and
+view archive contents without decompressing them.</p>
+<h2 id="installing-unrar">Installing unrar</h2>
+<p>Before using the tool, ensure it is installed on your system:</p>
+<ul>
+<li><strong>Debian/Ubuntu:</strong>
+<code>sudo apt update &amp;&amp; sudo apt install unrar</code></li>
+<li><strong>Fedora/RHEL:</strong>
+<code>sudo dnf install unrar</code></li>
+<li><strong>macOS (via Homebrew):</strong>
+<code>brew install unrar</code></li>
+</ul>
+<h2 id="basic-extraction-commands">Basic Extraction Commands</h2>
+<p>The <code>unrar</code> tool primarily uses two commands to unpack
+files: <code>x</code> and <code>e</code>.</p>
+<h3 id="extract-with-original-directory-structure-recommended">Extract
+with Original Directory Structure (Recommended)</h3>
+<p>To extract files while preserving their original subfolders and
+paths, use the <code>x</code> switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x filename.rar</span></code></pre></div>
+<h3 id="extract-without-directory-structure">Extract Without Directory
+Structure</h3>
+<p>To extract all files directly into your current working directory,
+ignoring any subdirectories stored inside the archive, use the
+<code>e</code> switch:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e filename.rar</span></code></pre></div>
+<h2 id="extract-to-a-specific-directory">Extract to a Specific
+Directory</h2>
+<p>To unpack the contents into a destination folder other than the
+current directory, append the target path at the end of the command.
+Make sure to include a trailing slash:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x filename.rar /path/to/destination/</span></code></pre></div>
+<p>If the destination directory does not exist, <code>unrar</code> will
+prompt to create it or create it automatically.</p>
+<h2 id="extracting-password-protected-archives">Extracting
+Password-Protected Archives</h2>
+<p>If the RAR archive is encrypted with a password, use the
+<code>-p</code> flag:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-pYourPassword</span> filename.rar</span></code></pre></div>
+<p>Alternatively, you can run the command with just <code>-p</code>, and
+<code>unrar</code> will securely prompt you to type the password without
+displaying it on the screen:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-p</span> filename.rar</span></code></pre></div>
+<h2 id="extracting-multi-part-rar-archives">Extracting Multi-Part RAR
+Archives</h2>
+<p>Multi-part archives are split into parts such as
+<code>.part1.rar</code>, <code>.part2.rar</code>, or <code>.r00</code>,
+<code>.r01</code>. To extract these, run the extract command exclusively
+on the first file in the sequence:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x filename.part1.rar</span></code></pre></div>
+<p>The utility automatically detects and processes all subsequent
+volumes.</p>
+<h2 id="viewing-archive-contents-without-extracting">Viewing Archive
+Contents Without Extracting</h2>
+<p>To inspect the contents, file sizes, and dates inside a RAR archive
+without unpacking it, use the <code>l</code> (list) or <code>v</code>
+(verbose list) command:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l filename.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

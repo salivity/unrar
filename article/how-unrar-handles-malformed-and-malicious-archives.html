@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Malformed and Malicious Archives - unrar</title>
+    <meta name="description" content="This article examines how the unrar utility responds to malformed and malicious RAR archives, covering its standard error-handling routines, behavior during path traversal attempts, and risks related to memory corruption. It details how the utility valid">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-malformed-and-malicious-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Malformed and Malicious Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-malformed-and-malicious-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines how the unrar utility responds to malformed and malicious RAR archives, covering its standard error-handling routines, behavior during path traversal attempts, and risks related to memory corruption. It details how the utility valid" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-malformed-and-malicious-archives">How Unrar
+Handles Malformed and Malicious Archives</h1>
+<p>This article examines how the <code>unrar</code> utility responds to
+malformed and malicious RAR archives, covering its standard
+error-handling routines, behavior during path traversal attempts, and
+risks related to memory corruption. It details how the utility validates
+archive headers, prevents directory escapes, and handles crafted
+compression payloads designed to trigger unexpected execution
+states.</p>
+<h2 id="structural-validation-and-error-detection">Structural Validation
+and Error Detection</h2>
+<p>When <code>unrar</code> processes an archive, it sequentially parses
+discrete data blocks (such as the main archive header, file headers, and
+service records). If any block contains invalid flags, unexpected data
+lengths, or inconsistent metadata, the utility halts execution or skips
+the affected stream.</p>
+<p>Common behaviors during non-malicious structural failures
+include:</p>
+<ul>
+<li><strong>CRC Mismatches:</strong> If an extracted file does not match
+the internal cyclic redundancy check (CRC32 or BLAKE2sp in RAR5),
+<code>unrar</code> flags a checksum error. By default, it deletes the
+partially extracted file unless the keep-broken-files switch
+(<code>-kb</code>) is specified.</li>
+<li><strong>Corrupt Headers:</strong> If a header size field is smaller
+than the minimum structural requirement or points past the end of the
+file (EOF), <code>unrar</code> terminates parsing immediately and
+returns an exit code indicating a fatal archive error.</li>
+<li><strong>Truncated Archives:</strong> If a file terminates
+prematurely during decompression, the unpacker reports an unexpected
+end-of-archive and exits without completing the remaining queue.</li>
+</ul>
+<h2 id="path-traversal-and-directory-escapes">Path Traversal and
+Directory Escapes</h2>
+<p>A primary vector in malicious archives is directory traversal, where
+archive entries include filenames containing relative path sequences
+(e.g., <code>../../etc/passwd</code>) or absolute paths (e.g.,
+<code>/usr/bin/target</code>).</p>
+<p>In modern, patched versions of <code>unrar</code>:</p>
+<ul>
+<li><strong>Path Sanitization:</strong> The utility strips absolute path
+indicators (such as leading <code>/</code> on Unix-like systems or drive
+letters like <code>C:\</code> on Windows) and resolves <code>..</code>
+components before writing files to the disk.</li>
+<li><strong>Root Confinement:</strong> Files are restricted to the
+destination directory specified on the command line. Any attempts to
+escape this root folder are blocked, and <code>unrar</code> normalizes
+the path to extract the file safely within the designated target
+folder.</li>
+</ul>
+<p>Historical vulnerabilities, such as CVE-2022-30333, demonstrated that
+insufficient validation of symbolic links or specific directory
+components in older Unix ports allowed arbitrary file writes outside
+target boundaries. Current releases strictly sanitize link destinations
+and directory names to prevent this behavior.</p>
+<h2 id="symbolic-link-and-hard-link-handling">Symbolic Link and Hard
+Link Handling</h2>
+<p>Malicious archives can contain symbolic links designed to point to
+sensitive system locations. If an archive extracts a symlink pointing to
+a system file and subsequently extracts a regular file targeting that
+same path, it could overwrite unauthorized data.</p>
+<p>To counter this:</p>
+<ul>
+<li><code>unrar</code> prevents absolute symlink targets by default or
+rejects symlinks that resolve outside the extraction root
+directory.</li>
+<li>On platforms where symlinks require elevated permissions (such as
+standard user accounts on modern Windows), <code>unrar</code> skips
+symlink creation entirely or issues a warning without elevating
+operations.</li>
+</ul>
+<h2 id="decompression-engine-and-memory-safety">Decompression Engine and
+Memory Safety</h2>
+<p>The core decompression routines of <code>unrar</code> are implemented
+in C++, making the tool historically sensitive to memory-safety bugs
+when parsing adversarial inputs. Attackers craft malformed compression
+dictionaries, Huffman tables, or run-length encoding (RLE) sequences to
+trigger:</p>
+<ul>
+<li><strong>Out-of-Bounds Reads/Writes:</strong> Malformed Huffman trees
+can cause the unpacker to read from or write to memory outside the
+allocated decompression buffer.</li>
+<li><strong>Integer Overflows:</strong> Manipulated packed-size and
+unpacked-size fields can cause the application to allocate an
+insufficient buffer, leading to subsequent heap-based buffer
+overflows.</li>
+</ul>
+<p>Modern builds of <code>unrar</code> incorporate strict boundary
+checks across the RAR decompression routines (covering RAR 1.5 through
+RAR 5.0 formats). When invalid decompression parameters are detected,
+the decompression state machine aborts, prints a read or unpack error,
+and cleanly unwinds execution rather than continuing to process
+corrupted data.</p>
+<h2 id="exit-codes-and-automation-impact">Exit Codes and Automation
+Impact</h2>
+<p>When deployed in automated environments (such as mail gateways,
+antivirus scanners, or ingestion pipelines), <code>unrar</code> signals
+anomalies using specific process exit codes:</p>
+<ul>
+<li><strong>Code 0:</strong> Successful extraction.</li>
+<li><strong>Code 1:</strong> Non-fatal warning (e.g., checksum error
+while using <code>-kb</code>).</li>
+<li><strong>Code 2:</strong> A fatal error occurred during
+extraction.</li>
+<li><strong>Code 3:</strong> Invalid checksum detected; extraction
+output rejected.</li>
+<li><strong>Code 4:</strong> Attempt to modify a locked archive or write
+error.</li>
+<li><strong>Code 9:</strong> File creation or permission failure.</li>
+</ul>
+<p>Automated systems processing untrusted archives rely on these
+non-zero exit codes to quarantine files, reject malformed payloads, and
+avoid passing broken or partially unpacked artifacts downstream.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

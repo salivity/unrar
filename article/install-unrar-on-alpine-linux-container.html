@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Install Unrar on Alpine Linux Container - unrar</title>
+    <meta name="description" content="This guide provides the exact commands required to install the unrar package inside an Alpine Linux container. You will learn how to use Alpine’s native package manager to quickly add the archive extraction tool while keeping the final container image">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/install-unrar-on-alpine-linux-container">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Install Unrar on Alpine Linux Container - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/install-unrar-on-alpine-linux-container" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides the exact commands required to install the unrar package inside an Alpine Linux container. You will learn how to use Alpine’s native package manager to quickly add the archive extraction tool while keeping the final container image" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="install-unrar-on-alpine-linux-container">Install Unrar on Alpine
+Linux Container</h1>
+<p>This guide provides the exact commands required to install the
+<code>unrar</code> package inside an Alpine Linux container. You will
+learn how to use Alpine’s native package manager to quickly add the
+archive extraction tool while keeping the final container image
+lightweight and optimized.</p>
+<h3 id="the-installation-command">The Installation Command</h3>
+<p>To install <code>unrar</code> inside an Alpine Linux container, use
+the Alpine package keeper (<code>apk</code>) with the
+<code>--no-cache</code> flag. Run the following command:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apk</span> add <span class="at">--no-cache</span> unrar</span></code></pre></div>
+<p>Using the <code>--no-cache</code> option is a container best
+practice. It downloads the package index directly from the remote
+repository, installs the package, and discards the cache index without
+storing it in <code>/var/cache/apk/</code>, keeping the container
+filesystem small.</p>
+<h3 id="installing-via-dockerfile">Installing via Dockerfile</h3>
+<p>If you are building an automated container image, include the command
+in your <code>Dockerfile</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode dockerfile"><code class="sourceCode dockerfile"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> alpine:latest</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">RUN</span> <span class="ex">apk</span> add <span class="at">--no-cache</span> unrar</span></code></pre></div>
+<h3 id="enabling-the-community-repository-if-needed">Enabling the
+Community Repository (If Needed)</h3>
+<p>In most standard Alpine environments, <code>unrar</code> is available
+directly through the community repository. If your container fails to
+locate the package with an <code>unsatisfied constraints</code> error,
+ensure the community repository is enabled in
+<code>/etc/apk/repositories</code>.</p>
+<p>You can enable the community repository and install
+<code>unrar</code> in a single command:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">apk</span> add <span class="at">--no-cache</span> <span class="at">--repository</span><span class="op">=</span>https://dl-cdn.alpinelinux.org/alpine/v<span class="va">$(</span><span class="fu">cut</span> <span class="at">-d.</span> <span class="at">-f1,2</span> /etc/alpine-release<span class="va">)</span>/community unrar</span></code></pre></div>
+<h3 id="verifying-the-installation">Verifying the Installation</h3>
+<p>After running the installation command, verify that the utility is
+accessible by checking its version:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="at">--version</span></span></code></pre></div>
+<h3 id="basic-extraction-usage">Basic Extraction Usage</h3>
+<p>Once installed, extract a RAR archive using the <code>x</code> flag
+to preserve directory paths:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

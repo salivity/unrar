@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to List RAR Archive Contents Using Unrar - unrar</title>
+    <meta name="description" content="This guide explains how to view the contents of a RAR file from the command line without extracting it, detailing the exact unrar commands used for basic listings, detailed technical views, and script-friendly outputs. To display a standard list of files">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-list-rar-archive-contents-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to List RAR Archive Contents Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-list-rar-archive-contents-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to view the contents of a RAR file from the command line without extracting it, detailing the exact unrar commands used for basic listings, detailed technical views, and script-friendly outputs. To display a standard list of files" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-list-rar-archive-contents-using-unrar">How to List RAR
+Archive Contents Using Unrar</h1>
+<p>This guide explains how to view the contents of a RAR file from the
+command line without extracting it, detailing the exact
+<code>unrar</code> commands used for basic listings, detailed technical
+views, and script-friendly outputs.</p>
+<h3 id="the-standard-list-command-l">The Standard List Command
+(<code>l</code>)</h3>
+<p>To display a standard list of files and folders contained inside a
+RAR archive, use the <code>l</code> command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.rar</span></code></pre></div>
+<p>This command outputs a table showing the filename, original
+uncompressed size, date, time, and file attributes for each item in the
+archive, along with a summary total at the bottom.</p>
+<h3 id="the-verbose-list-command-v">The Verbose List Command
+(<code>v</code>)</h3>
+<p>To view full technical details for each file, use the <code>v</code>
+(verbose) command:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v archive.rar</span></code></pre></div>
+<p>In addition to the standard file information, the verbose listing
+includes:</p>
+<ul>
+<li>Packed (compressed) file size</li>
+<li>Compression ratio percentage</li>
+<li>CRC32 checksums</li>
+<li>Host operating system</li>
+</ul>
+<h3 id="listing-file-names-only-lb-or-vb">Listing File Names Only
+(<code>lb</code> or <code>vb</code>)</h3>
+<p>If you need a clean output containing only the file paths—useful when
+piping results to other commands like <code>grep</code>,
+<code>xargs</code>, or text files—add the <code>b</code> (bare) modifier
+to either command:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar</span></code></pre></div>
+<p>This prints only the file names, one per line, omitting all headers,
+file sizes, and summary footers.</p>
+<h3 id="handling-password-protected-archives">Handling
+Password-Protected Archives</h3>
+<p>If the archive requires a password to view its contents, provide the
+password using the <code>-p</code> switch:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l <span class="at">-pSecretPassword</span> archive.rar</span></code></pre></div>
+<p>If you do not specify the password inline, <code>unrar</code> will
+prompt you to enter it securely in the terminal before displaying the
+list.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

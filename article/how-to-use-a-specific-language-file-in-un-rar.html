@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Use a Specific Language File in UnRAR - unrar</title>
+    <meta name="description" content="This guide explains how to configure the command-line utility unrar to display localized output using a specific language file. While unrar does not feature a dedicated runtime command-line switch to select languages on the fly, it determines its languag">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-use-a-specific-language-file-in-un-rar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Use a Specific Language File in UnRAR - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-use-a-specific-language-file-in-un-rar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to configure the command-line utility unrar to display localized output using a specific language file. While unrar does not feature a dedicated runtime command-line switch to select languages on the fly, it determines its languag" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-use-a-specific-language-file-in-unrar">How to Use a
+Specific Language File in UnRAR</h1>
+<p>This guide explains how to configure the command-line utility
+<code>unrar</code> to display localized output using a specific language
+file. While <code>unrar</code> does not feature a dedicated runtime
+command-line switch to select languages on the fly, it determines its
+language output through external language definition files—specifically
+<code>rar.lng</code>—or through system locale variables depending on
+your platform and build.</p>
+<h3 id="understanding-how-unrar-handles-language-files">Understanding
+How UnRAR Handles Language Files</h3>
+<p>By design, command-line versions of RAR and UnRAR search for a
+localized message file named <code>rar.lng</code> located in the same
+directory as the executable. If this file is present and matches the
+version of the software, <code>unrar</code> uses it to translate console
+messages, prompts, and error outputs. If the file is missing, the
+utility defaults to its built-in English strings.</p>
+<h3 id="method-1-specifying-the-language-file-via-rarlng">Method 1:
+Specifying the Language File via <code>rar.lng</code></h3>
+<p>To instruct <code>unrar</code> to use a specific language file, you
+must make that file available to the executable under the default
+expected name:</p>
+<ol type="1">
+<li><strong>Locate the Language Files:</strong> Obtain the localized
+<code>.lng</code> file corresponding to your desired language (for
+example, <code>german.lng</code>, <code>french.lng</code>, or
+<code>spanish.lng</code>) compatible with your UnRAR version.</li>
+<li><strong>Rename the Target File:</strong> Rename your desired
+language file to <code>rar.lng</code>.</li>
+<li><strong>Place the File Next to the Executable:</strong> Move the
+newly renamed <code>rar.lng</code> file into the directory containing
+your <code>unrar</code> executable (e.g.,
+<code>C:\Program Files\WinRAR\</code> on Windows or
+<code>/usr/local/bin/</code> on Unix-like systems).</li>
+</ol>
+<p>When <code>unrar</code> runs, it will detect <code>rar.lng</code> in
+its working binary directory and display console text in the selected
+language.</p>
+<h3
+id="method-2-managing-multiple-languages-with-symbolic-links-linux--macos">Method
+2: Managing Multiple Languages with Symbolic Links (Linux / macOS)</h3>
+<p>If you need to switch between multiple language files dynamically in
+a Unix or script-based environment, use symbolic links instead of
+repeatedly copying files:</p>
+<ol type="1">
+<li><p>Store your language files in a dedicated directory:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">/opt/unrar/lang/en.lng</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/opt/unrar/lang/de.lng</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">/opt/unrar/lang/fr.lng</span></span></code></pre></div></li>
+<li><p>Create a symbolic link pointing the target language to
+<code>rar.lng</code> in the same directory as the <code>unrar</code>
+binary:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-sf</span> /opt/unrar/lang/de.lng /usr/local/bin/rar.lng</span></code></pre></div></li>
+<li><p>Run your command:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div></li>
+</ol>
+<p>Changing the target of the <code>rar.lng</code> symlink instructs
+<code>unrar</code> to load a different localization profile for
+subsequent operations.</p>
+<h3 id="method-3-system-locale-configuration-package-builds">Method 3:
+System Locale Configuration (Package Builds)</h3>
+<p>If your version of <code>unrar</code> was installed via a Linux
+package manager and compiled with GNU <code>gettext</code> support
+rather than standalone <code>.lng</code> files, localized output is
+controlled directly through environment variables rather than external
+<code>.lng</code> files.</p>
+<p>To force a specific language output for a single execution, prefix
+the command with the <code>LC_ALL</code> or <code>LANG</code>
+variable:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">LC_ALL</span><span class="op">=</span>de_DE.UTF-8 <span class="ex">unrar</span> l archive.rar</span></code></pre></div>
+<p>Replace <code>de_DE.UTF-8</code> with your desired installed system
+locale (e.g., <code>es_ES.UTF-8</code>, <code>fr_FR.UTF-8</code>).</p>
+<h3 id="verifying-the-configuration">Verifying the Configuration</h3>
+<p>To confirm that <code>unrar</code> is using your specified language
+file, execute the help command:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="at">-</span><span class="pp">?</span></span></code></pre></div>
+<p>Inspect the header and syntax descriptions. If the output appears in
+your chosen language, the file has been loaded properly. If it appears
+in English, verify file permissions and ensure that <code>rar.lng</code>
+is located in the exact directory of the binary being executed.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

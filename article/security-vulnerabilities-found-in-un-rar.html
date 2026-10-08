@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Vulnerabilities Found in UnRAR - unrar</title>
+    <meta name="description" content="UnRAR, the standard extraction utility for RAR archives, has historically been subject to various high-severity security vulnerabilities, ranging from directory traversal to remote code execution. Because archive extractors often parse untrusted input au">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/security-vulnerabilities-found-in-un-rar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Security Vulnerabilities Found in UnRAR - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/security-vulnerabilities-found-in-un-rar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="UnRAR, the standard extraction utility for RAR archives, has historically been subject to various high-severity security vulnerabilities, ranging from directory traversal to remote code execution. Because archive extractors often parse untrusted input au" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="security-vulnerabilities-found-in-unrar">Security
+Vulnerabilities Found in UnRAR</h1>
+<p>UnRAR, the standard extraction utility for RAR archives, has
+historically been subject to various high-severity security
+vulnerabilities, ranging from directory traversal to remote code
+execution. Because archive extractors often parse untrusted input
+automatically within email gateways, antivirus systems, and web servers,
+flaws in UnRAR's underlying C++ parsing engine have frequently exposed
+systems to severe exploitation. This overview details the primary
+classes of historical vulnerabilities discovered in UnRAR, specific
+notable Common Vulnerabilities and Exposures (CVEs), and their
+operational impact.</p>
+<h3 id="path-traversal-and-arbitrary-file-write">Path Traversal and
+Arbitrary File Write</h3>
+<p>The most prevalent and impactful vulnerabilities in UnRAR relate to
+path traversal. Archive formats allow files to specify relative storage
+paths; if an extractor does not strictly sanitize these paths, an
+attacker can write or overwrite arbitrary files on the victim's
+filesystem.</p>
+<ul>
+<li><strong>CVE-2022-30333:</strong> A critical path traversal flaw
+discovered in the Unix version of UnRAR prior to version 6.12. An
+attacker could craft a malicious RAR archive with relative directory
+paths (such as <code>../</code>) to extract files outside the intended
+extraction folder. This vulnerability achieved remote code execution
+when targeted against automated systems, most notably Zimbra
+Collaboration mail servers, by overwriting system files or dropping
+malicious JSP shells into web-accessible directories.</li>
+</ul>
+<h3 id="buffer-and-memory-corruptions">Buffer and Memory
+Corruptions</h3>
+<p>Parsing compressed data requires complex algorithms for formats like
+PPMd and custom dictionary structures. Implementations within UnRAR have
+frequently suffered from memory management bugs, including out-of-bounds
+reads and writes.</p>
+<ul>
+<li><strong>CVE-2023-40477:</strong> An out-of-bounds write flaw in
+UnRAR and WinRAR's processing of recovery volumes (<code>.rev</code>
+files). The vulnerability resulted from a lack of proper memory
+validation when handling recovery records, allowing an attacker to
+trigger an out-of-bounds write, potentially leading to arbitrary code
+execution if a user opened or extracted a specially crafted volume.</li>
+<li><strong>CVE-2007-0855:</strong> An earlier stack-based buffer
+overflow in UnRAR's command-line parsing utility. The extractor failed
+to handle overly long filenames or password fields, allowing memory
+overwrites that crashed the application or executed arbitrary code with
+the user's privileges.</li>
+</ul>
+<h3
+id="denial-of-service-via-algorithmic-complexity-and-malformed-headers">Denial
+of Service via Algorithmic Complexity and Malformed Headers</h3>
+<p>UnRAR has also encountered several Denial of Service (DoS) flaws
+resulting from infinite loops, null-pointer dereferences, and uncaught
+parsing exceptions.</p>
+<ul>
+<li><strong>Malformed Archive Headers:</strong> Several historical
+issues involved malformed archive headers (such as invalid main headers
+or corrupted block sizes) that caused the extraction engine to enter
+infinite loops or crash due to null-pointer dereferences. While not
+resulting in code execution, these bugs effectively disabled automated
+file-scanning pipelines and mail filters processing inbound
+attachments.</li>
+</ul>
+<h3 id="attack-vector-implications">Attack Vector Implications</h3>
+<p>Because UnRAR is widely embedded into automated enterprise
+infrastructure (such as mail transport agents, file storage solutions,
+and network-attached storage firmware), these vulnerabilities rarely
+require active user interaction when deployed server-side. Once a
+malicious archive enters the pipeline, the automated background worker
+triggers the parsing logic, inheriting the permissions of the service
+running the binary. Modern mitigations require strictly sandboxing
+extraction services, running processes with least privilege, and
+regularly updating the UnRAR library to patched releases.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

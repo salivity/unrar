@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Fix Unrar Exit Code 9 - unrar</title>
+    <meta name="description" content="Unrar exit code 9 indicates a "File Create Error," which occurs when the extraction utility is unable to create a file or directory on the destination storage. This guide covers why this error code triggers during automated scripts or command-line operat">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-fix-unrar-exit-code-9">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Fix Unrar Exit Code 9 - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-fix-unrar-exit-code-9" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Unrar exit code 9 indicates a "File Create Error," which occurs when the extraction utility is unable to create a file or directory on the destination storage. This guide covers why this error code triggers during automated scripts or command-line operat" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-fix-unrar-exit-code-9">How to Fix Unrar Exit Code 9</h1>
+<p>Unrar exit code 9 indicates a "File Create Error," which occurs when
+the extraction utility is unable to create a file or directory on the
+destination storage. This guide covers why this error code triggers
+during automated scripts or command-line operations and provides direct,
+actionable solutions to resolve file creation failures during
+extraction.</p>
+<h3 id="what-unrar-exit-code-9-means">What Unrar Exit Code 9 Means</h3>
+<p>Command-line utilities use exit codes (return codes) to report the
+outcome of a command to the operating system or calling script. In the
+official RAR and UnRAR return code specification, <strong>Exit Code
+9</strong> is strictly defined as a <strong>Create Error</strong>. This
+means that Unrar successfully read the archive headers, but failed at
+the system level when attempting to initialize or write a new file or
+directory at the specified destination path.</p>
+<h3 id="common-causes">Common Causes</h3>
+<ol type="1">
+<li><p><strong>Insufficient Write Permissions</strong><br />
+The user executing the <code>unrar</code> command does not have
+permission to write to the destination directory.</p></li>
+<li><p><strong>File Path or Name Restrictions</strong><br />
+The archive contains filenames with reserved characters (such as
+<code>:</code>, <code>?</code>, <code>*</code>, <code>&lt;</code>,
+<code>&gt;</code> on Windows) or the target path exceeds the operating
+system's maximum path length limit (e.g., the 260-character limit on
+legacy Windows paths).</p></li>
+<li><p><strong>Read-Only Filesystem</strong><br />
+The destination drive, network share, or partition is mounted as
+read-only.</p></li>
+<li><p><strong>Directory Structure Missing</strong><br />
+The extraction command attempts to write to a target path structure that
+does not exist, and the current Unrar flags prevent or fail at
+auto-creating parent directories.</p></li>
+<li><p><strong>Exhausted Inodes or Storage Space</strong><br />
+While write errors often trigger exit code 5, a storage device
+completely out of inodes (on Linux/Unix) will fail at the creation step,
+triggering code 9.</p></li>
+</ol>
+<h3 id="how-to-resolve-the-error">How to Resolve the Error</h3>
+<h4 id="1-verify-destination-permissions">1. Verify Destination
+Permissions</h4>
+<p>Ensure the account running the extraction process has full write
+access to the output directory.</p>
+<ul>
+<li>On Linux/macOS:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> <span class="at">-R</span> u+w /path/to/destination</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chown</span> <span class="at">-R</span> your_user:your_group /path/to/destination</span></code></pre></div></li>
+<li>On Windows, verify that the current shell or automation service
+account has "Write" and "Modify" NTFS permissions for the destination
+folder.</li>
+</ul>
+<h4 id="2-test-with-an-absolute-destination-path">2. Test with an
+Absolute Destination Path</h4>
+<p>Explicitly supply an absolute path with a trailing slash to prevent
+ambiguous directory lookups:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar /absolute/path/to/destination/</span></code></pre></div>
+<h4 id="3-handle-long-paths-and-invalid-filenames">3. Handle Long Paths
+and Invalid Filenames</h4>
+<p>If the archive originated from a different operating system:</p>
+<ul>
+<li>Enable long path support in the Windows Registry
+(<code>LongPathsEnabled</code> set to <code>1</code> in
+<code>HKLM\SYSTEM\CurrentControlSet\Control\FileSystem</code>).</li>
+<li>Extract files to a shorter root folder (e.g.,
+<code>C:\temp\</code>).</li>
+<li>Use the <code>-ep</code> switch to exclude internal path structures
+if the nested folder tree is causing path-length overflow:
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar /destination/</span></code></pre></div></li>
+</ul>
+<h4 id="4-confirm-filesystem-status">4. Confirm Filesystem Status</h4>
+<p>Check whether the target storage device has remaining capacity and is
+mounted with write capabilities:</p>
+<ul>
+<li>On Linux, run <code>df -h</code> to verify available disk space and
+<code>df -i</code> to verify available inodes.</li>
+<li>Check mount attributes with <code>mount | grep &lt;device&gt;</code>
+to confirm it is mounted <code>rw</code> (read-write) rather than
+<code>ro</code> (read-only).</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

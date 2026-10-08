@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles 1990s RAR Archives - unrar</title>
+    <meta name="description" content="Modern versions of unrar maintain backward compatibility with archives created during the 1990s by retaining dedicated legacy decompression routines within its source code. While the RAR format underwent major architectural overhauls with RAR 3.0 in the">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-1990-s-rar-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles 1990s RAR Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-1990-s-rar-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Modern versions of unrar maintain backward compatibility with archives created during the 1990s by retaining dedicated legacy decompression routines within its source code. While the RAR format underwent major architectural overhauls with RAR 3.0 in the" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-1990s-rar-archives">How Unrar Handles 1990s
+RAR Archives</h1>
+<p>Modern versions of <code>unrar</code> maintain backward compatibility
+with archives created during the 1990s by retaining dedicated legacy
+decompression routines within its source code. While the RAR format
+underwent major architectural overhauls with RAR 3.0 in the early 2000s
+and RAR 5.0 in 2013, the official extraction utility inspects the
+archive header to detect vintage RAR 1.5 and RAR 2.0 formats,
+automatically routing data through specialized unpacking engines
+designed to parse 1990s compression algorithms.</p>
+<h3 id="archive-header-identification">Archive Header
+Identification</h3>
+<p>When <code>unrar</code> opens an archive, it reads the initial
+signature bytes (magic numbers) to determine the specification
+version:</p>
+<ul>
+<li><strong>RAR 1.x and 2.x:</strong> These legacy formats begin with
+the marker block <code>0x52 0x45 0x7E 0x5E</code>
+(<code>RE~^</code>).</li>
+<li><strong>RAR 3.x and 4.x:</strong> These use
+<code>0x52 0x61 0x72 0x21 0x1A 0x07 0x00</code>
+(<code>Rar!...</code>).</li>
+<li><strong>RAR 5.x:</strong> Modern archives use
+<code>0x52 0x61 0x72 0x21 0x1A 0x07 0x01 0x00</code>.</li>
+</ul>
+<p>Upon encountering the vintage <code>RE~^</code> marker,
+<code>unrar</code> bypasses its primary decompression engine and
+activates its legacy parsing modules.</p>
+<h3 id="dedicated-legacy-decompression-modules">Dedicated Legacy
+Decompression Modules</h3>
+<p>Instead of attempting to decompress older formats with modern
+algorithms, the official <code>unrar</code> source maintains isolated
+code files to replicate 1990s decompression behavior:</p>
+<ol type="1">
+<li><strong>Unpack 1.5 Engine (<code>unpack15.cpp</code>):</strong>
+Handles files created by RAR 1.5x (released in the mid-1990s). This
+engine processes basic sliding dictionary compression combined with
+fixed and dynamic Huffman trees.</li>
+<li><strong>Unpack 2.0 Engine (<code>unpack20.cpp</code>):</strong>
+Handles files created by RAR 2.0 through 2.9 (introduced in 1996). RAR
+2.0 expanded dictionary sizes up to 1 MB and introduced specialized
+compression algorithms for multimedia files (8-bit and 16-bit audio, raw
+bitmaps) along with solid archiving. The unpacker contains specific
+subroutines to reverse these obsolete multimedia filters.</li>
+</ol>
+<h3 id="unsupported-1990s-formats">Unsupported 1990s Formats</h3>
+<p>Compatibility does not extend indefinitely backward. Archives created
+by the earliest public releases, such as RAR 1.3 (released in 1993), are
+not fully supported by current builds of <code>unrar</code>. The
+internal unpack engine was standardized starting at RAR 1.5; archives
+older than this typically produce an unsupported format error, requiring
+original DOS binaries running in an emulator to extract properly.</p>
+<h3 id="security-and-legacy-code-maintenance">Security and Legacy Code
+Maintenance</h3>
+<p>Legacy formats present a notable attack surface because 1990s formats
+were designed before modern secure coding standards were established.
+Over the years, vulnerabilities—such as integer overflows, out-of-bounds
+writes, and path traversal flaws—have been discovered within the legacy
+unpack modules. Rather than removing backward compatibility entirely,
+the maintainers of <code>unrar</code> have audited and hardened
+<code>unpack15.cpp</code> and <code>unpack20.cpp</code>, enforcing
+strict bounds checking when parsing corrupted or maliciously crafted
+vintage archives.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

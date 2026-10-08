@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Unrar with an Invalid Switch - unrar</title>
+    <meta name="description" content="When executing the unrar command-line utility with an invalid or unrecognized switch, the program immediately aborts the requested operation, prints an error message, displays its standard usage guide, and terminates with a non-zero exit code. This artic">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/running-unrar-with-an-invalid-switch">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Running Unrar with an Invalid Switch - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/running-unrar-with-an-invalid-switch" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When executing the unrar command-line utility with an invalid or unrecognized switch, the program immediately aborts the requested operation, prints an error message, displays its standard usage guide, and terminates with a non-zero exit code. This artic" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="running-unrar-with-an-invalid-switch">Running Unrar with an
+Invalid Switch</h1>
+<p>When executing the <code>unrar</code> command-line utility with an
+invalid or unrecognized switch, the program immediately aborts the
+requested operation, prints an error message, displays its standard
+usage guide, and terminates with a non-zero exit code. This article
+explains the exact behavior of <code>unrar</code> during a switch error,
+the safety of your target files, and how the resulting exit codes affect
+automated scripts.</p>
+<h3 id="immediate-halting-of-execution">Immediate Halting of
+Execution</h3>
+<p>The <code>unrar</code> command evaluates syntax and parameters before
+opening or decompressing an archive. If you provide a switch that the
+utility does not recognize (for example, entering <code>-invalid</code>
+or using an unsupported flag), the parser flags the anomaly immediately.
+The tool does not attempt to skip the flag or process the archive
+partially; instead, execution halts before reading, extracting, or
+modifying any data.</p>
+<h3 id="standard-output-and-error-messages">Standard Output and Error
+Messages</h3>
+<p>Upon encountering an unrecognized switch, <code>unrar</code> prints a
+clear diagnostic line to the terminal. Depending on your version and
+platform (such as the freeware UnRAR source by RARLAB or system package
+distributions), the console displays:</p>
+<pre class="text"><code>Unknown switch: -&lt;switch_name&gt;</code></pre>
+<p>Immediately following the error line, <code>unrar</code> outputs its
+standard help screen. This reference manual lists valid command modes
+(such as <code>e</code> for extract, <code>x</code> for extract with
+full paths, and <code>t</code> for test) alongside legitimate switches
+(such as <code>-p</code> for passwords, <code>-o+</code> for overwrite,
+or <code>-y</code> for assuming yes on all queries).</p>
+<h3 id="archive-and-file-safety">Archive and File Safety</h3>
+<p>Because parsing happens prior to execution, your archives and
+destination directories remain completely untouched. No temporary files
+are created, no files are partially extracted, and existing files in the
+directory will not be overwritten or corrupted.</p>
+<h3 id="exit-codes-and-scripting-impact">Exit Codes and Scripting
+Impact</h3>
+<p>In automated environments such as Bash or PowerShell scripts, running
+<code>unrar</code> with an invalid switch prevents silent failures by
+returning an error exit status. While a successful extraction returns an
+exit status of <code>0</code>, a syntax or switch failure typically
+produces a non-zero exit code (commonly <code>10</code> or
+<code>1</code>, depending on the specific UnRAR build).</p>
+<p>If a script monitors execution using error checks (such as
+<code>set -e</code> in shell scripts or evaluating <code>$?</code>), the
+script will detect the failure and stop, preventing downstream tasks
+from running against missing or unextracted files.</p>
+<h3 id="resolving-the-issue">Resolving the Issue</h3>
+<p>To resolve an invalid switch error:</p>
+<ol type="1">
+<li>Verify switch case sensitivity, as most <code>unrar</code>
+implementations treat uppercase and lowercase options differently.</li>
+<li>Check that the hyphen prefix (<code>-</code>) is placed correctly
+before the option.</li>
+<li>Review the available options by running <code>unrar</code> without
+arguments or viewing the manual via <code>man unrar</code>.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

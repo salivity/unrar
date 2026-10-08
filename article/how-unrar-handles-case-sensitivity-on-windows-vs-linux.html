@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Case Sensitivity on Windows vs Linux - unrar</title>
+    <meta name="description" content="When extracting archives containing files with mixed or colliding letter casing, unrar behaves differently on Windows and Linux due to the underlying filesystem architectures. While Linux natively supports case-sensitive filenames, allowing files like fi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-case-sensitivity-on-windows-vs-linux">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Case Sensitivity on Windows vs Linux - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-case-sensitivity-on-windows-vs-linux" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives containing files with mixed or colliding letter casing, unrar behaves differently on Windows and Linux due to the underlying filesystem architectures. While Linux natively supports case-sensitive filenames, allowing files like fi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-case-sensitivity-on-windows-vs-linux">How
+Unrar Handles Case Sensitivity on Windows vs Linux</h1>
+<p>When extracting archives containing files with mixed or colliding
+letter casing, <code>unrar</code> behaves differently on Windows and
+Linux due to the underlying filesystem architectures. While Linux
+natively supports case-sensitive filenames, allowing files like
+<code>file.txt</code> and <code>FILE.txt</code> to coexist in the same
+directory, Windows is case-insensitive by default. Consequently,
+<code>unrar</code> adapts its extraction logic to the host operating
+system, seamlessly writing distinct files on Linux while triggering
+collision and overwrite mechanisms on Windows.</p>
+<h3 id="filesystem-foundations-posix-vs-windows">Filesystem Foundations:
+POSIX vs. Windows</h3>
+<p>The core difference in how <code>unrar</code> behaves stems from how
+each operating system interacts with its filesystem:</p>
+<ul>
+<li><strong>Linux (ext4, Btrfs, XFS):</strong> POSIX-compliant
+filesystems treat uppercase and lowercase characters as distinct byte
+values. As a result, <code>Document.txt</code> and
+<code>document.txt</code> are recognized as two independent files.</li>
+<li><strong>Windows (NTFS, FAT32):</strong> Although NTFS is
+case-preserving (it remembers whether a letter was typed in uppercase or
+lowercase), it is case-insensitive by default at the Win32 API layer.
+Requesting access to <code>Document.txt</code> points to the exact same
+file record as <code>document.txt</code>.</li>
+</ul>
+<h3 id="how-unrar-behaves-on-linux">How Unrar Behaves on Linux</h3>
+<p>When running <code>unrar</code> on a Linux system, the utility relies
+directly on the operating system’s case-sensitive system calls.</p>
+<p>If an archive contains two files whose names differ only by letter
+case—such as <code>Data.csv</code> and
+<code>data.csv</code>—<code>unrar</code> extracts both without issue.
+Neither file will overwrite the other, and no user prompt is triggered.
+The extracted output directly mirrors the distinct file entries stored
+inside the RAR archive.</p>
+<h3 id="how-unrar-behaves-on-windows">How Unrar Behaves on Windows</h3>
+<p>When extracting that same archive on Windows, <code>unrar</code>
+encounters a conflict. Because Windows sees <code>Data.csv</code> and
+<code>data.csv</code> as identical target paths, attempting to extract
+the second file points directly to the file that was just created.</p>
+<p>In standard interactive mode, <code>unrar</code> recognizes that a
+file matching the target name already exists on disk. It will pause
+extraction and present an overwrite prompt:</p>
+<pre class="text"><code>data.csv already exists. Overwrite it ?
+[Y]es, [N]o, [A]ll, n[E]ver, [R]ename, [Q]uit</code></pre>
+<p>If the extraction is automated or run in non-interactive mode without
+collision flags, the default behavior depends on the specified
+switches:</p>
+<ul>
+<li>Without flags, the process may stall or fail on the duplicate
+entry.</li>
+<li>If forced to overwrite (via <code>-o+</code>), the second file
+silently replaces the first file, resulting in data loss.</li>
+<li>If forced not to overwrite (via <code>-o-</code>), the second file
+is skipped entirely.</li>
+</ul>
+<h3 id="managing-case-sensitivity-with-command-line-switches">Managing
+Case Sensitivity with Command-Line Switches</h3>
+<p>To handle or normalize case issues across platforms,
+<code>unrar</code> provides several built-in parameters:</p>
+<ul>
+<li><strong><code>-cl</code> (Convert names to lowercase):</strong>
+Converts all extracted file paths to lowercase. On Linux, this can cause
+unintended collisions if multiple files end up with the exact same
+lowercase name.</li>
+<li><strong><code>-cu</code> (Convert names to uppercase):</strong>
+Converts all extracted file paths to uppercase, behaving similarly to
+<code>-cl</code>.</li>
+<li><strong><code>-or</code> (Automatically rename duplicates):</strong>
+On Windows, using the <code>-or</code> flag automatically appends an
+incremented number to colliding filenames (for example, creating
+<code>data(1).csv</code>). This prevents data loss when extracting
+archives with case-only collisions on a case-insensitive drive.</li>
+</ul>
+<h3 id="enabling-case-sensitivity-in-windows">Enabling Case Sensitivity
+in Windows</h3>
+<p>Modern versions of Windows 10 and 11 allow per-directory case
+sensitivity using the Windows Subsystem for Linux (WSL) filesystem
+layer. If you enable case sensitivity on an NTFS folder using the
+<code>fsutil file setCaseSensitiveInfo &lt;directory&gt; enable</code>
+command, running extraction tools inside that specific directory allows
+Windows to handle case-differing files identically to Linux.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

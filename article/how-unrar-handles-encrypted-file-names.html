@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Encrypted File Names - unrar</title>
+    <meta name="description" content="When handling RAR archives with encrypted file names, the unrar utility requires authentication before it can read, list, or extract any contents. Unlike standard encrypted archives where only the file payloads are hidden, header-encrypted archives prote">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-encrypted-file-names">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Encrypted File Names - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-encrypted-file-names" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When handling RAR archives with encrypted file names, the unrar utility requires authentication before it can read, list, or extract any contents. Unlike standard encrypted archives where only the file payloads are hidden, header-encrypted archives prote" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-encrypted-file-names">How Unrar Handles
+Encrypted File Names</h1>
+<p>When handling RAR archives with encrypted file names, the
+<code>unrar</code> utility requires authentication before it can read,
+list, or extract any contents. Unlike standard encrypted archives where
+only the file payloads are hidden, header-encrypted archives protect the
+metadata itself, forcing <code>unrar</code> to halt execution
+immediately and prompt for a password before it can parse the archive
+structure.</p>
+<h3 id="standard-encryption-vs-encrypted-file-names">Standard Encryption
+vs. Encrypted File Names</h3>
+<p>RAR archives support two distinct levels of password protection:</p>
+<ol type="1">
+<li><strong>Standard Data Encryption (<code>-p</code> flag):</strong>
+Only the file data inside the archive is encrypted using AES. The
+archive headers—containing file names, directory trees, file sizes, and
+timestamps—remain unencrypted in plaintext.</li>
+<li><strong>Encrypted Headers / File Names (<code>-hp</code>
+flag):</strong> Both the file data and the internal archive headers are
+encrypted. The entire file table is unreadable without the decryption
+key.</li>
+</ol>
+<h3 id="how-unrar-processes-encrypted-headers">How <code>unrar</code>
+Processes Encrypted Headers</h3>
+<p>When you run <code>unrar</code> against an archive created with the
+<code>-hp</code> switch, the tool follows a strict sequence:</p>
+<ol type="1">
+<li><strong>Signature Verification:</strong> The utility reads the
+initial RAR file signature (magic bytes) to confirm that the file is a
+valid RAR archive format (RAR 4.x or RAR 5.x).</li>
+<li><strong>Immediate Password Prompt:</strong> Upon detecting the
+header encryption flag, <code>unrar</code> immediately halts execution
+and prompts the user:
+<pre class="text"><code>Enter password (will not be echoed):</code></pre>
+This prompt occurs regardless of the operation requested, including
+non-extracting commands such as listing archive contents
+(<code>unrar l</code> or <code>unrar v</code>).</li>
+<li><strong>Key Derivation and Header Decryption:</strong>
+<code>unrar</code> processes the supplied password through a key
+derivation function (PBKDF2 in RAR 5.x) to generate the AES decryption
+key. It then attempts to decrypt the main header block.</li>
+<li><strong>Validation:</strong> If the password is correct, the header
+decrypts cleanly, exposing the file tables and allowing
+<code>unrar</code> to proceed with the requested task. If the password
+is wrong, the decryption fails, and <code>unrar</code> terminates with
+an error such as <code>Corrupt file or wrong password</code> without
+displaying any file names.</li>
+</ol>
+<h3 id="command-line-usage-and-automation">Command-Line Usage and
+Automation</h3>
+<p>To handle archives with encrypted file names without an interactive
+prompt, you can pass the password directly using the <code>-p</code>
+switch:</p>
+<ul>
+<li><strong>List contents:</strong>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l <span class="at">-pSecretPassword</span> archive.rar</span></code></pre></div></li>
+<li><strong>Extract contents:</strong>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-pSecretPassword</span> archive.rar</span></code></pre></div></li>
+</ul>
+<p>If no password is provided in automated scripts or non-interactive
+environments (such as headless servers without stdin attached),
+<code>unrar</code> will fail immediately, as it cannot proceed past the
+encrypted header.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

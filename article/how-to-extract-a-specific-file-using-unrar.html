@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Extract a Specific File Using Unrar - unrar</title>
+    <meta name="description" content="Extracting individual files from a RAR archive saves time and disk space by avoiding the need to decompress the entire archive. This guide covers the precise command-line syntax required to extract a specific file using the unrar utility on Linux and Uni">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-extract-a-specific-file-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Extract a Specific File Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-extract-a-specific-file-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting individual files from a RAR archive saves time and disk space by avoiding the need to decompress the entire archive. This guide covers the precise command-line syntax required to extract a specific file using the unrar utility on Linux and Uni" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-extract-a-specific-file-using-unrar">How to Extract a
+Specific File Using Unrar</h1>
+<p>Extracting individual files from a RAR archive saves time and disk
+space by avoiding the need to decompress the entire archive. This guide
+covers the precise command-line syntax required to extract a specific
+file using the <code>unrar</code> utility on Linux and Unix-like
+systems, including options for preserving directory structures and
+specifying destination directories.</p>
+<h3 id="basic-command-syntax">Basic Command Syntax</h3>
+<p>The general syntax to extract a single file requires invoking
+<code>unrar</code>, specifying an extraction command, passing the
+archive name, and stating the targeted filename:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar path/to/file.ext</span></code></pre></div>
+<p><code>unrar</code> provides two primary extraction commands:</p>
+<ul>
+<li><strong><code>e</code> (Extract without paths):</strong> Extracts
+the specified file directly into the current working directory, ignoring
+any internal folder hierarchy inside the archive.</li>
+<li><strong><code>x</code> (Extract with full paths):</strong> Extracts
+the specified file while recreating its original directory structure as
+stored in the archive.</li>
+</ul>
+<hr />
+<h3 id="step-1-list-the-contents-to-find-the-exact-file-name">Step 1:
+List the Contents to Find the Exact File Name</h3>
+<p>Before extracting, verify the exact name and path of the target file
+inside the archive using the list (<code>l</code>) or list bare
+(<code>lb</code>) command:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar</span></code></pre></div>
+<p>This lists all files in the archive with their internal directory
+paths, which you can use in the extraction command.</p>
+<hr />
+<h3 id="step-2-extract-the-file">Step 2: Extract the File</h3>
+<h4 id="extracting-to-the-current-directory-flattened">Extracting to the
+Current Directory (Flattened)</h4>
+<p>To extract a file named <code>document.pdf</code> directly to your
+current working directory without its parent folders:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar document.pdf</span></code></pre></div>
+<p>If the file is inside a subfolder in the archive (e.g.,
+<code>folder/document.pdf</code>), provide the full internal path:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar folder/document.pdf</span></code></pre></div>
+<h4 id="extracting-with-directory-structure-preserved">Extracting with
+Directory Structure Preserved</h4>
+<p>To keep the internal folder structure when unpacking:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar folder/document.pdf</span></code></pre></div>
+<p>This creates the <code>folder/</code> directory in your current
+location and places <code>document.pdf</code> inside it.</p>
+<hr />
+<h3 id="step-3-specifying-a-destination-directory">Step 3: Specifying a
+Destination Directory</h3>
+<p>To extract the file to a different folder on your system, append the
+destination path with a trailing slash (<code>/</code>) to the end of
+the command:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar document.pdf /path/to/destination/</span></code></pre></div>
+<p><em>Note: The trailing slash is required so <code>unrar</code>
+recognizes the destination argument as a folder rather than a rename
+target.</em></p>
+<hr />
+<h3 id="handling-spaces-in-file-names">Handling Spaces in File
+Names</h3>
+<p>If the archive name or the file you want to extract contains spaces,
+wrap the paths in quotation marks:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e <span class="st">&quot;My Archive.rar&quot;</span> <span class="st">&quot;Sub Folder/My Document.pdf&quot;</span> /destination/</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

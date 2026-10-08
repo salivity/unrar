@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Existing Directory Permissions - unrar</title>
+    <meta name="description" content="When extracting an archive using unrar, handling pre-existing directories with differing permissions is governed by strict preservation and security defaults. This article explains how the utility treats existing folder attributes, why permission conflic">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-existing-directory-permissions">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Existing Directory Permissions - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-existing-directory-permissions" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting an archive using unrar, handling pre-existing directories with differing permissions is governed by strict preservation and security defaults. This article explains how the utility treats existing folder attributes, why permission conflic" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-existing-directory-permissions">How Unrar
+Handles Existing Directory Permissions</h1>
+<p>When extracting an archive using <code>unrar</code>, handling
+pre-existing directories with differing permissions is governed by
+strict preservation and security defaults. This article explains how the
+utility treats existing folder attributes, why permission conflicts
+occur, the role of overwrite switches, and how to force or prevent
+permission updates during extraction.</p>
+<h3 id="default-extraction-behavior">Default Extraction Behavior</h3>
+<p>By default, <code>unrar</code> does not modify the permissions of
+directories that already exist on the target file system. When you run
+an extraction command such as <code>unrar x archive.rar</code>, the
+utility performs the following checks for directories:</p>
+<ol type="1">
+<li><strong>Detection:</strong> It checks if the destination directory
+path already exists.</li>
+<li><strong>Bypass:</strong> If the directory is present,
+<code>unrar</code> simply traverses into it to extract the contained
+files. It skips applying the archived directory permissions, leaving the
+target directory's existing <code>chmod</code> mode, ownership, and
+Access Control Lists (ACLs) untouched.</li>
+<li><strong>Creation:</strong> Permissions and attributes stored inside
+the RAR archive are applied solely to directories that
+<code>unrar</code> creates from scratch during the extraction
+process.</li>
+</ol>
+<h3 id="the-role-of-overwrite-switches">The Role of Overwrite
+Switches</h3>
+<p>Standard overwrite flags do not alter how <code>unrar</code> treats
+existing directory metadata:</p>
+<ul>
+<li><strong><code>-o+</code> (Overwrite all):</strong> Forces
+<code>unrar</code> to overwrite existing <em>files</em> without
+prompting. It does not force an update to the permissions or ownership
+of pre-existing directories.</li>
+<li><strong><code>-o-</code> (Skip existing files):</strong> Skips
+existing files entirely and similarly leaves existing directory metadata
+unchanged.</li>
+</ul>
+<p>Because RAR formats treat directory records differently from file
+data, overwrite commands apply almost exclusively to file content rather
+than updating the metadata of parent or existing directory
+structures.</p>
+<h3 id="influence-of-user-privileges-and-umask">Influence of User
+Privileges and Umask</h3>
+<p>How permissions are assigned—and whether they can be modified—also
+depends on the execution context:</p>
+<ul>
+<li><strong>Standard User:</strong> A standard user lacks the privilege
+to alter permissions on directories they do not own. Even if
+<code>unrar</code> attempted to update the directory mode to match the
+archive, the operating system would deny the action unless the user owns
+the directory.</li>
+<li><strong>Root / Superuser:</strong> Running <code>unrar</code> as
+root allows the tool to set user/group ownership (<code>chown</code>)
+and exact permissions (<code>chmod</code>) on newly created directories.
+However, pre-existing folders will still retain their original
+permissions unless explicitly removed prior to extraction.</li>
+<li><strong>File Creation Mask (<code>umask</code>):</strong> When new
+directories are created, the resulting permissions are typically
+filtered through the user's active <code>umask</code> unless the archive
+was created with explicit POSIX attribute preservation.</li>
+</ul>
+<h3 id="how-to-apply-archived-permissions-to-existing-directories">How
+to Apply Archived Permissions to Existing Directories</h3>
+<p>If you need the directory structure to precisely mirror the
+permissions stored inside the archive, <code>unrar</code> does not
+provide an in-place directory metadata update switch. You must use one
+of the following approaches:</p>
+<ol type="1">
+<li><strong>Remove the Existing Directories:</strong> Delete or rename
+the conflicting directory tree before extracting. This forces
+<code>unrar</code> to recreate the folders and apply the stored
+attributes directly.</li>
+<li><strong>Extract to a Temporary Location:</strong> Extract the
+archive into an empty temporary folder, verify the desired directory
+permissions, and use tools like <code>rsync</code> with the
+<code>--perms</code> and <code>--owner</code> flags to synchronize the
+attributes onto the destination directory.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

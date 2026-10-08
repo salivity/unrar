@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Ignore Recovery Volumes in Unrar - unrar</title>
+    <meta name="description" content="This guide explains how to prevent the unrar command-line utility from processing or scanning RAR recovery volumes (.rev files) during extraction. By applying the standard exclusion switch, you can instruct the utility to bypass recovery archives entirel">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-ignore-recovery-volumes-in-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Ignore Recovery Volumes in Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-ignore-recovery-volumes-in-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to prevent the unrar command-line utility from processing or scanning RAR recovery volumes (.rev files) during extraction. By applying the standard exclusion switch, you can instruct the utility to bypass recovery archives entirel" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-ignore-recovery-volumes-in-unrar">How to Ignore Recovery
+Volumes in Unrar</h1>
+<p>This guide explains how to prevent the <code>unrar</code>
+command-line utility from processing or scanning RAR recovery volumes
+(<code>.rev</code> files) during extraction. By applying the standard
+exclusion switch, you can instruct the utility to bypass recovery
+archives entirely, speeding up extraction or preventing unwanted volume
+reconstruction.</p>
+<h3 id="the-command-to-ignore-recovery-volumes">The Command to Ignore
+Recovery Volumes</h3>
+<p>To instruct <code>unrar</code> to ignore recovery volumes completely,
+use the <code>-x</code> (exclude) switch with a wildcard targeting the
+<code>.rev</code> file extension:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-x</span><span class="pp">*</span>.rev archive.part01.rar</span></code></pre></div>
+<p>If you are extracting files to the current working directory without
+preserving directory structures, use the <code>e</code> command
+instead:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e <span class="at">-x</span><span class="pp">*</span>.rev archive.part01.rar</span></code></pre></div>
+<h3 id="how-the-switch-works">How the Switch Works</h3>
+<ul>
+<li><strong><code>-x&lt;pattern&gt;</code></strong>: Tells
+<code>unrar</code> to exclude any file matching the specified pattern
+from being opened, processed, or extracted.</li>
+<li><strong><code>*.rev</code></strong>: Matches all recovery volume
+files associated with RAR multi-part archives (e.g.,
+<code>archive.part01.rev</code>, <code>archive01.rev</code>).</li>
+</ul>
+<h3 id="batch-extraction-without-recovery-volumes">Batch Extraction
+Without Recovery Volumes</h3>
+<p>When extracting multiple archives or using wildcards across a
+directory, command-line shells may inadvertently pass <code>.rev</code>
+files directly to the utility. To safely extract all RAR archives while
+skipping recovery volumes in batch operations, place the exclusion
+switch before the target pattern:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-x</span><span class="pp">*</span>.rev <span class="pp">*</span>.rar</span></code></pre></div>
+<h3 id="keeping-incomplete-files-without-recovery">Keeping Incomplete
+Files Without Recovery</h3>
+<p>If you are bypassing recovery volumes because an archive is damaged
+or missing parts, <code>unrar</code> will typically delete incomplete
+files upon encountering an error. To retain the partial data without
+attempting repair, combine the exclude flag with the <code>-kb</code>
+(keep broken) flag:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> <span class="at">-x</span><span class="pp">*</span>.rev archive.part01.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

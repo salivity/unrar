@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract a Specific Byte Range? - unrar</title>
+    <meta name="description" content="The standard unrar command-line utility cannot natively extract a specific byte range from a compressed file within an archive, as it lacks built-in flags for byte offsets. However, users can achieve byte-range extraction by streaming the decompressed co">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-a-specific-byte-range">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract a Specific Byte Range? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-a-specific-byte-range" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The standard unrar command-line utility cannot natively extract a specific byte range from a compressed file within an archive, as it lacks built-in flags for byte offsets. However, users can achieve byte-range extraction by streaming the decompressed co" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-a-specific-byte-range">Can Unrar Extract a
+Specific Byte Range?</h1>
+<p>The standard <code>unrar</code> command-line utility cannot natively
+extract a specific byte range from a compressed file within an archive,
+as it lacks built-in flags for byte offsets. However, users can achieve
+byte-range extraction by streaming the decompressed content to standard
+output and slicing the stream with core Unix utilities such as
+<code>dd</code>. This article explains why native byte extraction is
+unsupported due to RAR compression mechanics and provides the standard
+workaround for extracting precise byte ranges.</p>
+<h2 id="native-capability-and-compression-constraints">Native Capability
+and Compression Constraints</h2>
+<p>The <code>unrar</code> utility does not provide an option to seek or
+extract arbitrary byte ranges directly. This limitation stems from how
+the RAR format handles data compression.</p>
+<p>RAR archives utilize dictionary-based algorithms (such as LZSS and
+PPMd). In compressed files—especially solid archives—decompression
+relies on sequential context. To reconstruct a specific byte sequence
+located in the middle of a file, the decompression engine must process
+the preceding data to rebuild the sliding dictionary and decode tables.
+Because random access into compressed data is mathematically impractical
+without decompressing from the start of the compression block,
+<code>unrar</code> does not implement random seeking by byte
+offsets.</p>
+<p>Even if an archive is created with zero compression (stored mode
+using <code>-m0</code>), the <code>unrar</code> command-line syntax
+still omits byte-slicing parameters.</p>
+<h2 id="how-to-extract-byte-ranges-using-stdout">How to Extract Byte
+Ranges Using stdout</h2>
+<p>To extract a specific range of bytes, you must instruct
+<code>unrar</code> to decompress the target file to standard output
+(<code>stdout</code>), suppress console noise, and pipe the data to a
+stream-manipulation tool like <code>dd</code>.</p>
+<h3 id="the-command-syntax">The Command Syntax</h3>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar target_file.ext <span class="kw">|</span> <span class="fu">dd</span> bs=1 skip=OFFSET count=LENGTH of=extracted_chunk.bin</span></code></pre></div>
+<h3 id="parameter-breakdown">Parameter Breakdown</h3>
+<ul>
+<li><strong><code>p</code></strong>: Instructs <code>unrar</code> to
+print the decompressed file data directly to standard output.</li>
+<li><strong><code>-inul</code></strong>: Disables all informational,
+banner, and progress messages to ensure the binary output is not
+corrupted by plain text.</li>
+<li><strong><code>bs=1</code></strong>: Configures <code>dd</code> to
+operate on a block size of 1 byte, enabling precise boundary
+selection.</li>
+<li><strong><code>skip=OFFSET</code></strong>: Specifies the starting
+byte offset to skip from the beginning of the file.</li>
+<li><strong><code>count=LENGTH</code></strong>: Specifies the total
+number of bytes to read after the offset.</li>
+<li><strong><code>of=extracted_chunk.bin</code></strong>: Designates the
+destination file for the extracted byte range.</li>
+</ul>
+<h3 id="example">Example</h3>
+<p>To extract 1,024 bytes starting at byte offset 5,000 from
+<code>data.iso</code> inside <code>backup.rar</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> backup.rar data.iso <span class="kw">|</span> <span class="fu">dd</span> bs=1 skip=5000 count=1024 of=chunk.bin</span></code></pre></div>
+<p>This method decompresses the file sequentially from the beginning,
+passes the stream through the pipe, and truncates the data at the
+desired boundaries.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

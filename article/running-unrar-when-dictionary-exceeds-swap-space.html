@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Unrar When Dictionary Exceeds Swap Space - unrar</title>
+    <meta name="description" content="When decompressing an archive using unrar, the utility must allocate enough virtual memory to accommodate the compression dictionary used during the archive's creation. If the required dictionary size exceeds the total available memory—meaning the sum">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/running-unrar-when-dictionary-exceeds-swap-space">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Running Unrar When Dictionary Exceeds Swap Space - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/running-unrar-when-dictionary-exceeds-swap-space" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When decompressing an archive using unrar, the utility must allocate enough virtual memory to accommodate the compression dictionary used during the archive's creation. If the required dictionary size exceeds the total available memory—meaning the sum" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="running-unrar-when-dictionary-exceeds-swap-space">Running Unrar
+When Dictionary Exceeds Swap Space</h1>
+<p>When decompressing an archive using <code>unrar</code>, the utility
+must allocate enough virtual memory to accommodate the compression
+dictionary used during the archive's creation. If the required
+dictionary size exceeds the total available memory—meaning the sum of
+physical RAM and available swap space is insufficient—the operating
+system cannot fulfill the allocation request. This scenario typically
+leads to severe performance degradation through memory thrashing,
+followed by an immediate process crash or forceful termination by the
+operating system's Out-Of-Memory (OOM) killer.</p>
+<h3 id="how-unrar-handles-memory-allocation">How Unrar Handles Memory
+Allocation</h3>
+<p>RAR compression, particularly with the RAR5 format, supports
+dictionary sizes ranging from small megabyte allocations up to several
+gigabytes. During the extraction process, <code>unrar</code> must load
+the dictionary window into active virtual memory to reference previously
+decompressed data blocks.</p>
+<p>Unlike streaming compression tools that can operate with dynamic,
+minimal buffers, <code>unrar</code> attempts to map the entire
+dictionary block into memory via standard system calls (such as
+<code>malloc</code> or <code>mmap</code>) before writing extracted files
+to disk.</p>
+<h3 id="system-thrashing">System Thrashing</h3>
+<p>Before total exhaustion occurs, if the dictionary size fits within
+RAM plus swap but heavily relies on the swap partition, the operating
+system undergoes extreme memory thrashing. The kernel constantly swaps
+pages between the fast physical RAM and the slower swap drive to satisfy
+access requests from <code>unrar</code>.</p>
+<p>This leads to:</p>
+<ul>
+<li>100% disk I/O utilization on the drive hosting the swap space.</li>
+<li>Total system unresponsiveness or extreme latency for other
+processes.</li>
+<li>Stalled decompression progress as the CPU waits for data pages to
+read from disk.</li>
+</ul>
+<h3 id="memory-exhaustion-and-process-termination">Memory Exhaustion and
+Process Termination</h3>
+<p>When the dictionary size is strictly larger than the combined
+capacity of physical RAM and all allocated swap, the behavior depends on
+the operating system's virtual memory management:</p>
+<ol type="1">
+<li><p><strong>Linux and Unix-like Systems:</strong></p>
+<ul>
+<li><strong>Overcommit Disabled:</strong> If memory overcommit is
+disabled (<code>vm.overcommit_memory = 2</code>), the kernel immediately
+denies the memory request. The <code>unrar</code> binary catches the
+failed allocation, throws an exception (such as
+<code>std::bad_alloc</code>), and aborts with an error such as
+<code>Cannot allocate memory</code> or
+<code>Not enough memory</code>.</li>
+<li><strong>Overcommit Enabled:</strong> If overcommit is active
+(standard on most desktop and server installations), the kernel grants
+the virtual address space initially. However, the moment
+<code>unrar</code> writes to the allocated pages and physical address
+translation fails due to exhausted swap, the kernel's Out-Of-Memory
+(OOM) Killer triggers. The kernel identifies <code>unrar</code> as the
+highest consumer of memory resources and sends a <code>SIGKILL</code>
+(<code>Kill</code> signal 9), immediately halting execution.</li>
+</ul></li>
+<li><p><strong>Windows Systems:</strong></p>
+<ul>
+<li>The Windows memory manager monitors commit limits. If the requested
+commit size exceeds the physical RAM and pagefile limits, Windows
+refuses the memory commit request.</li>
+<li>The extraction utility aborts cleanly or crashes with an explicit
+out-of-memory error, leaving the partially extracted file corrupt or
+deleted.</li>
+</ul></li>
+</ol>
+<h3 id="recovery-and-prevention">Recovery and Prevention</h3>
+<p>If extraction fails due to dictionary constraints exceeding swap
+capacity, the extraction cannot proceed without increasing system memory
+resources. The primary solutions include:</p>
+<ul>
+<li><strong>Expanding Swap Space:</strong> Temporarily create a larger
+swap file on an available storage drive to provide the necessary virtual
+address space.</li>
+<li><strong>Adding Physical RAM:</strong> Upgrade hardware to match
+modern RAR archives that utilize multi-gigabyte dictionaries.</li>
+<li><strong>Using 64-bit Binaries:</strong> Ensure the 64-bit version of
+<code>unrar</code> is in use, as 32-bit builds are limited by their 2 GB
+to 4 GB process address space, regardless of available swap size.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

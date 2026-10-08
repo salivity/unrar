@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Broken Multi-Volume Sequence Error - unrar</title>
+    <meta name="description" content="When extracting split RAR archives using the unrar command-line utility, encountering a missing or corrupted file in the set will halt the extraction process. This guide details the exact error messages unrar displays when a multi-volume sequence is brok">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-broken-multi-volume-sequence-error">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Broken Multi-Volume Sequence Error - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-broken-multi-volume-sequence-error" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting split RAR archives using the unrar command-line utility, encountering a missing or corrupted file in the set will halt the extraction process. This guide details the exact error messages unrar displays when a multi-volume sequence is brok" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-broken-multi-volume-sequence-error">Unrar Broken
+Multi-Volume Sequence Error</h1>
+<p>When extracting split RAR archives using the <code>unrar</code>
+command-line utility, encountering a missing or corrupted file in the
+set will halt the extraction process. This guide details the exact error
+messages <code>unrar</code> displays when a multi-volume sequence is
+broken, why these errors trigger, and how to address them.</p>
+<p>When a multi-volume RAR sequence is broken—such as when a piece is
+missing, out of order, or renamed incorrectly—<code>unrar</code> outputs
+the following error message:</p>
+<pre class="text"><code>Cannot find volume &lt;archive_name&gt;.partX.rar</code></pre>
+<p>Depending on the specific command flags used, <code>unrar</code> may
+pause and prompt for the missing file location:</p>
+<pre class="text"><code>Insert disk with &lt;archive_name&gt;.partX.rar</code></pre>
+<p>If the prompt is skipped, aborted, or executed in non-interactive
+batch mode, <code>unrar</code> terminates the process and outputs:</p>
+<pre class="text"><code>Cannot open &lt;archive_name&gt;.partX.rar
+Unexpected end of archive
+Total errors: 1</code></pre>
+<p>If a volume is physically present but truncated or damaged
+mid-stream, <code>unrar</code> instead produces:</p>
+<pre class="text"><code>CRC failed in &lt;extracted_file&gt;
+Unexpected end of archive
+Total errors: 1</code></pre>
+<h3 id="causes-of-the-error">Causes of the Error</h3>
+<ol type="1">
+<li><strong>Missing Part:</strong> A volume file (such as
+<code>.part2.rar</code> or <code>.r01</code>) is missing from the target
+directory.</li>
+<li><strong>Naming Mismatch:</strong> The naming scheme across volumes
+is inconsistent (for example, mixing <code>archive.part1.rar</code> with
+<code>archive.part02.rar</code>).</li>
+<li><strong>Incomplete Download:</strong> The subsequent volume was only
+partially downloaded or corrupted during transfer.</li>
+</ol>
+<h3 id="how-to-resolve-the-issue">How to Resolve the Issue</h3>
+<ul>
+<li><strong>Verify Naming Continuity:</strong> Ensure all parts follow a
+consistent naming structure (e.g., <code>file.part1.rar</code>,
+<code>file.part2.rar</code> or <code>file.rar</code>,
+<code>file.r00</code>, <code>file.r01</code>).</li>
+<li><strong>Keep Files in One Directory:</strong> Ensure all volume
+files reside in the same folder from which the extraction command is
+run.</li>
+<li><strong>Check Missing Volumes:</strong> Identify which volume number
+<code>unrar</code> failed to find and re-download or reconstruct that
+specific file using available recovery volumes (<code>.rev</code> files)
+or PAR2 recovery sets.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

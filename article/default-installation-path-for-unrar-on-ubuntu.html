@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Default Installation Path for unrar on Ubuntu - unrar</title>
+    <meta name="description" content="This article explains the default installation path of the unrar utility on Ubuntu Linux systems and outlines straightforward methods to locate and verify the executable binary using built-in terminal commands. On Ubuntu, when you install the standard no">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/default-installation-path-for-unrar-on-ubuntu">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Default Installation Path for unrar on Ubuntu - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/default-installation-path-for-unrar-on-ubuntu" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains the default installation path of the unrar utility on Ubuntu Linux systems and outlines straightforward methods to locate and verify the executable binary using built-in terminal commands. On Ubuntu, when you install the standard no" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="default-installation-path-for-unrar-on-ubuntu">Default
+Installation Path for unrar on Ubuntu</h1>
+<p>This article explains the default installation path of the
+<code>unrar</code> utility on Ubuntu Linux systems and outlines
+straightforward methods to locate and verify the executable binary using
+built-in terminal commands.</p>
+<h2 id="the-default-path">The Default Path</h2>
+<p>On Ubuntu, when you install the standard non-free or free version of
+<code>unrar</code> via the <code>apt</code> package manager, the
+executable binary is placed in:</p>
+<pre class="text"><code>/usr/bin/unrar</code></pre>
+<p>Because <code>/usr/bin</code> is included in the default system
+<code>$PATH</code> environment variable, you can run the
+<code>unrar</code> command from any directory in the terminal without
+specifying its absolute file path.</p>
+<h2 id="how-to-verify-the-installation-path">How to Verify the
+Installation Path</h2>
+<p>You can confirm the exact location of the <code>unrar</code>
+executable on your system using one of the following terminal
+commands:</p>
+<h3 id="1-using-the-which-command">1. Using the <code>which</code>
+Command</h3>
+<p>The <code>which</code> command locates the binary executable
+associated with the given command name:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">which</span> unrar</span></code></pre></div>
+<p>Output:</p>
+<pre class="text"><code>/usr/bin/unrar</code></pre>
+<h3 id="2-using-the-whereis-command">2. Using the <code>whereis</code>
+Command</h3>
+<p>The <code>whereis</code> command finds the binary, source, and manual
+page files for the program:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">whereis</span> unrar</span></code></pre></div>
+<p>Output:</p>
+<pre class="text"><code>unrar: /usr/bin/unrar /usr/share/man/man1/unrar.1.gz</code></pre>
+<h3 id="3-using-the-type-command">3. Using the <code>type</code>
+Command</h3>
+<p>The <code>type</code> command describes how the shell interprets the
+command:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span> <span class="at">-p</span> unrar</span></code></pre></div>
+<p>Output:</p>
+<pre class="text"><code>/usr/bin/unrar</code></pre>
+<h2 id="installing-unrar-if-missing">Installing unrar if Missing</h2>
+<p>If the commands above return no output, the package is not installed.
+To install it to the default path, enable the <code>multiverse</code>
+repository and run:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install unrar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

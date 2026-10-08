@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Extract Corrupt RAR Files Using Unrar - unrar</title>
+    <meta name="description" content="Extracting files from a corrupt RAR archive is possible using the command-line utility unrar, provided you instruct the tool to retain damaged data instead of deleting it. By default, unrar deletes any file that fails a Cyclic Redundancy Check (CRC). How">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-extract-corrupt-rar-files-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Extract Corrupt RAR Files Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-extract-corrupt-rar-files-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting files from a corrupt RAR archive is possible using the command-line utility unrar, provided you instruct the tool to retain damaged data instead of deleting it. By default, unrar deletes any file that fails a Cyclic Redundancy Check (CRC). How" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-extract-corrupt-rar-files-using-unrar">How to Extract
+Corrupt RAR Files Using Unrar</h1>
+<p>Extracting files from a corrupt RAR archive is possible using the
+command-line utility <code>unrar</code>, provided you instruct the tool
+to retain damaged data instead of deleting it. By default,
+<code>unrar</code> deletes any file that fails a Cyclic Redundancy Check
+(CRC). However, by utilizing the "keep broken files" switch
+(<code>-kb</code>), you can force <code>unrar</code> to save partially
+recovered or corrupted files while extracting completely intact files
+alongside them. This guide explains how this mechanism works, the exact
+commands to use, and the technical limitations you may encounter.</p>
+<h3 id="the-default-behavior-vs-the--kb-flag">The Default Behavior vs.
+The <code>-kb</code> Flag</h3>
+<p>When <code>unrar</code> encounters corrupted bytes during extraction,
+it reports a CRC or checksum error and immediately deletes the affected
+file from your disk to prevent corrupted data from being used.</p>
+<p>To override this behavior and keep the valid portions of a file up to
+the point of corruption, use the <code>-kb</code> (Keep Broken)
+switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar</span></code></pre></div>
+<ul>
+<li><code>x</code>: Extracts files with their full directory path.</li>
+<li><code>-kb</code>: Prevents <code>unrar</code> from deleting files
+that produce CRC errors.</li>
+</ul>
+<p>When running this command, <code>unrar</code> will fully extract any
+undamaged files within the archive. For damaged files, it will extract
+as much data as it can read and leave the partial file on your drive
+rather than discarding it.</p>
+<h3 id="solid-vs-non-solid-archives">Solid vs. Non-Solid Archives</h3>
+<p>The success of extracting data from a corrupt archive largely depends
+on whether the archive was compressed as "solid" or "non-solid":</p>
+<ul>
+<li><strong>Non-Solid Archives:</strong> Each file is compressed
+independently. If file A is corrupt, <code>unrar</code> can skip or
+partially extract file A, and file B will remain completely unaffected
+and fully recoverable.</li>
+<li><strong>Solid Archives:</strong> Multiple files are treated as a
+single continuous data stream to achieve higher compression ratios. If
+corruption occurs early in a solid archive, <code>unrar</code> cannot
+decode the stream past the corrupted sector, which often prevents the
+extraction of any subsequent files in the archive.</li>
+</ul>
+<h3 id="using-built-in-recovery-records">Using Built-In Recovery
+Records</h3>
+<p>If the archive was created with a recovery record (RR), you should
+attempt to repair the archive before extracting broken files. The repair
+process uses Reed-Solomon error correction to reconstruct missing or
+altered bytes.</p>
+<p>Run the repair command:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> r archive.rar</span></code></pre></div>
+<p>This creates a new file named <code>fixed.archive.rar</code>. If the
+damage falls within the threshold of the recovery record, the archive
+will be restored to an error-free state, allowing you to extract all
+files without needing the <code>-kb</code> switch.</p>
+<h3 id="what-to-expect-from-extracted-corrupt-files">What to Expect from
+Extracted Corrupt Files</h3>
+<p>Files extracted with the <code>-kb</code> switch will contain missing
+or zeroed-out blocks:</p>
+<ul>
+<li><strong>Media Files (Video and Audio):</strong> Formats like MP4,
+MKV, or MP3 often play successfully up to the corrupted section, or may
+skip the damaged frames entirely.</li>
+<li><strong>Text and Raw Data:</strong> Plain text, logs, and
+uncompressed data will generally be readable up to the point of
+corruption.</li>
+<li><strong>Executables and Compressed Formats:</strong> Software
+installers, databases, and sub-archives (such as ZIP or nested RAR
+files) will usually fail to open or execute, as even a single corrupted
+byte breaks structural validation.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

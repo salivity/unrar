@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Verify All Parts of a Split Archive? - unrar</title>
+    <meta name="description" content="The command-line utility unrar can verify the complete integrity of a multi-part (split) RAR archive in a single command, but it does so sequentially rather than in parallel. By running a test command against the first volume of the set, unrar automatica">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-verify-all-parts-of-a-split-archive">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Verify All Parts of a Split Archive? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-verify-all-parts-of-a-split-archive" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The command-line utility unrar can verify the complete integrity of a multi-part (split) RAR archive in a single command, but it does so sequentially rather than in parallel. By running a test command against the first volume of the set, unrar automatica" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-verify-all-parts-of-a-split-archive">Can unrar Verify
+All Parts of a Split Archive?</h1>
+<p>The command-line utility <code>unrar</code> can verify the complete
+integrity of a multi-part (split) RAR archive in a single command, but
+it does so sequentially rather than in parallel. By running a test
+command against the first volume of the set, <code>unrar</code>
+automatically discovers, traverses, and checks every subsequent volume
+for checksum errors, missing blocks, and file corruption until the
+entire archive is validated.</p>
+<h3 id="how-to-test-a-split-archive">How to Test a Split Archive</h3>
+<p>To verify a split archive, you only need to run the test command
+(<code>t</code>) against the first file in the set. If your archive
+files are named using the modern naming convention (e.g.,
+<code>archive.part1.rar</code>, <code>archive.part2.rar</code>), execute
+the following command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t archive.part1.rar</span></code></pre></div>
+<p>For older RAR naming conventions (e.g., <code>archive.rar</code>,
+<code>archive.r00</code>, <code>archive.r01</code>), target the base
+<code>.rar</code> file:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t archive.rar</span></code></pre></div>
+<h3 id="how-the-verification-process-works">How the Verification Process
+Works</h3>
+<p>When the test command is executed, <code>unrar</code> performs the
+following steps:</p>
+<ol type="1">
+<li><strong>Volume Chaining:</strong> It reads the header of the primary
+volume, identifies that the archive is part of a multi-volume set, and
+determines the total structure.</li>
+<li><strong>Continuous Stream Decompression:</strong> Because RAR
+compression often spans data across volume boundaries,
+<code>unrar</code> reads through the archive as a continuous data
+stream. When it reaches the end of <code>part1.rar</code>, it
+automatically looks for <code>part2.rar</code> in the same
+directory.</li>
+<li><strong>Checksum Validation:</strong> As it simulates the extraction
+process in memory, it recalculates the CRC32 or BLAKE2 checksums and
+compares them against the stored checksums inside the archive
+headers.</li>
+</ol>
+<h3 id="sequential-execution-vs-parallel-processing">Sequential
+Execution vs. Parallel Processing</h3>
+<p>While <code>unrar</code> verifies the entire archive in a single,
+uninterrupted workflow without requiring manual intervention for each
+part, it does not process the files concurrently. RAR multi-volume
+archives, particularly solid archives, store compressed data
+sequentially. Because the decompression algorithm depends on the
+previous data dictionary state, <code>unrar</code> must read the parts
+in chronological order rather than verifying separate parts at the same
+exact moment across multiple CPU threads.</p>
+<h3 id="error-handling">Error Handling</h3>
+<p>If any single volume in the split set is damaged or missing,
+<code>unrar</code> reports an error:</p>
+<ul>
+<li><strong>Missing Volumes:</strong> If a required part is missing from
+the directory, the process pauses and prompts for the path to the
+missing volume, or it exits with an error code if running in
+non-interactive mode.</li>
+<li><strong>Corrupt Data:</strong> If data within any segment does not
+match the header checksum, <code>unrar</code> displays a checksum error
+identifying the specific affected file inside the archive.</li>
+</ul>
+<p>Using <code>unrar t</code> on the first volume is the standard,
+reliable method to guarantee the health of an entire split archive
+before attempting extraction.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

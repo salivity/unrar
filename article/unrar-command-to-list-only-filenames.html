@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Command to List Only Filenames - unrar</title>
+    <meta name="description" content="When managing RAR archives on the command line, you often need to view the contents of an archive without uncompressing it or parsing through verbose metadata like file sizes, ratios, and permissions. This guide explains the specific command switch used">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-command-to-list-only-filenames">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Command to List Only Filenames - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-command-to-list-only-filenames" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When managing RAR archives on the command line, you often need to view the contents of an archive without uncompressing it or parsing through verbose metadata like file sizes, ratios, and permissions. This guide explains the specific command switch used" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-command-to-list-only-filenames">Unrar Command to List Only
+Filenames</h1>
+<p>When managing RAR archives on the command line, you often need to
+view the contents of an archive without uncompressing it or parsing
+through verbose metadata like file sizes, ratios, and permissions. This
+guide explains the specific command switch used in the
+<code>unrar</code> utility to display a clean, bare list of filenames,
+making it easy to inspect archives or pipe the output into other
+command-line tools.</p>
+<h2 id="the-command-unrar-lb">The Command: <code>unrar lb</code></h2>
+<p>To print only the bare list of filenames and paths inside a RAR
+archive, use the <code>lb</code> command.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar</span></code></pre></div>
+<h3 id="how-it-works">How It Works</h3>
+<ul>
+<li><strong><code>unrar</code></strong>: Invokes the RAR extraction and
+inspection utility.</li>
+<li><strong><code>lb</code></strong>: Stands for "List Bare." It strips
+away header banners, column titles, file dates, sizes, attributes, and
+summary footers, leaving only the file paths.</li>
+<li><strong><code>archive.rar</code></strong>: The path to your target
+RAR file.</li>
+</ul>
+<h2 id="unrar-lb-vs-standard-unrar-l"><code>unrar lb</code> vs. Standard
+<code>unrar l</code></h2>
+<p>The standard listing command, <code>unrar l archive.rar</code>,
+outputs a formatted table containing detailed file information:</p>
+<pre class="text"><code>UNRAR 6.x freeware      Copyright (c) 1993-2023 Alexander Roshal
+
+Archive: archive.rar
+Details: RAR 5
+
+ Attributes      Size     Date    Time   Name
+----------- ---------  ---------- -----  ----
+ -rw-r--r--      1024  2023-10-12 14:00  document.pdf
+ -rw-r--r--      2048  2023-10-12 14:01  image.png
+----------- ---------  ---------- -----  ----
+                 3072                    2</code></pre>
+<p>In contrast, running <code>unrar lb archive.rar</code> produces only
+the file paths, one per line:</p>
+<pre class="text"><code>document.pdf
+image.png</code></pre>
+<h2 id="common-use-cases">Common Use Cases</h2>
+<h3 id="exporting-the-file-list-to-a-text-file">Exporting the File List
+to a Text File</h3>
+<p>You can redirect the bare output directly to a file to create a
+catalog or inventory:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar <span class="op">&gt;</span> files.txt</span></code></pre></div>
+<h3 id="searching-for-a-specific-file">Searching for a Specific
+File</h3>
+<p>Because the output contains no extra text, you can pipe it to
+<code>grep</code> to quickly check for the existence of a file:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.rar <span class="kw">|</span> <span class="fu">grep</span> <span class="st">&quot;target_file.txt&quot;</span></span></code></pre></div>
+<h3 id="using-inside-scripts-and-loops">Using Inside Scripts and
+Loops</h3>
+<p>The clean output allows you to iterate over the contents within Bash
+scripts without needing <code>awk</code>, <code>cut</code>, or regex
+cleanup:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> file <span class="kw">in</span> <span class="va">$(</span><span class="ex">unrar</span> lb archive.rar<span class="va">)</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Found: </span><span class="va">$file</span><span class="st">&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

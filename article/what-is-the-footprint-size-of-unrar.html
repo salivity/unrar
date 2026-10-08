@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is the Footprint Size of Unrar? - unrar</title>
+    <meta name="description" content="A typical installation of the unrar utility maintains an exceptionally lightweight footprint, requiring less than 2 megabytes of disk space and negligible system resources. This guide breaks down the precise storage footprint of unrar across major platfo">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-is-the-footprint-size-of-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is the Footprint Size of Unrar? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-is-the-footprint-size-of-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="A typical installation of the unrar utility maintains an exceptionally lightweight footprint, requiring less than 2 megabytes of disk space and negligible system resources. This guide breaks down the precise storage footprint of unrar across major platfo" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-is-the-footprint-size-of-unrar">What Is the Footprint Size
+of Unrar?</h1>
+<p>A typical installation of the <code>unrar</code> utility maintains an
+exceptionally lightweight footprint, requiring less than 2 megabytes of
+disk space and negligible system resources. This guide breaks down the
+precise storage footprint of <code>unrar</code> across major platforms,
+examines its minimal runtime memory requirements, and outlines the
+dependencies needed to run the tool.</p>
+<h3 id="disk-space-and-binary-size">Disk Space and Binary Size</h3>
+<p>The actual disk footprint of <code>unrar</code> depends slightly on
+the operating system, compilation flags, and whether the package comes
+from RARLAB (the proprietary, official freeware release) or the
+open-source <code>unrar-free</code> alternative.</p>
+<ul>
+<li><strong>Linux (Debian/Ubuntu/CentOS):</strong> The standalone
+<code>unrar</code> binary typically measures between <strong>300 KB and
+600 KB</strong>. When installed via standard package managers (like
+<code>apt install unrar</code>), the total installed size reported on
+disk is generally between <strong>700 KB and 1.5 MB</strong>, which
+includes manual pages, documentation, and licensing text.</li>
+<li><strong>Windows:</strong> The official command-line executable
+distributed by RARLAB (<code>UnRAR.exe</code>) is approximately
+<strong>350 KB to 500 KB</strong>. It does not require an installation
+directory or registry modifications and functions as a standalone
+portable file.</li>
+<li><strong>macOS:</strong> Installed via Homebrew or compiled from
+source, the binary occupies roughly <strong>400 KB to 700 KB</strong> of
+storage.</li>
+</ul>
+<h3 id="dependencies-and-overhead">Dependencies and Overhead</h3>
+<p><code>unrar</code> is written in C++ and compiled directly to native
+machine code. It does not rely on heavy runtime environments, virtual
+machines, or large external frameworks.</p>
+<ul>
+<li><strong>Shared Libraries:</strong> On modern Linux systems, it
+dynamically links only to standard core libraries, such as
+<code>libc</code> and <code>libstdc++</code>. Because these libraries
+are already present on virtually every operating system,
+<code>unrar</code> introduces almost zero auxiliary dependency
+overhead.</li>
+<li><strong>Static Binaries:</strong> Completely static builds of
+<code>unrar</code> incorporate all necessary code directly into the
+executable, resulting in a single self-contained binary of roughly
+<strong>1.2 MB to 2 MB</strong>.</li>
+</ul>
+<h3 id="runtime-memory-ram-footprint">Runtime Memory (RAM)
+Footprint</h3>
+<p>When idle or closed, <code>unrar</code> consumes zero RAM as it runs
+strictly as an on-demand process rather than a continuous background
+service or daemon.</p>
+<p>During active extraction, memory usage is dictated primarily by the
+RAR dictionary size used when the archive was created:</p>
+<ul>
+<li><strong>Legacy RAR 4.x Archives:</strong> Typically consume between
+<strong>2 MB and 8 MB</strong> of RAM during extraction.</li>
+<li><strong>Modern RAR 5.x Archives:</strong> The default dictionary
+size is usually 32 MB or 64 MB, resulting in runtime memory consumption
+of roughly <strong>35 MB to 70 MB</strong> while unpacking. In rare
+cases where an archive is compressed with the maximum allowable
+dictionary size (up to 1 GB), memory usage scales to match the
+dictionary window, but typical day-to-day operations remain well under
+<strong>50 MB</strong> of RAM.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

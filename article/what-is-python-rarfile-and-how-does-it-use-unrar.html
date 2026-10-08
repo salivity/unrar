@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Is Python rarfile and How Does It Use unrar? - unrar</title>
+    <meta name="description" content="The rarfile module is an open-source Python library designed to read and extract RAR archives using an interface almost identical to Python’s built-in zipfile module. Because the RAR compression format is proprietary, rarfile cannot decompress data on">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-is-python-rarfile-and-how-does-it-use-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Is Python rarfile and How Does It Use unrar? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-is-python-rarfile-and-how-does-it-use-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The rarfile module is an open-source Python library designed to read and extract RAR archives using an interface almost identical to Python’s built-in zipfile module. Because the RAR compression format is proprietary, rarfile cannot decompress data on" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-is-python-rarfile-and-how-does-it-use-unrar">What Is Python
+rarfile and How Does It Use unrar?</h1>
+<p>The <code>rarfile</code> module is an open-source Python library
+designed to read and extract RAR archives using an interface almost
+identical to Python’s built-in <code>zipfile</code> module. Because the
+RAR compression format is proprietary, <code>rarfile</code> cannot
+decompress data on its own; instead, it relies directly on an external
+extraction utility, most commonly the <code>unrar</code> command-line
+executable or library, to handle the underlying decompression
+processes.</p>
+<h3 id="what-is-the-rarfile-module">What is the <code>rarfile</code>
+Module?</h3>
+<p><code>rarfile</code> is a third-party Python package that provides a
+Pythonic interface for inspecting and extracting RAR files. It mimics
+the standard library's <code>zipfile.ZipFile</code> API, allowing
+developers to read archive metadata, list archive contents, read
+individual files into memory, and extract archives to disk with minimal
+code changes.</p>
+<p>Key characteristics of <code>rarfile</code> include:</p>
+<ul>
+<li><strong>API Compatibility:</strong> Emulates <code>zipfile</code>,
+making it familiar and easy to integrate into existing Python
+codebases.</li>
+<li><strong>Format Support:</strong> Supports both RAR3 and RAR5
+formats, multi-volume archives, and password-protected files.</li>
+<li><strong>Read-Only:</strong> It only supports reading and extracting
+archives; it cannot create or modify RAR files.</li>
+</ul>
+<h3 id="what-is-unrar">What is <code>unrar</code>?</h3>
+<p><code>unrar</code> is a dedicated utility developed by RARLAB (and
+available across various operating systems) specifically designed to
+decompress RAR archives. While the RAR decompression algorithm's source
+code is publicly distributed by RARLAB, its license prohibits using the
+code to reverse-engineer the compression format or create compatible
+encoders without restriction. As a result, native pure-Python
+implementations of RAR extraction are rare, leaving <code>unrar</code>
+as the standard, robust tool for opening these archives across Linux,
+macOS, and Windows.</p>
+<h3 id="how-rarfile-relates-to-unrar">How <code>rarfile</code> Relates
+to <code>unrar</code></h3>
+<p>The relationship between <code>rarfile</code> and <code>unrar</code>
+is that of a wrapper and an execution engine:</p>
+<ol type="1">
+<li><strong>Backend Dependency:</strong> <code>rarfile</code> does not
+contain the decompression logic. When you call methods like
+<code>extract()</code>, <code>extractall()</code>, or
+<code>read()</code>, <code>rarfile</code> parses the archive headers in
+Python but delegates the actual decompression by invoking the
+<code>unrar</code> binary in the background via subprocesses.</li>
+<li><strong>System Requirement:</strong> For <code>rarfile</code> to
+work, the <code>unrar</code> executable must be installed on the host
+operating system and accessible via the system's <code>PATH</code>
+environment variable. Alternatively, you can configure the path manually
+within Python:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rarfile</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>rarfile.UNRAR_TOOL <span class="op">=</span> <span class="st">&quot;/path/to/unrar&quot;</span></span></code></pre></div></li>
+<li><strong>Alternative Backends:</strong> While <code>unrar</code> is
+the primary and recommended backend, <code>rarfile</code> can also be
+configured to use other tools such as <code>bsdtar</code> or
+<code>7z</code> for extraction, though <code>unrar</code> provides the
+most complete compatibility with advanced RAR features like RAR5 and
+solid archives.</li>
+</ol>
+<h3 id="basic-workflow-example">Basic Workflow Example</h3>
+<p>To use <code>rarfile</code>, both the Python package and the
+<code>unrar</code> binary must be present on the system:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rarfile</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Open a RAR archive</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rarfile.RarFile(<span class="st">&quot;archive.rar&quot;</span>) <span class="im">as</span> rf:</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># List files</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> file_info <span class="kw">in</span> rf.infolist():</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(file_info.filename, file_info.file_size)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract all contents</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    rf.extractall(path<span class="op">=</span><span class="st">&quot;./extracted_files&quot;</span>)</span></code></pre></div>
+<p>In summary, <code>rarfile</code> provides the high-level Python
+abstraction for managing RAR files, while <code>unrar</code> provides
+the low-level engine necessary to perform the actual decompression.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

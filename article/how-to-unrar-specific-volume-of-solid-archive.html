@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Unrar Specific Volume of Solid Archive - unrar</title>
+    <meta name="description" content="This guide explains how to extract files from multi-volume solid RAR archives using the unrar command-line tool. You will learn the technical constraints of solid compression, the exact commands required to extract individual files, and how to handle sce">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-unrar-specific-volume-of-solid-archive">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Unrar Specific Volume of Solid Archive - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-unrar-specific-volume-of-solid-archive" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to extract files from multi-volume solid RAR archives using the unrar command-line tool. You will learn the technical constraints of solid compression, the exact commands required to extract individual files, and how to handle sce" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-unrar-specific-volume-of-solid-archive">How to Unrar
+Specific Volume of Solid Archive</h1>
+<p>This guide explains how to extract files from multi-volume solid RAR
+archives using the <code>unrar</code> command-line tool. You will learn
+the technical constraints of solid compression, the exact commands
+required to extract individual files, and how to handle scenarios where
+you only have access to specific volumes of a split archive.</p>
+<hr />
+<h3 id="the-nature-of-solid-multi-volume-archives">The Nature of Solid
+Multi-Volume Archives</h3>
+<p>Before attempting extraction, it is essential to understand how solid
+RAR archives work. In a standard archive, each file is compressed
+independently. In a <strong>solid archive</strong>, all files are merged
+into a single continuous data stream before compression. This improves
+compression ratios significantly, but it introduces a major dependency:
+decompressing any file later in the stream requires the decompression
+dictionary built from the data preceding it.</p>
+<p>Because of this design, you cannot independently decompress a middle
+or late volume (such as <code>part03.rar</code>) of a solid archive
+without providing the preceding volumes (<code>part01.rar</code>,
+<code>part02.rar</code>).</p>
+<hr />
+<h3 id="standard-extraction-extracting-specific-files">Standard
+Extraction: Extracting Specific Files</h3>
+<p>If you possess all volumes and want to extract a specific file
+located within a particular volume, you do not point <code>unrar</code>
+directly at that volume. Instead, you target the first volume and
+specify the name of the file you want. The tool will parse through the
+stream across the volumes and extract only the designated file.</p>
+<h4 id="command-syntax">Command Syntax</h4>
+<p>To extract with full directory paths preserved:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part01.rar <span class="st">&quot;path/to/specific_file.ext&quot;</span></span></code></pre></div>
+<p>To extract directly into the current directory without
+subfolders:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.part01.rar <span class="st">&quot;path/to/specific_file.ext&quot;</span></span></code></pre></div>
+<p><em>Note: Replace <code>archive.part01.rar</code> with the first
+volume name (or <code>.rar</code> in older naming schemes like
+<code>.rar</code>, <code>.r00</code>, <code>.r01</code>).</em></p>
+<hr />
+<h3
+id="attempting-extraction-starting-from-a-specific-volume">Attempting
+Extraction Starting from a Specific Volume</h3>
+<p>If you attempt to run <code>unrar</code> directly on a secondary
+volume of a solid set:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part03.rar</span></code></pre></div>
+<p><code>unrar</code> will recognize that the file is part of a
+multi-volume solid set and will immediately prompt you for the location
+of <code>archive.part01.rar</code> or fail with an error stating that
+previous volumes are required to initialize the dictionary.</p>
+<h4 id="handling-damaged-or-incomplete-sets-the--kb-flag">Handling
+Damaged or Incomplete Sets (The <code>-kb</code> Flag)</h4>
+<p>If earlier volumes are missing and you must attempt to recover data
+from an isolated volume, use the <code>-kb</code> (Keep Broken) switch.
+This forces <code>unrar</code> to retain whatever data it can
+reconstruct, even if errors occur:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.part03.rar</span></code></pre></div>
+<p><strong>Outcome:</strong></p>
+<ul>
+<li>For <strong>non-solid archives</strong>, this successfully extracts
+any file that starts and ends entirely inside
+<code>part03.rar</code>.</li>
+<li>For <strong>solid archives</strong>, extraction will usually fail or
+produce corrupted files, as the decompression algorithm cannot decode
+the stream without the missing dictionary history from previous
+volumes.</li>
+</ul>
+<hr />
+<h3 id="summary-of-best-practices">Summary of Best Practices</h3>
+<ol type="1">
+<li><strong>Always start at Volume 1:</strong> Whenever extracting from
+multi-volume archives, point <code>unrar</code> to the first volume
+(<code>.part01.rar</code> or <code>.rar</code>).</li>
+<li><strong>Specify file targets:</strong> Filter by file name at the
+end of the command rather than trying to split the archive
+manually.</li>
+<li><strong>Keep all parts in the same directory:</strong> Ensure all
+volumes (<code>.part01.rar</code>, <code>.part02.rar</code>, etc.) are
+placed in the same working folder so <code>unrar</code> can transition
+between them automatically.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

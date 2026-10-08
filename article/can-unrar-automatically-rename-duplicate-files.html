@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Automatically Rename Duplicate Files? - unrar</title>
+    <meta name="description" content="The command-line tool unrar can automatically rename extracted files that have conflicting names with existing files in the target directory. By using the built-in -or switch, users can prevent accidental overwrites and bypass manual interactive prompts,">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-automatically-rename-duplicate-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Automatically Rename Duplicate Files? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-automatically-rename-duplicate-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The command-line tool unrar can automatically rename extracted files that have conflicting names with existing files in the target directory. By using the built-in -or switch, users can prevent accidental overwrites and bypass manual interactive prompts," />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-automatically-rename-duplicate-files">Can Unrar
+Automatically Rename Duplicate Files?</h1>
+<p>The command-line tool <code>unrar</code> can automatically rename
+extracted files that have conflicting names with existing files in the
+target directory. By using the built-in <code>-or</code> switch, users
+can prevent accidental overwrites and bypass manual interactive prompts,
+allowing the utility to automatically append an incremental number to
+the conflicting filename.</p>
+<h3 id="how-to-automatically-rename-files-using-unrar">How to
+Automatically Rename Files Using Unrar</h3>
+<p>To automatically rename files during extraction when a file with the
+same name already exists in the destination, use the <code>-or</code>
+(auto-rename) switch.</p>
+<p>The command syntax is:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-or</span> archive.rar</span></code></pre></div>
+<p>Or for flat extraction without subdirectories:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e <span class="at">-or</span> archive.rar</span></code></pre></div>
+<h3 id="how-the--or-switch-works">How the <code>-or</code> Switch
+Works</h3>
+<p>When the <code>-or</code> flag is passed:</p>
+<ul>
+<li><strong>Detection:</strong> The tool checks the destination
+directory before extracting each item.</li>
+<li><strong>Renaming Scheme:</strong> If <code>document.txt</code>
+already exists, the newly extracted file will automatically be saved as
+<code>document(1).txt</code>. If <code>document(1).txt</code> also
+exists, it proceeds to <code>document(2).txt</code>, and so on.</li>
+<li><strong>Non-Interactive Execution:</strong> The extraction runs
+smoothly without pausing to ask the user whether to overwrite, skip, or
+rename the conflicting file, making it ideal for automated bash scripts
+and background jobs.</li>
+</ul>
+<h3 id="alternative-overwrite-controls">Alternative Overwrite
+Controls</h3>
+<p>To handle file conflicts differently, <code>unrar</code> provides
+alternative flags:</p>
+<ul>
+<li><code>-o+</code>: Overwrites all existing files without
+prompting.</li>
+<li><code>-o-</code>: Skips all files that already exist in the
+destination without prompting.</li>
+<li>Default (no switch): Pauses and prompts the user interactively with
+options to overwrite, skip, rename, or cancel whenever a collision
+occurs.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

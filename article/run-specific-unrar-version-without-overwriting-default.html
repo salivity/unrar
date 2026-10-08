@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run Specific unrar Version Without Overwriting Default - unrar</title>
+    <meta name="description" content="Running a specific version of unrar alongside an existing system installation requires isolating the alternative binary to prevent it from conflicting with your default package manager. By downloading or compiling the target version into an independent d">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/run-specific-unrar-version-without-overwriting-default">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Run Specific unrar Version Without Overwriting Default - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/run-specific-unrar-version-without-overwriting-default" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Running a specific version of unrar alongside an existing system installation requires isolating the alternative binary to prevent it from conflicting with your default package manager. By downloading or compiling the target version into an independent d" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="run-specific-unrar-version-without-overwriting-default">Run
+Specific unrar Version Without Overwriting Default</h1>
+<p>Running a specific version of <code>unrar</code> alongside an
+existing system installation requires isolating the alternative binary
+to prevent it from conflicting with your default package manager. By
+downloading or compiling the target version into an independent
+directory, you can invoke it using relative paths, absolute paths, or
+custom shell aliases without altering your primary
+<code>/usr/bin/unrar</code> executable.</p>
+<h3 id="step-1-obtain-the-specific-unrar-version">Step 1: Obtain the
+Specific unrar Version</h3>
+<p>Download the required version's pre-compiled Linux binary or source
+code directly from the official RARLAB repository or release archives.
+If downloading source code, extract the archive and compile the binary
+locally:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xvf</span> unrarsrc-X.X.X.tar.gz</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> unrar</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> makefile</span></code></pre></div>
+<p>This compiles a standalone <code>unrar</code> executable inside the
+current working directory without performing a system-wide
+installation.</p>
+<h3 id="step-2-place-the-binary-in-an-isolated-directory">Step 2: Place
+the Binary in an Isolated Directory</h3>
+<p>Do not move the resulting executable to standard system paths like
+<code>/usr/bin/</code> or overwrite <code>/usr/local/bin/unrar</code>.
+Instead, store the binary in an isolated location, such as a designated
+directory in <code>/opt</code> or your user home directory:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> mkdir <span class="at">-p</span> /opt/unrar-custom</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> cp unrar /opt/unrar-custom/</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> chmod +x /opt/unrar-custom/unrar</span></code></pre></div>
+<p>Alternatively, you can place it in <code>~/.local/bin/</code> with a
+unique name to prevent naming collisions:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> unrar ~/.local/bin/unrar-custom</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x ~/.local/bin/unrar-custom</span></code></pre></div>
+<h3 id="step-3-run-the-custom-version-directly">Step 3: Run the Custom
+Version Directly</h3>
+<p>To use the custom version without invoking the system default, call
+the binary by its explicit path:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Using an absolute path</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/opt/unrar-custom/unrar</span> x archive.rar</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Using a renamed local binary</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">~/.local/bin/unrar-custom</span> x archive.rar</span></code></pre></div>
+<h3 id="step-4-create-a-command-alias-optional">Step 4: Create a Command
+Alias (Optional)</h3>
+<p>If you need frequent access to the secondary version, configure a
+persistent alias in your shell configuration file (such as
+<code>~/.bashrc</code> or <code>~/.zshrc</code>):</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> unrar-custom=<span class="st">&#39;/opt/unrar-custom/unrar&#39;</span></span></code></pre></div>
+<p>Apply the changes:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code></pre></div>
+<p>Now, typing <code>unrar</code> will continue to run your standard
+system default, while typing <code>unrar-custom</code> will execute your
+specific standalone version.</p>
+<h3 id="step-5-verify-the-active-versions">Step 5: Verify the Active
+Versions</h3>
+<p>Confirm that both versions remain independent by checking their
+version numbers:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the system default</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 2</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the custom version</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">/opt/unrar-custom/unrar</span> <span class="kw">|</span> <span class="fu">head</span> <span class="at">-n</span> 2</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

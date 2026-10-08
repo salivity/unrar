@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automatically Extract Multi-Volume RAR Files - unrar</title>
+    <meta name="description" content="Automating the extraction of multi-volume RAR archives saves time and eliminates the tedium of processing split files manually. Multi-part archives typically follow naming conventions such as .part01.rar or legacy .r00 series, and attempting to run an ex">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/automatically-extract-multi-volume-rar-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Automatically Extract Multi-Volume RAR Files - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/automatically-extract-multi-volume-rar-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Automating the extraction of multi-volume RAR archives saves time and eliminates the tedium of processing split files manually. Multi-part archives typically follow naming conventions such as .part01.rar or legacy .r00 series, and attempting to run an ex" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="automatically-extract-multi-volume-rar-files">Automatically
+Extract Multi-Volume RAR Files</h1>
+<p>Automating the extraction of multi-volume RAR archives saves time and
+eliminates the tedium of processing split files manually. Multi-part
+archives typically follow naming conventions such as
+<code>.part01.rar</code> or legacy <code>.r00</code> series, and
+attempting to run an extraction command on every single file leads to
+redundant work and errors. This guide provides lightweight Bash and
+PowerShell scripts using the <code>unrar</code> command-line utility to
+automatically detect the initial volume of each set and extract the
+contents cleanly.</p>
+<h2 id="the-challenge-with-multi-volume-archives">The Challenge with
+Multi-Volume Archives</h2>
+<p>When <code>unrar</code> processes the first archive in a multi-volume
+sequence, it automatically detects and extracts all subsequent parts in
+the sequence. If a script blindly runs <code>unrar</code> against every
+<code>.rar</code> file in a directory, the entire archive will be
+extracted repeatedly—once for every volume segment.</p>
+<p>To script this correctly, the script must target only the
+<strong>first</strong> file of each multi-volume archive:</p>
+<ul>
+<li><strong>Modern naming:</strong> Files ending in
+<code>.part1.rar</code>, <code>.part01.rar</code>, or
+<code>.part001.rar</code>.</li>
+<li><strong>Legacy naming:</strong> The primary <code>.rar</code> file
+(accompanied by <code>.r00</code>, <code>.r01</code>, etc.).</li>
+</ul>
+<hr />
+<h2 id="linux-and-macos-bash-script">Linux and macOS: Bash Script</h2>
+<p>The following Bash script uses <code>find</code> to locate the first
+volume of any modern multi-volume archive (as well as standalone
+<code>.rar</code> files that are not subsequent parts) and extracts them
+into their respective directories.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Set directory to the first argument, or default to current directory</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="va">TARGET_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${1</span><span class="op">:-</span>.<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Find and extract modern multi-volume archives (.part1.rar, .part01.rar, etc.)</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span> <span class="at">-type</span> f <span class="at">-regextype</span> posix-extended <span class="at">-iregex</span> <span class="st">&#39;.*\.part0*1\.rar&#39;</span> <span class="kw">|</span> <span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">file</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Extracting multi-volume archive: </span><span class="va">$file</span><span class="st">&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="ex">unrar</span> x <span class="at">-o-</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="va">)</span><span class="st">/&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Find and extract legacy multi-volume archives (.rar alongside .r00)</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">find</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span> <span class="at">-type</span> f <span class="at">-name</span> <span class="st">&quot;*.rar&quot;</span> ! <span class="at">-name</span> <span class="st">&quot;*.part*.rar&quot;</span> <span class="kw">|</span> <span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">file</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="va">base</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${file</span><span class="op">%</span>.rar<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">[[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="va">${base}</span><span class="st">.r00&quot;</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Extracting legacy multi-volume archive: </span><span class="va">$file</span><span class="st">&quot;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="ex">unrar</span> x <span class="at">-o-</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="va">)</span><span class="st">/&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<h3 id="script-flags-explained">Script Flags Explained:</h3>
+<ul>
+<li><code>x</code>: Extracts files with their full relative directory
+paths intact.</li>
+<li><code>-o-</code>: Skip existing files to prevent overwriting already
+extracted data.</li>
+<li><code>$(dirname "$file")/</code>: Ensures extracted files are placed
+in the same folder as the archive.</li>
+</ul>
+<hr />
+<h2 id="windows-powershell-script">Windows: PowerShell Script</h2>
+<p>On Windows, ensure <code>unrar.exe</code> (installed with WinRAR) is
+added to your system <code>PATH</code>. Open PowerShell and run the
+following script to search a folder recursively and process all
+multi-volume sets:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">param</span> <span class="op">(</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="va">$TargetFolder</span> <span class="op">=</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Match modern multi-volume archives (e.g., .part01.rar, .part1.rar)</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="va">$modernParts</span> <span class="op">=</span> <span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="va">$TargetFolder</span> <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">|</span> </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Name</span> <span class="op">-match</span> <span class="st">&#39;\.part0*1\.rar$&#39;</span> <span class="op">}</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="cf">foreach</span> <span class="op">(</span><span class="va">$archive</span> <span class="kw">in</span> <span class="va">$modernParts</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Write-Host</span> <span class="st">&quot;Extracting modern set: </span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="op">&amp;</span> unrar x <span class="op">-</span>o- <span class="st">&quot;</span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">DirectoryName</span><span class="op">)</span><span class="st">\&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Match legacy multi-volume archives (base .rar with existing .r00)</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="va">$legacyParts</span> <span class="op">=</span> <span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="va">$TargetFolder</span> <span class="op">-</span>Recurse <span class="op">-</span>File <span class="op">-</span>Filter <span class="st">&quot;*.rar&quot;</span> <span class="op">|</span> </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Where-Object</span> <span class="op">{</span> <span class="va">$_</span><span class="op">.</span><span class="fu">Name</span> <span class="op">-notmatch</span> <span class="st">&#39;\.part\d+\.rar$&#39;</span> <span class="op">}</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="cf">foreach</span> <span class="op">(</span><span class="va">$archive</span> <span class="kw">in</span> <span class="va">$legacyParts</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="va">$r00Path</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">IO</span><span class="op">.</span><span class="fu">Path</span><span class="op">]::</span>ChangeExtension<span class="op">(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">,</span> <span class="st">&quot;.r00&quot;</span><span class="op">)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span><span class="fu">Test-Path</span> <span class="va">$r00Path</span><span class="op">)</span> <span class="op">{</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="fu">Write-Host</span> <span class="st">&quot;Extracting legacy set: </span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="op">&amp;</span> unrar x <span class="op">-</span>o- <span class="st">&quot;</span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">FullName</span><span class="op">)</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="op">$(</span><span class="va">$archive</span><span class="op">.</span><span class="fu">DirectoryName</span><span class="op">)</span><span class="st">\&quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<hr />
+<h2
+id="optional-automatically-delete-archives-after-extraction">Optional:
+Automatically Delete Archives After Extraction</h2>
+<p>If you want to automatically clean up disk space by deleting archive
+parts only after a successful extraction, check the exit code of
+<code>unrar</code>. In <code>unrar</code>, an exit code of
+<code>0</code> denotes success.</p>
+<h3 id="bash-cleanup-snippet">Bash Cleanup Snippet:</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="ex">unrar</span> x <span class="at">-o-</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span><span class="va">)</span><span class="st">/&quot;</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Extraction successful. Deleting archive parts...&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove all parts matching the base name prefix</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="va">base_prefix</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${file</span><span class="op">%%</span>.part<span class="pp">*</span><span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rm</span> <span class="at">-f</span> <span class="st">&quot;</span><span class="va">${base_prefix}</span><span class="st">&quot;</span>.part<span class="pp">*</span>.rar</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

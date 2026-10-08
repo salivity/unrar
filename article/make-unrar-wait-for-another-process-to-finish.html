@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Unrar Wait for Another Process to Finish - unrar</title>
+    <meta name="description" content="The unrar utility does not possess a native configuration flag to pause execution until another application terminates. However, you can achieve this behavior seamlessly by wrapping unrar with standard operating system shell commands and process manageme">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/make-unrar-wait-for-another-process-to-finish">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Make Unrar Wait for Another Process to Finish - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/make-unrar-wait-for-another-process-to-finish" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The unrar utility does not possess a native configuration flag to pause execution until another application terminates. However, you can achieve this behavior seamlessly by wrapping unrar with standard operating system shell commands and process manageme" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="make-unrar-wait-for-another-process-to-finish">Make Unrar Wait
+for Another Process to Finish</h1>
+<p>The <code>unrar</code> utility does not possess a native
+configuration flag to pause execution until another application
+terminates. However, you can achieve this behavior seamlessly by
+wrapping <code>unrar</code> with standard operating system shell
+commands and process management tools. This guide details how to make
+<code>unrar</code> wait for an active process to finish on both Linux
+and Windows systems.</p>
+<h3 id="method-1-chaining-commands-directly-linux--windows">Method 1:
+Chaining Commands Directly (Linux &amp; Windows)</h3>
+<p>If you are launching both the initial process and the
+<code>unrar</code> command in the same script or terminal session, use
+the conditional execution operator (<code>&amp;&amp;</code>). This
+ensures <code>unrar</code> runs only after the preceding command exits
+successfully.</p>
+<p><strong>Linux / macOS:</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">download_tool</span> files.rar <span class="kw">&amp;&amp;</span> <span class="ex">unrar</span> x files.rar</span></code></pre></div>
+<p><strong>Windows (Command Prompt / PowerShell):</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>download_tool.exe files.rar <span class="kw">&amp;&amp;</span> unrar.exe x files.rar</span></code></pre></div>
+<hr />
+<h3 id="method-2-waiting-by-process-id-pid-on-linux">Method 2: Waiting
+by Process ID (PID) on Linux</h3>
+<p>If the target process is already running independently, locate its
+Process ID (PID) using <code>ps</code> or <code>pgrep</code>, then use
+<code>tail</code> or <code>wait</code> to halt execution until that PID
+closes.</p>
+<h4 id="using-tail---pid">Using <code>tail --pid</code></h4>
+<p>The <code>tail</code> command can monitor a PID and exit
+automatically when the process dies:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tail</span> <span class="at">--pid</span><span class="op">=</span>1234 <span class="at">-f</span> /dev/null <span class="kw">&amp;&amp;</span> <span class="ex">unrar</span> x archive.rar</span></code></pre></div>
+<p><em>Replace <code>1234</code> with the PID of the process you need to
+wait for.</em></p>
+<h4 id="using-wait">Using <code>wait</code></h4>
+<p>If the target process was started as a background job in the current
+shell session:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">wait</span> 1234 <span class="kw">&amp;&amp;</span> <span class="ex">unrar</span> x archive.rar</span></code></pre></div>
+<hr />
+<h3 id="method-3-waiting-by-process-name-on-linux">Method 3: Waiting by
+Process Name on Linux</h3>
+<p>When you only know the executable name (for example, waiting for a
+torrent client or another decompression task), loop until
+<code>pgrep</code> returns a non-zero exit code:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="ex">pgrep</span> <span class="at">-x</span> <span class="st">&quot;target_process&quot;</span> <span class="op">&gt;</span> /dev/null<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 3</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span></code></pre></div>
+<p>This loop checks every three seconds. Once
+<code>target_process</code> exits, the loop breaks and
+<code>unrar</code> executes.</p>
+<hr />
+<h3 id="method-4-waiting-for-a-process-on-windows-powershell">Method 4:
+Waiting for a Process on Windows (PowerShell)</h3>
+<p>On Windows systems, PowerShell provides the <code>Wait-Process</code>
+cmdlet, which blocks execution until the specified process shuts
+down.</p>
+<h4 id="by-process-name">By Process Name:</h4>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Wait-Process</span> <span class="op">-</span>Name <span class="st">&quot;target_process&quot;</span><span class="op">;</span> <span class="op">&amp;</span> unrar<span class="op">.</span><span class="fu">exe</span> x archive<span class="op">.</span><span class="fu">rar</span></span></code></pre></div>
+<h4 id="by-process-id">By Process ID:</h4>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Wait-Process</span> <span class="op">-</span>Id <span class="dv">1234</span><span class="op">;</span> <span class="op">&amp;</span> unrar<span class="op">.</span><span class="fu">exe</span> x archive<span class="op">.</span><span class="fu">rar</span></span></code></pre></div>
+<h4 id="in-windows-batch-bat">In Windows Batch (.bat):</h4>
+<p>If using a standard batch script without PowerShell, monitor the
+process with <code>tasklist</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ot">:loop</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>tasklist <span class="at">/fi</span> <span class="st">&quot;imagename eq target_process.exe&quot;</span> <span class="kw">|</span> <span class="kw">find</span> <span class="at">/i</span> <span class="st">&quot;target_process.exe&quot;</span> <span class="kw">&gt;</span>nul</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> <span class="at">errorlevel</span> <span class="dv">1</span> <span class="kw">(</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    timeout <span class="at">/t</span> 3 <span class="at">/nobreak</span> <span class="kw">&gt;</span>nul</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">goto</span> <span class="ot">loop</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="kw">)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>unrar.exe x archive.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

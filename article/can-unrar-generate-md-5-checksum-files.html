@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Generate MD5 Checksum Files? - unrar</title>
+    <meta name="description" content="The command-line tool unrar cannot natively generate external checksum files, such as .md5 or .sha256, alongside extracted files. While unrar includes built-in integrity verification mechanisms to ensure extracted files are not corrupt, creating standalo">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-generate-md-5-checksum-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Generate MD5 Checksum Files? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-generate-md-5-checksum-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The command-line tool unrar cannot natively generate external checksum files, such as .md5 or .sha256, alongside extracted files. While unrar includes built-in integrity verification mechanisms to ensure extracted files are not corrupt, creating standalo" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-generate-md5-checksum-files">Can unrar Generate MD5
+Checksum Files?</h1>
+<p>The command-line tool <code>unrar</code> cannot natively generate
+external checksum files, such as <code>.md5</code> or
+<code>.sha256</code>, alongside extracted files. While
+<code>unrar</code> includes built-in integrity verification mechanisms
+to ensure extracted files are not corrupt, creating standalone digest
+files requires pairing <code>unrar</code> with external hashing
+utilities. This guide outlines how <code>unrar</code> handles checksum
+verification internally and provides practical shell commands to
+automatically generate checksum files immediately after extraction on
+Linux, macOS, and Windows.</p>
+<h3 id="how-unrar-handles-file-integrity">How unrar Handles File
+Integrity</h3>
+<p>RAR archives contain internal checksums for every compressed file.
+Depending on the archive version, WinRAR and <code>rar</code> embed
+either CRC32 hashes (RAR4 format) or BLAKE2sp hashes (RAR5 format)
+directly within the archive metadata.</p>
+<p>When you run an extraction command such as
+<code>unrar x archive.rar</code> or a test command like
+<code>unrar t archive.rar</code>, the utility automatically calculates
+the checksum of the unpacked data and compares it against the stored
+value. If a mismatch occurs, <code>unrar</code> flags a checksum error.
+However, <code>unrar</code> lacks any command-line switch or
+configuration setting to export these internal hashes into an external
+hash list or to calculate third-party digests like MD5 or SHA-256 during
+extraction.</p>
+<h3 id="generating-checksum-files-on-linux-and-macos">Generating
+Checksum Files on Linux and macOS</h3>
+<p>To create a checksum file alongside your unpacked data, you can chain
+<code>unrar</code> with standard Unix hashing tools such as
+<code>md5sum</code> or <code>sha256sum</code>.</p>
+<p>To extract into a specific folder and immediately generate an MD5
+checksum file for all extracted contents:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar output_dir/ <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> output_dir <span class="kw">&amp;&amp;</span> <span class="fu">md5sum</span> <span class="pp">*</span> <span class="op">&gt;</span> checksums.md5</span></code></pre></div>
+<p>If the archive contains subdirectories and you need recursive
+hashing, use <code>find</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar output_dir/ <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> output_dir <span class="kw">&amp;&amp;</span> <span class="fu">find</span> . <span class="at">-type</span> f <span class="at">-not</span> <span class="at">-name</span> <span class="st">&quot;checksums.md5&quot;</span> <span class="at">-exec</span> md5sum {} + <span class="op">&gt;</span> checksums.md5</span></code></pre></div>
+<p>To create SHA-256 files instead, substitute <code>md5sum</code> with
+<code>sha256sum</code>.</p>
+<h3 id="generating-checksum-files-on-windows-powershell">Generating
+Checksum Files on Windows (PowerShell)</h3>
+<p>On Windows systems, you can achieve the same automated workflow using
+PowerShell alongside the <code>unrar.exe</code> executable and the
+<code>Get-FileHash</code> cmdlet.</p>
+<p>To extract the archive and generate an MD5 checksum file:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>unrar<span class="op">.</span><span class="fu">exe</span> x archive<span class="op">.</span><span class="fu">rar</span> output_dir\</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path output_dir <span class="op">-</span>File <span class="op">-</span>Recurse <span class="op">|</span> Get-FileHash <span class="op">-</span>Algorithm MD5 <span class="op">|</span> <span class="fu">Format-Table</span> Hash<span class="op">,</span> Path <span class="op">&gt;</span> output_dir\checksums<span class="op">.</span><span class="fu">md5</span></span></code></pre></div>
+<p>For a standard SHA-256 hash list, replace <code>-Algorithm MD5</code>
+with <code>-Algorithm SHA256</code>.</p>
+<h3 id="conclusion">Conclusion</h3>
+<p>While <code>unrar</code> guarantees that extracted files match the
+state in which they were originally archived via its internal CRC32 or
+BLAKE2 algorithms, it does not support generating external checksum
+files. The standard and most reliable practice is to chain the
+extraction command with native operating system hashing tools.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

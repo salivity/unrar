@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Damaged Encrypted RAR Files? - unrar</title>
+    <meta name="description" content="When a RAR archive has a damaged encryption header, the standard unrar utility cannot extract its contents. Encrypted RAR archives rely on precise cryptographic metadata and initialization vectors stored in the header to decrypt file names and payload da">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-damaged-encrypted-rar-files">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Damaged Encrypted RAR Files? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-damaged-encrypted-rar-files" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When a RAR archive has a damaged encryption header, the standard unrar utility cannot extract its contents. Encrypted RAR archives rely on precise cryptographic metadata and initialization vectors stored in the header to decrypt file names and payload da" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-damaged-encrypted-rar-files">Can Unrar Extract
+Damaged Encrypted RAR Files?</h1>
+<p>When a RAR archive has a damaged encryption header, the standard
+<code>unrar</code> utility cannot extract its contents. Encrypted RAR
+archives rely on precise cryptographic metadata and initialization
+vectors stored in the header to decrypt file names and payload data.
+Even minor corruption in this section causes decryption algorithms to
+fail, resulting in errors such as "Corrupt header", "Checksum error", or
+"Wrong password." Unless the archive contains parity data through a
+built-in recovery record, standard extraction is not possible.</p>
+<h3 id="why-damaged-headers-cause-extraction-to-fail">Why Damaged
+Headers Cause Extraction to Fail</h3>
+<p>RAR archives use AES-128 (for RAR4) or AES-256 (for RAR5) encryption
+in Cipher Block Chaining (CBC) mode. This cryptographic structure makes
+partial recovery extremely difficult:</p>
+<ul>
+<li><strong>Header Encryption Mode:</strong> If an archive was created
+with the "encrypt file names" option (the <code>-hp</code> switch), the
+entire directory structure is encrypted. A single corrupted bit in this
+header scrambles the decrypted output across the entire cryptographic
+block due to the avalanche effect.</li>
+<li><strong>Loss of Initialization Parameters:</strong> The archive
+header contains critical parameters, including the cryptographic salt
+and initialization vector (IV). If these bytes are corrupted, the key
+derivation function produces an invalid key, causing <code>unrar</code>
+to treat the password as incorrect or report a header corruption
+error.</li>
+<li><strong>Missing File Boundaries:</strong> Without readable headers,
+<code>unrar</code> cannot locate where files begin and end within the
+compressed stream, making decompression impossible even if the payload
+data remains intact.</li>
+</ul>
+<h3 id="header-encryption-vs-data-only-encryption">Header Encryption vs.
+Data-Only Encryption</h3>
+<p>The extent of the problem depends on how the RAR file was originally
+encrypted:</p>
+<ol type="1">
+<li><strong>Full Archive Encryption (<code>-hp</code>):</strong> Both
+the header and data are encrypted. If the main encryption header is
+damaged, <code>unrar</code> cannot read the table of contents or access
+any data. Extraction is completely blocked.</li>
+<li><strong>Standard File Encryption (<code>-p</code>):</strong> The
+header remains unencrypted, but individual file payloads are encrypted.
+If only the general archive header is slightly damaged,
+<code>unrar</code> might still identify file boundaries, but it will
+fail when processing individual files if their specific encryption
+headers or streams are corrupted.</li>
+</ol>
+<h3 id="how-to-attempt-recovery">How to Attempt Recovery</h3>
+<p>Standard <code>unrar</code> does not have advanced heuristic
+file-carving capabilities. However, you can try specific repair
+methods:</p>
+<ul>
+<li><strong>Use the RAR Recovery Record:</strong> If the archive was
+created with a recovery record (a built-in parity feature), standard
+tools can reconstruct the damaged header. Run
+<code>rar r damaged_archive.rar</code> to generate a fixed archive
+(<code>fixed.damaged_archive.rar</code>), then attempt extraction with
+<code>unrar</code>.</li>
+<li><strong>Third-Party Archive Repair Utilities:</strong> Some forensic
+and data-recovery tools attempt to bypass corrupted archive headers to
+locate uncompressed or raw streams. However, because AES encryption
+requires an exact key and IV, raw file carving typically fails for
+encrypted RAR blocks unless the exact cryptographic parameters can be
+reconstructed.</li>
+<li><strong>Hex Editing (Manual Repair):</strong> If the damage is
+confined to a non-cryptographic flag within the header (and not the
+salt, IV, or encrypted block itself), manually repairing the byte
+structure in a hex editor may allow <code>unrar</code> to proceed. If
+the actual cryptographic salt or encrypted stream has bit rot, manual
+editing will not restore the data.</li>
+</ul>
+<p>Standard <code>unrar</code> requires an intact encryption header to
+execute its cryptographic routines. Without a recovery record or a
+backup copy of the archive, a damaged encryption header permanently
+prevents extraction.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

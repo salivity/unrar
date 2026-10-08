@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Script to Unrar and Delete All Archives - unrar</title>
+    <meta name="description" content="Managing large collections of compressed files manually can be tedious and time-consuming. This guide provides a simple, robust Bash script to automatically extract every .rar archive within a target directory and safely delete the original archive file">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/bash-script-to-unrar-and-delete-all-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Bash Script to Unrar and Delete All Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/bash-script-to-unrar-and-delete-all-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Managing large collections of compressed files manually can be tedious and time-consuming. This guide provides a simple, robust Bash script to automatically extract every .rar archive within a target directory and safely delete the original archive file" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="bash-script-to-unrar-and-delete-all-archives">Bash Script to
+Unrar and Delete All Archives</h1>
+<p>Managing large collections of compressed files manually can be
+tedious and time-consuming. This guide provides a simple, robust Bash
+script to automatically extract every <code>.rar</code> archive within a
+target directory and safely delete the original archive file only after
+a successful extraction.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before running the script, ensure you have the <code>unrar</code>
+utility installed on your Linux system.</p>
+<p>On Ubuntu/Debian:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update <span class="kw">&amp;&amp;</span> <span class="fu">sudo</span> apt install unrar</span></code></pre></div>
+<p>On Fedora/CentOS/RHEL:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install unrar</span></code></pre></div>
+<p>On Arch Linux:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> pacman <span class="at">-S</span> unrar</span></code></pre></div>
+<h2 id="the-bash-script">The Bash Script</h2>
+<p>Create a new file named <code>extract_and_remove.sh</code> and add
+the following code:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Target directory (defaults to current directory if not specified)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="va">TARGET_DIR</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${1</span><span class="op">:-</span>.<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if target directory exists</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="ot">!</span> <span class="ot">-d</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span> <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Error: Directory &#39;</span><span class="va">$TARGET_DIR</span><span class="st">&#39; does not exist.&quot;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">exit</span> 1</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop through all .rar files in the specified directory</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">shopt</span> <span class="at">-s</span> nullglob</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> archive <span class="kw">in</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span>/<span class="pp">*</span>.rar<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Skip multi-part archives other than part 1 to avoid duplicate extractions</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="ot">=~</span> <span class="dt">\.</span><span class="ss">part</span><span class="op">[</span><span class="ss">0</span><span class="op">-</span><span class="ss">9</span><span class="op">]</span><span class="pp">+</span><span class="dt">\.</span><span class="ss">rar</span> <span class="kw">]]</span> <span class="kw">&amp;&amp;</span> <span class="kw">[[</span> <span class="ot">!</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="ot">=~</span> <span class="dt">\.</span><span class="ss">part0</span><span class="pp">*</span><span class="ss">1</span><span class="dt">\.</span><span class="ss">rar</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">&quot;Extracting: </span><span class="va">$archive</span><span class="st">&quot;</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract the archive into the same directory</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">unrar</span> x <span class="at">-o+</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">$TARGET_DIR</span><span class="st">&quot;</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Delete the archive only if unrar succeeded (exit code 0)</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="va">$?</span> <span class="ot">-eq</span> 0 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Extraction successful. Deleting original: </span><span class="va">$archive</span><span class="st">&quot;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        <span class="co"># If it&#39;s a multi-part archive, remove all parts</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">[[</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> <span class="ot">=~</span> <span class="dt">\.</span><span class="ss">part0</span><span class="pp">*</span><span class="ss">1</span><span class="dt">\.</span><span class="ss">rar</span> <span class="kw">]];</span> <span class="cf">then</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>            <span class="va">prefix</span><span class="op">=</span><span class="st">&quot;</span><span class="va">${archive</span><span class="op">%</span>.part0<span class="pp">*</span>1.rar<span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rm</span> <span class="at">-f</span> <span class="st">&quot;</span><span class="va">$prefix</span><span class="st">&quot;</span>.part<span class="pp">*</span>.rar</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>            <span class="fu">rm</span> <span class="at">-f</span> <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">fi</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">echo</span> <span class="st">&quot;Error: Failed to extract </span><span class="va">$archive</span><span class="st">. Original file kept.&quot;</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">&quot;Process completed.&quot;</span></span></code></pre></div>
+<h2 id="how-it-works">How It Works</h2>
+<ul>
+<li><code>TARGET_DIR="${1:-.}"</code>: Sets the search path to the
+argument passed when executing the script. If no argument is passed, it
+defaults to the current directory (<code>.</code>).</li>
+<li><code>shopt -s nullglob</code>: Prevents the loop from running with
+the literal string <code>*.rar</code> if no RAR files are found.</li>
+<li><code>unrar x -o+</code>: Extracts files with full paths preserved
+(<code>x</code>) and automatically overwrites existing files
+(<code>-o+</code>).</li>
+<li><code>if [ $? -eq 0 ]</code>: Checks the exit status of the
+<code>unrar</code> command. The original file is removed with
+<code>rm</code> only if <code>unrar</code> returns <code>0</code>,
+preventing data loss if an archive is corrupted or
+password-protected.</li>
+<li>Multi-part handling: Detects multi-part archives (e.g.,
+<code>.part1.rar</code>, <code>.part2.rar</code>) to extract them from
+the first part only and cleans up all associated parts once
+finished.</li>
+</ul>
+<h2 id="running-the-script">Running the Script</h2>
+<ol type="1">
+<li>Make the script executable:</li>
+</ol>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x extract_and_remove.sh</span></code></pre></div>
+<ol start="2" type="1">
+<li>Run the script in your current directory:</li>
+</ol>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./extract_and_remove.sh</span></span></code></pre></div>
+<p>Or pass a specific folder path:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">./extract_and_remove.sh</span> /path/to/your/archives</span></code></pre></div>
+<h2 id="quick-one-liner-alternative">Quick One-Liner Alternative</h2>
+<p>If you do not need multi-part handling and prefer a fast terminal
+command, navigate to your target folder and run:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> f <span class="kw">in</span> <span class="pp">*</span>.rar<span class="kw">;</span> <span class="cf">do</span> <span class="ex">unrar</span> x <span class="at">-o+</span> <span class="st">&quot;</span><span class="va">$f</span><span class="st">&quot;</span> <span class="kw">&amp;&amp;</span> <span class="fu">rm</span> <span class="st">&quot;</span><span class="va">$f</span><span class="st">&quot;</span><span class="kw">;</span> <span class="cf">done</span></span></code></pre></div>
+<p>This sequentially extracts each archive and runs <code>rm "$f"</code>
+only if <code>unrar</code> exits successfully.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

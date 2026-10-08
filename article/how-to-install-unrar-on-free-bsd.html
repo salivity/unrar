@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Install Unrar on FreeBSD - unrar</title>
+    <meta name="description" content="This guide provides a straightforward walkthrough for installing the unrar utility on FreeBSD to extract RAR archive files. It covers the two primary installation methods supported by FreeBSD: the binary package manager (pkg) for a quick and standard set">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-install-unrar-on-free-bsd">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Install Unrar on FreeBSD - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-install-unrar-on-free-bsd" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide provides a straightforward walkthrough for installing the unrar utility on FreeBSD to extract RAR archive files. It covers the two primary installation methods supported by FreeBSD: the binary package manager (pkg) for a quick and standard set" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-install-unrar-on-freebsd">How to Install Unrar on
+FreeBSD</h1>
+<p>This guide provides a straightforward walkthrough for installing the
+<code>unrar</code> utility on FreeBSD to extract RAR archive files. It
+covers the two primary installation methods supported by FreeBSD: the
+binary package manager (<code>pkg</code>) for a quick and standard
+setup, and the FreeBSD Ports Collection for compiling the tool directly
+from source.</p>
+<h2 id="method-1-installing-via-the-package-manager-pkg">Method 1:
+Installing via the Package Manager (<code>pkg</code>)</h2>
+<p>Using the binary package manager is the fastest and recommended
+method for most users because it downloads and installs pre-compiled
+binaries.</p>
+<ol type="1">
+<li>Open your terminal and switch to root (or use
+<code>sudo</code>).</li>
+<li>Update the local package repository catalog:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pkg</span> update</span></code></pre></div></li>
+<li>Install the <code>unrar</code> package:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pkg</span> install unrar</span></code></pre></div></li>
+<li>When prompted to proceed with fetching and installing the package,
+type <code>y</code> and press <strong>Enter</strong>.</li>
+</ol>
+<h2 id="method-2-installing-via-the-ports-collection">Method 2:
+Installing via the Ports Collection</h2>
+<p>If you prefer to compile software from source or need custom build
+options, you can use the FreeBSD Ports Collection.</p>
+<ol type="1">
+<li>Ensure your ports tree is up to date. If not already extracted,
+fetch it using:
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">portsnap</span> fetch extract</span></code></pre></div>
+<em>(Or <code>portsnap fetch update</code> if previously
+extracted).</em></li>
+<li>Navigate to the <code>unrar</code> port directory:
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /usr/ports/archivers/unrar</span></code></pre></div></li>
+<li>Compile and install the port:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> install clean</span></code></pre></div></li>
+</ol>
+<h2 id="verifying-the-installation">Verifying the Installation</h2>
+<p>After completing either installation method, verify that
+<code>unrar</code> is properly installed by checking its version and
+help menu:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div>
+<h2 id="basic-usage">Basic Usage</h2>
+<p>To extract a RAR archive while preserving the internal directory
+structure, run:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive_name.rar</span></code></pre></div>
+<p>To extract files into the current directory without subdirectories,
+run:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive_name.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

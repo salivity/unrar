@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can unrar Extract Files and Calculate SHA-256? - unrar</title>
+    <meta name="description" content="The standard unrar command-line utility cannot natively calculate SHA-256 hashes while extracting files to disk. While RAR archives include internal integrity checks, they rely on CRC32 for older archives or BLAKE2sp for the RAR5 format rather than SHA-2">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-files-and-calculate-sha-256">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can unrar Extract Files and Calculate SHA-256? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-files-and-calculate-sha-256" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The standard unrar command-line utility cannot natively calculate SHA-256 hashes while extracting files to disk. While RAR archives include internal integrity checks, they rely on CRC32 for older archives or BLAKE2sp for the RAR5 format rather than SHA-2" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-files-and-calculate-sha-256">Can unrar Extract
+Files and Calculate SHA-256?</h1>
+<p>The standard <code>unrar</code> command-line utility cannot natively
+calculate SHA-256 hashes while extracting files to disk. While RAR
+archives include internal integrity checks, they rely on CRC32 for older
+archives or BLAKE2sp for the RAR5 format rather than SHA-256. However,
+users can achieve simultaneous extraction and SHA-256 generation by
+piping extracted data streams to hashing utilities or by using scripts
+to process the data concurrently.</p>
+<h2 id="native-capabilities-and-limitations">Native Capabilities and
+Limitations</h2>
+<p>The official <code>unrar</code> binary provides commands for testing
+and extracting archives, but it lacks any built-in flag to generate
+cryptographic hashes like SHA-256.</p>
+<p>When you run <code>unrar t archive.rar</code>, the program checks the
+archive's internal checksums:</p>
+<ul>
+<li><strong>RAR4 and earlier:</strong> Uses 32-bit CRC (CRC32).</li>
+<li><strong>RAR5:</strong> Uses 256-bit BLAKE2sp checksums for file data
+integrity.</li>
+</ul>
+<p>Because SHA-256 is not implemented in the RAR specification for file
+validation, <code>unrar</code> cannot output this specific hash natively
+during an extraction command like <code>unrar x</code>.</p>
+<h2 id="method-1-streaming-a-single-file-to-disk-and-hash">Method 1:
+Streaming a Single File to Disk and Hash</h2>
+<p>For archives containing a single file, or when targeting a specific
+file inside an archive, you can stream the decompressed output directly
+to standard output (<code>stdout</code>) using the <code>p</code>
+(print) command. By combining this with Unix tools like <code>tee</code>
+and <code>sha256sum</code>, you can write the file to disk and calculate
+the hash in a single pass without reading the file twice:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> p <span class="at">-inul</span> archive.rar filename.ext <span class="kw">|</span> <span class="fu">tee</span> filename.ext <span class="kw">|</span> <span class="fu">sha256sum</span></span></code></pre></div>
+<ul>
+<li><code>p</code>: Prints file data to <code>stdout</code>.</li>
+<li><code>-inul</code>: Suppresses standard <code>unrar</code> status
+and error messages, ensuring only pure file data enters the pipe.</li>
+<li><code>tee filename.ext</code>: Writes the incoming stream to disk
+while passing it along.</li>
+<li><code>sha256sum</code>: Calculates the SHA-256 checksum from
+standard input.</li>
+</ul>
+<h2 id="method-2-handling-multi-file-archives">Method 2: Handling
+Multi-File Archives</h2>
+<p>The streaming method does not work cleanly for entire multi-file
+archives because <code>unrar p</code> streams all uncompressed files
+into a single, contiguous data stream. To extract multiple files and
+obtain individual SHA-256 hashes, you have two primary options:</p>
+<h3 id="post-extraction-hashing">Post-Extraction Hashing</h3>
+<p>The most straightforward approach is to extract the files first and
+calculate the hashes immediately afterward:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar /destination/path/</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /destination/path/ <span class="kw">&amp;&amp;</span> <span class="fu">sha256sum</span> <span class="pp">*</span> <span class="op">&gt;</span> checksums.sha256</span></code></pre></div>
+<h3 id="python-automation-for-true-concurrency">Python Automation for
+True Concurrency</h3>
+<p>If storage performance or single-pass reading is critical, you can
+write a small script using Python's <code>rarfile</code> library. This
+approach reads the decompressed stream of each entry inside the archive
+in memory chunks, writing to the disk and feeding
+<code>hashlib.sha256()</code> at the same time:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> hashlib</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rarfile</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="cf">with</span> rarfile.RarFile(<span class="st">&quot;archive.rar&quot;</span>) <span class="im">as</span> rf:</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> member <span class="kw">in</span> rf.infolist():</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> member.isdir():</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        hasher <span class="op">=</span> hashlib.sha256()</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">with</span> rf.<span class="bu">open</span>(member) <span class="im">as</span> source, <span class="bu">open</span>(member.filename, <span class="st">&quot;wb&quot;</span>) <span class="im">as</span> target:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">while</span> chunk <span class="op">:=</span> source.read(<span class="dv">65536</span>):</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>                target.write(chunk)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                hasher.update(chunk)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>hasher<span class="sc">.</span>hexdigest()<span class="sc">}</span><span class="ss">  </span><span class="sc">{</span>member<span class="sc">.</span>filename<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This script achieves true simultaneous disk-writing and SHA-256
+calculation across all files within the archive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

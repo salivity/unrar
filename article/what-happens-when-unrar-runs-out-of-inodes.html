@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What Happens When unrar Runs Out of Inodes? - unrar</title>
+    <meta name="description" content="Extracting an archive with unrar on a filesystem that has run out of inodes causes the extraction process to fail immediately when attempting to write new files or directories. Even if the disk has gigabytes of unallocated storage space remaining, the op">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/what-happens-when-unrar-runs-out-of-inodes">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="What Happens When unrar Runs Out of Inodes? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/what-happens-when-unrar-runs-out-of-inodes" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting an archive with unrar on a filesystem that has run out of inodes causes the extraction process to fail immediately when attempting to write new files or directories. Even if the disk has gigabytes of unallocated storage space remaining, the op" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="what-happens-when-unrar-runs-out-of-inodes">What Happens When
+unrar Runs Out of Inodes?</h1>
+<p>Extracting an archive with <code>unrar</code> on a filesystem that
+has run out of inodes causes the extraction process to fail immediately
+when attempting to write new files or directories. Even if the disk has
+gigabytes of unallocated storage space remaining, the operating system
+cannot allocate metadata for new entries. Consequently,
+<code>unrar</code> throws file creation errors, halts or skips files,
+and leaves behind an incomplete extraction with non-zero exit status
+codes.</p>
+<h3 id="the-underlying-system-error">The Underlying System Error</h3>
+<p>In Unix-like filesystems (such as ext4, XFS, and UFS), an inode
+stores metadata about a file or directory, including permissions,
+ownership, and data block locations. Every file and folder consumes
+exactly one inode. When the filesystem reaches zero free inodes, the
+kernel cannot register new files.</p>
+<p>When <code>unrar</code> attempts to unpack an entry, it issues system
+calls such as <code>open()</code> (with the <code>O_CREAT</code> flag)
+or <code>mkdir()</code>. Because no inodes are available, the kernel
+rejects these calls and returns the <code>ENOSPC</code> error code.
+Counterintuitively, the operating system translates <code>ENOSPC</code>
+as "No space left on device," which often misleads users into thinking
+they have exhausted raw disk storage capacity rather than inode
+entries.</p>
+<h3 id="how-unrar-reacts">How <code>unrar</code> Reacts</h3>
+<p>During execution, <code>unrar</code> encounters the kernel rejection
+and exhibits specific behaviors:</p>
+<ul>
+<li><strong>Error Messages:</strong> For every file it tries to unpack
+after inodes are exhausted, <code>unrar</code> prints an error directly
+to standard error or standard output:
+<pre class="text"><code>Cannot create &lt;filename&gt;
+No space left on device</code></pre></li>
+<li><strong>Process Interruption:</strong> Depending on the exact flags
+used, <code>unrar</code> will either prompt the user for an action, skip
+the failing files, or terminate immediately.</li>
+<li><strong>Exit Codes:</strong> The utility terminates with a non-zero
+exit code (typically exit code 1 or 9 depending on the build and
+specific failure mode), indicating a fatal write failure to any calling
+scripts or processes.</li>
+</ul>
+<h3 id="state-of-the-filesystem-after-failure">State of the Filesystem
+After Failure</h3>
+<p>Running out of inodes during extraction leaves the filesystem in a
+messy, partial state:</p>
+<ol type="1">
+<li><strong>Incomplete Extraction:</strong> Any files processed before
+the inode exhaustion will remain intact on the filesystem. Any files
+queued after the limit was reached will be missing.</li>
+<li><strong>Zero-Byte Files:</strong> In some edge cases, an inode might
+be allocated right as the limit is hit, but subsequent metadata or
+directory links cannot be established, leaving empty or truncated
+files.</li>
+<li><strong>No Automatic Rollback:</strong> Standard <code>unrar</code>
+implementations do not provide transactional rollbacks. It will not
+clean up the files it successfully unpacked prior to the failure,
+requiring manual intervention to remove the partial data.</li>
+</ol>
+<h3 id="identifying-and-resolving-the-issue">Identifying and Resolving
+the Issue</h3>
+<p>If an extraction fails with disk space errors when storage appears
+available, check inode consumption with the following command:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">df</span> <span class="at">-i</span></span></code></pre></div>
+<p>Look at the <code>IUse%</code> column for the target partition. If it
+shows 100%, the filesystem has no remaining inodes.</p>
+<p>To resolve the issue and allow <code>unrar</code> to complete:</p>
+<ul>
+<li>Delete large numbers of small, unused files, such as stale cache
+directories, old session files, or massive temporary log files.</li>
+<li>Move the archive to another filesystem or a dynamic-inode filesystem
+(such as Btrfs or ZFS) that does not impose fixed inode limits.</li>
+<li>Re-run the <code>unrar</code> command once free inodes appear in the
+<code>df -i</code> output.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

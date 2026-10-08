@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles the Archive Bit on Windows - unrar</title>
+    <meta name="description" content="This article explains how the UnRAR utility processes the Windows "Archive" file attribute during file extraction. It details how attributes are preserved in RAR archive headers, how UnRAR interacts with the Windows API to apply or clear the archive bit">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-the-archive-bit-on-windows">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles the Archive Bit on Windows - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-the-archive-bit-on-windows" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the UnRAR utility processes the Windows "Archive" file attribute during file extraction. It details how attributes are preserved in RAR archive headers, how UnRAR interacts with the Windows API to apply or clear the archive bit" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-the-archive-bit-on-windows">How Unrar Handles
+the Archive Bit on Windows</h1>
+<p>This article explains how the UnRAR utility processes the Windows
+"Archive" file attribute during file extraction. It details how
+attributes are preserved in RAR archive headers, how UnRAR interacts
+with the Windows API to apply or clear the archive bit on newly
+extracted files, and which command-line switches alter this default
+behavior.</p>
+<h2 id="the-archive-attribute-in-windows">The Archive Attribute in
+Windows</h2>
+<p>In Windows file systems (NTFS, FAT32, and ReFS), the Archive bit
+(<code>FILE_ATTRIBUTE_ARCHIVE</code>, value <code>0x20</code>) is a
+metadata flag used primarily by backup software. When any file is
+created or modified, the Windows kernel automatically sets this bit to
+indicate that the file has changed and needs to be backed up.</p>
+<h2 id="how-rar-stores-file-attributes">How RAR Stores File
+Attributes</h2>
+<p>When WinRAR or the RAR command-line tool creates an archive on
+Windows, it reads the file attributes via the Windows API and records
+them into the RAR file header. The standard DOS/Windows attribute
+flags—Read-Only (<code>0x01</code>), Hidden (<code>0x02</code>), System
+(<code>0x04</code>), and Archive (<code>0x20</code>)—are stored as part
+of the file metadata block inside the <code>.rar</code> container.</p>
+<h2 id="unrar-processing-during-extraction">UnRAR Processing During
+Extraction</h2>
+<p>When UnRAR extracts a file on a Windows system, the processing of the
+archive bit occurs in distinct stages:</p>
+<ol type="1">
+<li><strong>File Creation:</strong> UnRAR creates the target file using
+the Win32 API function <code>CreateFile()</code>. By default, the
+Windows operating system automatically assigns the Archive attribute to
+any newly created file.</li>
+<li><strong>Payload Writing:</strong> The decompressed data streams are
+written to the target file, and file handles are closed.</li>
+<li><strong>Attribute Restoration:</strong> Once writing is complete,
+UnRAR reads the original attribute bitmask stored inside the RAR archive
+header.</li>
+<li><strong>Explicit Application via API:</strong> UnRAR calls
+<code>SetFileAttributesW()</code> with the exact bitmask recorded during
+compression.</li>
+</ol>
+<p>Because <code>SetFileAttributesW()</code> replaces the existing
+attribute flags rather than merging them, the final state of the archive
+bit depends entirely on the state it had when compressed:</p>
+<ul>
+<li>If the original file had the Archive bit <strong>set</strong>, UnRAR
+explicitly sets it (or leaves it set).</li>
+<li>If the original file had the Archive bit <strong>cleared</strong>
+(for instance, if a backup tool had already processed it), UnRAR strips
+the Archive bit from the newly created file, overriding the Windows
+default.</li>
+</ul>
+<h2 id="overriding-attribute-handling-with-switches">Overriding
+Attribute Handling with Switches</h2>
+<p>UnRAR provides command-line options to modify how file attributes are
+applied:</p>
+<ul>
+<li><strong><code>-ai</code> (Ignore file attributes):</strong> Tells
+UnRAR not to restore the stored DOS/Windows attributes from the archive
+header. When this switch is used, the file retains the default
+attributes assigned by the Windows operating system at creation, meaning
+the Archive bit remains <strong>set</strong>, while Read-Only, Hidden,
+and System attributes from the archive are ignored.</li>
+<li><strong><code>-or</code> (Automatically rename existing
+files):</strong> If a file already exists and is overwritten or renamed,
+the standard extraction process still concludes with an explicit
+attribute update matching the archive's header data.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

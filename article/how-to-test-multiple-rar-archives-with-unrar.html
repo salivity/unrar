@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Test Multiple RAR Archives with Unrar - unrar</title>
+    <meta name="description" content="Testing the integrity of multiple RAR archives ensures files are free from corruption before extraction or long-term storage. This guide explains how to verify a massive batch of archives simultaneously using a single unrar command, complete with recursi">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-test-multiple-rar-archives-with-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Test Multiple RAR Archives with Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-test-multiple-rar-archives-with-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Testing the integrity of multiple RAR archives ensures files are free from corruption before extraction or long-term storage. This guide explains how to verify a massive batch of archives simultaneously using a single unrar command, complete with recursi" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-test-multiple-rar-archives-with-unrar">How to Test
+Multiple RAR Archives with Unrar</h1>
+<p>Testing the integrity of multiple RAR archives ensures files are free
+from corruption before extraction or long-term storage. This guide
+explains how to verify a massive batch of archives simultaneously using
+a single <code>unrar</code> command, complete with recursive folder
+scanning and automated error logging.</p>
+<h3 id="the-single-command">The Single Command</h3>
+<p>To test an entire batch of RAR archives at once, open your terminal
+or command prompt, navigate to the target directory, and execute:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t <span class="at">-r</span> <span class="st">&quot;*.rar&quot;</span></span></code></pre></div>
+<h3 id="command-breakdown">Command Breakdown</h3>
+<ul>
+<li><strong><code>t</code> (Test):</strong> Instructs <code>unrar</code>
+to verify archive integrity. It simulates the extraction process in
+memory and validates CRC checksums for every compressed file without
+writing data to the disk.</li>
+<li><strong><code>-r</code> (Recurse subdirectories):</strong> Directs
+the command to search through the current directory and all child
+folders.</li>
+<li><strong><code>"*.rar"</code>:</strong> The wildcard specifies every
+RAR file. Quoting the wildcard is essential on Unix-like systems (Linux
+and macOS) so the shell passes the pattern directly to
+<code>unrar</code> rather than expanding it beforehand. This prevents
+"argument list too long" errors when dealing with tens of thousands of
+files.</li>
+</ul>
+<h3 id="optimizing-for-massive-batches">Optimizing for Massive
+Batches</h3>
+<p>Testing thousands of files can clutter your terminal with standard
+output. You can streamline the process by suppressing unnecessary text
+and capturing errors directly into a log file.</p>
+<p>Use the <code>-id</code> (information display) switches to suppress
+normal output:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> t <span class="at">-r</span> <span class="at">-idq</span> <span class="st">&quot;*.rar&quot;</span> <span class="op">&gt;</span> test_errors.log <span class="dv">2</span><span class="op">&gt;&amp;</span><span class="dv">1</span></span></code></pre></div>
+<ul>
+<li><strong><code>-idq</code>:</strong> Runs in quiet mode, displaying
+only warning and error messages.</li>
+<li><strong><code>&gt; test_errors.log 2&gt;&amp;1</code>:</strong>
+Redirects both standard output and error messages into a file named
+<code>test_errors.log</code>.</li>
+</ul>
+<h3 id="checking-the-results">Checking the Results</h3>
+<p>If the process finishes with an empty log file, all archives passed
+integrity verification.</p>
+<p>On Linux or macOS, you can quickly check the final exit status by
+running:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$?</span></span></code></pre></div>
+<ul>
+<li><strong>0:</strong> Successful operation with no errors.</li>
+<li><strong>1:</strong> Non-fatal errors encountered.</li>
+<li><strong>2:</strong> A fatal error occurred.</li>
+<li><strong>3:</strong> A CRC error was found (corrupt archive).</li>
+<li><strong>4:</strong> Attempted to modify a locked archive.</li>
+<li><strong>5:</strong> Write error.</li>
+<li><strong>6:</strong> Open file error.</li>
+<li><strong>7:</strong> Wrong command-line options.</li>
+<li><strong>8:</strong> Not enough memory.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

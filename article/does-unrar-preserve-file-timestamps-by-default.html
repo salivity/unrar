@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Does unrar Preserve File Timestamps by Default? - unrar</title>
+    <meta name="description" content="When extracting files from a RAR archive using the unrar utility, the tool preserves original file modification timestamps by default. Users extracting files through standard commands do not need to supply extra arguments to keep the original modificatio">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/does-unrar-preserve-file-timestamps-by-default">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Does unrar Preserve File Timestamps by Default? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/does-unrar-preserve-file-timestamps-by-default" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting files from a RAR archive using the unrar utility, the tool preserves original file modification timestamps by default. Users extracting files through standard commands do not need to supply extra arguments to keep the original modificatio" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="does-unrar-preserve-file-timestamps-by-default">Does unrar
+Preserve File Timestamps by Default?</h1>
+<p>When extracting files from a RAR archive using the <code>unrar</code>
+utility, the tool preserves original file modification timestamps by
+default. Users extracting files through standard commands do not need to
+supply extra arguments to keep the original modification dates intact,
+as the extraction process automatically applies the stored metadata to
+the newly unpacked files.</p>
+<h3 id="default-timestamp-behavior">Default Timestamp Behavior</h3>
+<p>When a RAR archive is created, it automatically stores the last
+modification time (<code>mtime</code>) of each file. During extraction
+via standard commands such as <code>unrar x archive.rar</code> or
+<code>unrar e archive.rar</code>, <code>unrar</code> reads this metadata
+and restores the exact original modification timestamp for each
+extracted file.</p>
+<p>However, standard filesystems track three distinct timestamps:</p>
+<ul>
+<li><strong>Modification Time (<code>mtime</code>):</strong> Preserved
+by default.</li>
+<li><strong>Creation/Birth Time (<code>ctime</code> /
+<code>crtime</code>):</strong> Not preserved by default unless
+specifically captured during compression and supported by the target
+operating system.</li>
+<li><strong>Access Time (<code>atime</code>):</strong> Set to the time
+of extraction by default unless explicitly archived and restored.</li>
+</ul>
+<h3 id="managing-timestamps-with-the--ts-switch">Managing Timestamps
+with the <code>-ts</code> Switch</h3>
+<p>To control how timestamps are handled, <code>unrar</code> provides
+the <code>-ts</code> (time stamp) switch. This allows fine-grained
+control over modification, creation, and access times during
+unpacking:</p>
+<ul>
+<li><strong>Restore All Timestamps:</strong> If the archive contains
+creation and access times, you can restore them alongside modification
+times using:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-ts</span> archive.rar</span></code></pre></div></li>
+<li><strong>Ignore Stored Timestamps:</strong> If you want extracted
+files to reflect the current system time instead of the original archive
+dates, disable timestamp restoration with <code>-ts-</code>:
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-ts-</span> archive.rar</span></code></pre></div></li>
+<li><strong>Target Specific Timestamps:</strong> You can selectively
+restore specific attributes using modifier letters:
+<ul>
+<li><code>-tsm+</code>: Restores modification time (default
+behavior).</li>
+<li><code>-tsc+</code>: Restores creation time (if present in the
+archive).</li>
+<li><code>-tsa+</code>: Restores last access time.</li>
+</ul></li>
+</ul>
+<h3 id="directory-timestamps">Directory Timestamps</h3>
+<p>While file modification times are restored cleanly, directory
+timestamps can behave differently depending on the operating system.
+When <code>unrar</code> extracts files into a folder, the host
+filesystem updates the folder’s modification time to reflect that new
+items were added inside it. Using full path extraction
+(<code>unrar x</code>) ensures that directory structures and metadata
+are handled as accurately as the filesystem permits.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

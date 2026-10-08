@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Case-Sensitive Filename Conflicts on Windows - unrar</title>
+    <meta name="description" content="When extracting archives created on case-sensitive systems like Linux onto Windows, filename collisions frequently occur when two files differ only by capitalization. Because Windows uses a case-insensitive file system by default, the unrar utility canno">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-case-sensitive-filename-conflicts-on-windows">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Case-Sensitive Filename Conflicts on Windows - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-case-sensitive-filename-conflicts-on-windows" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives created on case-sensitive systems like Linux onto Windows, filename collisions frequently occur when two files differ only by capitalization. Because Windows uses a case-insensitive file system by default, the unrar utility canno" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-case-sensitive-filename-conflicts-on-windows">Unrar
+Case-Sensitive Filename Conflicts on Windows</h1>
+<p>When extracting archives created on case-sensitive systems like Linux
+onto Windows, filename collisions frequently occur when two files differ
+only by capitalization. Because Windows uses a case-insensitive file
+system by default, the <code>unrar</code> utility cannot place both
+files in the same directory under their original names without
+intervention. This article explains how <code>unrar</code> behaves
+during these collisions on Windows and provides the exact command-line
+options available to manage or prevent data loss.</p>
+<h3 id="the-source-of-the-conflict">The Source of the Conflict</h3>
+<p>Operating systems such as Linux treat <code>document.txt</code> and
+<code>DOCUMENT.txt</code> as distinct files within the same directory.
+When packed into a RAR archive on these platforms, both entries are
+preserved.</p>
+<p>Windows NTFS technically supports case sensitivity, but the Windows
+subsystem and standard Win32 APIs operate in a case-insensitive manner.
+When <code>unrar</code> attempts to extract the second file to a Windows
+folder, the operating system views the target file as already existing,
+triggering a naming collision.</p>
+<h3 id="default-unrar-behavior-on-windows">Default <code>unrar</code>
+Behavior on Windows</h3>
+<p>By default, when <code>unrar</code> encounters a case collision
+during extraction on Windows, it treats the second file as an overwrite
+collision.</p>
+<p>If running in interactive mode via the command prompt,
+<code>unrar</code> halts and prompts the user with standard overwrite
+options:</p>
+<ul>
+<li><strong>[Y]es</strong>: Overwrites the first extracted file with the
+contents of the second file.</li>
+<li><strong>[N]o</strong>: Skips the conflicting file, keeping only the
+first file extracted.</li>
+<li><strong>[A]ll</strong>: Overwrites all subsequent conflicting files
+without prompting.</li>
+<li><strong>n[E]ver</strong>: Skips all subsequent conflicting
+files.</li>
+<li><strong>[R]ename</strong>: Prompts you to manually specify a new
+filename for the conflicting file.</li>
+<li><strong>[Q]uit</strong>: Terminates the extraction process
+immediately.</li>
+</ul>
+<p>If the prompt is answered with overwrite, data loss occurs because
+the content of the first file is replaced by the content of the
+subsequent file.</p>
+<h3
+id="controlling-conflict-resolution-via-command-line-flags">Controlling
+Conflict Resolution via Command-Line Flags</h3>
+<p>To automate or handle these collisions safely in non-interactive
+scripts or standard operations, <code>unrar</code> provides specific
+switches:</p>
+<ul>
+<li><strong>Automatic Renaming (<code>-or</code>)</strong>: Use this
+switch to preserve both files. When a collision occurs,
+<code>unrar</code> automatically appends an incremented number to the
+conflicting filename (for example, <code>DOCUMENT(1).txt</code>).
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>unrar x <span class="at">-or</span> archive.rar</span></code></pre></div></li>
+<li><strong>Skip Existing Files (<code>-o-</code>)</strong>: This switch
+skips any file that conflicts with an already-extracted file. The first
+extracted file is kept, and any case-variant duplicates are ignored.
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>unrar x <span class="at">-o</span>- archive.rar</span></code></pre></div></li>
+<li><strong>Overwrite All (<code>-o+</code>)</strong>: This forces
+<code>unrar</code> to overwrite existing files without confirmation. In
+a case collision, the last file extracted will replace any earlier files
+sharing the same case-insensitive name.
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>unrar x <span class="at">-o</span>+ archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="alternative-enabling-case-sensitivity-in-windows">Alternative:
+Enabling Case Sensitivity in Windows</h3>
+<p>Modern versions of Windows 10 and Windows 11 allow per-directory case
+sensitivity on NTFS partitions. You can enable this behavior for a
+target folder before running <code>unrar</code> using PowerShell or
+Command Prompt with administrator privileges:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fsutil.exe file setCaseSensitiveInfo <span class="st">&quot;C:\path\to\extraction_folder&quot;</span> enable</span></code></pre></div>
+<p>Once enabled for the destination folder, the underlying Windows
+filesystem will allow both <code>document.txt</code> and
+<code>DOCUMENT.txt</code> to coexist simultaneously without triggering
+overwrite prompts.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

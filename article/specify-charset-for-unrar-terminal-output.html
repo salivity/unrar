@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Specify Charset for Unrar Terminal Output - unrar</title>
+    <meta name="description" content="This guide explains how to configure unrar to output text using a specific character set in your terminal. When extracting or listing archives containing non-ASCII filenames, foreign alphabets, or special symbols, configuring the output encoding prevents">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/specify-charset-for-unrar-terminal-output">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Specify Charset for Unrar Terminal Output - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/specify-charset-for-unrar-terminal-output" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to configure unrar to output text using a specific character set in your terminal. When extracting or listing archives containing non-ASCII filenames, foreign alphabets, or special symbols, configuring the output encoding prevents" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="specify-charset-for-unrar-terminal-output">Specify Charset for
+Unrar Terminal Output</h1>
+<p>This guide explains how to configure <code>unrar</code> to output
+text using a specific character set in your terminal. When extracting or
+listing archives containing non-ASCII filenames, foreign alphabets, or
+special symbols, configuring the output encoding prevents garbled
+characters, question marks, and terminal display errors. Below is the
+precise syntax and usage examples for controlling console output
+encoding using the native <code>unrar</code> command-line switches.</p>
+<h3 id="syntax-overview">Syntax Overview</h3>
+<p>To set a specific character set for terminal output, use the
+<code>-sc</code> switch appended with the character set identifier and
+the display target specifier (<code>d</code>):</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="op">&lt;</span>command<span class="op">&gt;</span> -sc<span class="op">&lt;</span>charset<span class="op">&gt;</span>d <span class="op">&lt;</span>archive.rar<span class="op">&gt;</span></span></code></pre></div>
+<h3 id="parameter-breakdown">Parameter Breakdown</h3>
+<p>The <code>-sc</code> switch accepts two components to control console
+display:</p>
+<ol type="1">
+<li><p><strong>Charset Identifiers:</strong></p>
+<ul>
+<li><code>u</code>: Unicode (UTF-8)</li>
+<li><code>a</code>: ANSI (standard Windows code page or local 8-bit
+encoding)</li>
+<li><code>o</code>: OEM (DOS/legacy console encoding)</li>
+</ul></li>
+<li><p><strong>Target Specifier:</strong></p>
+<ul>
+<li><code>d</code>: Display (directs the encoding choice specifically to
+terminal and console output)</li>
+</ul></li>
+</ol>
+<h3 id="practical-examples">Practical Examples</h3>
+<h4 id="1-set-terminal-output-to-utf-8">1. Set Terminal Output to
+UTF-8</h4>
+<p>To view archive contents in standard UTF-8 encoding (most modern
+Linux and macOS terminals):</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l <span class="at">-scud</span> archive.rar</span></code></pre></div>
+<h4 id="2-set-terminal-output-to-oem">2. Set Terminal Output to OEM</h4>
+<p>If you are running <code>unrar</code> on older Windows Command Prompt
+environments that rely on OEM codepages:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v <span class="at">-scod</span> archive.rar</span></code></pre></div>
+<h4 id="3-set-terminal-output-to-ansi">3. Set Terminal Output to
+ANSI</h4>
+<p>To force output matching the ANSI standard:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l <span class="at">-scad</span> archive.rar</span></code></pre></div>
+<h3 id="combining-targets">Combining Targets</h3>
+<p>The <code>-sc</code> switch allows combining targets if you also want
+to apply the same character set to comments (<code>c</code>) or list
+files (<code>l</code>) simultaneously:</p>
+<ul>
+<li><strong>UTF-8 for both console display and archive
+comments:</strong>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v <span class="at">-scucd</span> archive.rar</span></code></pre></div></li>
+<li><strong>UTF-8 across display, comments, and list files:</strong>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-scu</span> archive.rar</span></code></pre></div>
+<em>(Omitting the target letter applies the chosen charset globally to
+all operations).</em></li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

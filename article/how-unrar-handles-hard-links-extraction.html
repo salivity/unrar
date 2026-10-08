@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Hard Links Extraction - unrar</title>
+    <meta name="description" content="When extracting archives that contain hard links, the unrar utility recreates the original filesystem references by leveraging operating system APIs, provided the target filesystem supports them. This article explains how unrar detects hard link records">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-hard-links-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Hard Links Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-hard-links-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives that contain hard links, the unrar utility recreates the original filesystem references by leveraging operating system APIs, provided the target filesystem supports them. This article explains how unrar detects hard link records" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-hard-links-extraction">How Unrar Handles Hard
+Links Extraction</h1>
+<p>When extracting archives that contain hard links, the
+<code>unrar</code> utility recreates the original filesystem references
+by leveraging operating system APIs, provided the target filesystem
+supports them. This article explains how <code>unrar</code> detects hard
+link records within RAR archives, the extraction order and system calls
+it uses, and how it handles potential errors and unsupported
+filesystems.</p>
+<h3 id="archival-support-and-metadata">Archival Support and
+Metadata</h3>
+<p>The RAR archive format, specifically RAR 5.0 and later, includes
+native support for storing filesystem links, including hard links,
+symbolic links, and directory junctions. When an archive is created with
+hard link preservation enabled, the archiver stores the full data stream
+for only the first occurrence of the file. Any subsequent hard-linked
+instances are saved as lightweight metadata entries referencing the
+target file's path rather than duplicating the file contents.</p>
+<h3 id="the-extraction-process">The Extraction Process</h3>
+<p>During extraction, <code>unrar</code> processes the archive
+sequentially:</p>
+<ol type="1">
+<li><strong>Primary File Extraction:</strong> When <code>unrar</code>
+encounters the first instance of the linked file, it extracts the file
+data to disk as a standard file.</li>
+<li><strong>Link Resolution:</strong> When it encounters subsequent
+entries flagged as hard links, it reads the target path stored in the
+metadata.</li>
+<li><strong>Link Creation:</strong> Instead of writing duplicate data
+blocks to the disk, <code>unrar</code> invokes native system calls to
+link the new directory entry directly to the existing file's inode or
+file record.
+<ul>
+<li>On Unix-like systems (Linux, macOS, BSD), it uses the standard
+<code>link()</code> or <code>linkat()</code> POSIX functions.</li>
+<li>On Windows (operating on NTFS volumes), it utilizes the Win32 API
+function <code>CreateHardLink()</code>.</li>
+</ul></li>
+</ol>
+<p>Because hard links point to the same underlying data, the extracted
+links share the exact same disk space, permissions, and file attributes
+as the source file.</p>
+<h3 id="extraction-dependencies-and-order">Extraction Dependencies and
+Order</h3>
+<p>Because a hard link requires an existing physical file to point to,
+extraction depends heavily on the presence of the primary target. If you
+extract the entire archive in its original order, the process completes
+seamlessly. However, issues can arise under specific conditions:</p>
+<ul>
+<li><strong>Partial Extraction:</strong> If a user selectively extracts
+only the hard link entry without extracting the primary target file,
+<code>unrar</code> cannot establish the link. The operation typically
+results in an error stating that the target file does not exist.</li>
+<li><strong>Extraction Order:</strong> In cases where files are
+processed out of order, the link creation will fail unless the target
+file is created on the disk first.</li>
+</ul>
+<h3 id="filesystem-limitations-and-fallback-behavior">Filesystem
+Limitations and Fallback Behavior</h3>
+<p>Hard links are strictly a filesystem-level feature and are not
+universally supported across all storage media:</p>
+<ul>
+<li><strong>Supported Filesystems:</strong> Native hard linking
+functions correctly on NTFS (Windows), ext4, Btrfs, XFS (Linux), and
+APFS (macOS).</li>
+<li><strong>Unsupported Filesystems:</strong> Filesystems such as FAT16,
+FAT32, and exFAT do not support hard links.</li>
+</ul>
+<p>When extracting to a filesystem that does not support hard links,
+<code>unrar</code> cannot invoke the respective system calls. Depending
+on the version and command-line flags used, <code>unrar</code> either
+fails the link creation step with an I/O error or, in some build
+variants, falls back to copying the original file to satisfy the
+destination path, sacrificing the space-saving benefit of the link.</p>
+<h3 id="security-and-privilege-considerations">Security and Privilege
+Considerations</h3>
+<p>Modern versions of <code>unrar</code> include security boundaries to
+prevent directory traversal and link-based vulnerabilities. The utility
+verifies that the hard link target resolves within the designated
+extraction directory to avoid unauthorized modifications to system
+files. Additionally, standard user permissions apply: <code>unrar</code>
+can only create hard links within directories where the active user has
+write permissions, and on Windows, creating cross-volume hard links is
+fundamentally restricted by the OS architecture.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

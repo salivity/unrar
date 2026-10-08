@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Stop Unrar Creating a Root Folder - unrar</title>
+    <meta name="description" content="When extracting a RAR archive, the command-line utility unrar often extracts contents into an enclosing root directory, either because of the extraction command used or because the archive was packaged with an internal parent folder. This guide covers ho">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-stop-unrar-creating-a-root-folder">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Stop Unrar Creating a Root Folder - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-stop-unrar-creating-a-root-folder" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting a RAR archive, the command-line utility unrar often extracts contents into an enclosing root directory, either because of the extraction command used or because the archive was packaged with an internal parent folder. This guide covers ho" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-stop-unrar-creating-a-root-folder">How to Stop Unrar
+Creating a Root Folder</h1>
+<p>When extracting a RAR archive, the command-line utility
+<code>unrar</code> often extracts contents into an enclosing root
+directory, either because of the extraction command used or because the
+archive was packaged with an internal parent folder. This guide covers
+how to prevent <code>unrar</code> from generating an unwanted root
+directory, whether you want to flatten all files into a single location
+or preserve subdirectories while stripping the top-level folder.</p>
+<h3 id="extracting-files-without-folders-flatten-archive">Extracting
+Files Without Folders (Flatten Archive)</h3>
+<p>If you want to extract all files directly into your current directory
+or a specific folder without any subdirectories or root folders, use the
+<code>e</code> (extract) command instead of <code>x</code> (extract with
+full paths).</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar</span></code></pre></div>
+<p>To extract directly into a target folder without creating
+subfolders:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar /path/to/destination/</span></code></pre></div>
+<p>The <code>e</code> switch instructs <code>unrar</code> to ignore the
+archive's internal path structures, dumping all files directly into the
+specified directory.</p>
+<hr />
+<h3
+id="preserving-subfolders-while-removing-the-top-level-folder">Preserving
+Subfolders While Removing the Top-Level Folder</h3>
+<p>The standard <code>unrar</code> tool does not have a native
+<code>--strip-components</code> flag like <code>tar</code>. If the
+archive contains a root folder that encloses other nested folders and
+you want to keep the nested structure without the root parent, use one
+of the following methods.</p>
+<h4 id="option-1-use-bsdtar-with-strip-components">Option 1: Use
+<code>bsdtar</code> with Strip Components</h4>
+<p>If your system has <code>bsdtar</code> installed (standard on macOS
+and available on Linux via <code>libarchive-tools</code>), you can
+unpack the RAR file and remove the root directory level dynamically:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bsdtar</span> <span class="at">--strip-components</span><span class="op">=</span>1 <span class="at">-xf</span> archive.rar</span></code></pre></div>
+<p>This removes the primary root folder and preserves any subfolders
+inside it.</p>
+<h4 id="option-2-extract-move-and-clean-up-via-shell">Option 2: Extract,
+Move, and Clean Up via Shell</h4>
+<p>If you are strictly using <code>unrar</code>, extract the archive
+normally, move the contents out of the generated root folder, and delete
+the empty directory:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> root_folder/<span class="pp">*</span> .</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rmdir</span> root_folder</span></code></pre></div>
+<p>Replace <code>root_folder</code> with the actual name of the
+top-level directory unpacked by the archive.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

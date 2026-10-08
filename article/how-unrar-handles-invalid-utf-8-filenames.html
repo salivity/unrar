@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Invalid UTF-8 Filenames - unrar</title>
+    <meta name="description" content="When extracting archives containing filenames with invalid or malformed UTF-8 sequences, the command-line utility unrar utilizes internal character conversion routines that attempt to sanitize, replace, or adapt the problematic characters to fit the host">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-invalid-utf-8-filenames">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Invalid UTF-8 Filenames - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-invalid-utf-8-filenames" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting archives containing filenames with invalid or malformed UTF-8 sequences, the command-line utility unrar utilizes internal character conversion routines that attempt to sanitize, replace, or adapt the problematic characters to fit the host" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-invalid-utf-8-filenames">How Unrar Handles
+Invalid UTF-8 Filenames</h1>
+<p>When extracting archives containing filenames with invalid or
+malformed UTF-8 sequences, the command-line utility <code>unrar</code>
+utilizes internal character conversion routines that attempt to
+sanitize, replace, or adapt the problematic characters to fit the host
+operating system's filesystem rules. Depending on the archive format
+version (RAR4 versus RAR5) and the system locale, <code>unrar</code>
+either replaces unmappable bytes with generic substitution characters,
+transliterates them, or outputs the raw byte stream directly to the
+filesystem.</p>
+<h3 id="rar-header-encodings-rar4-vs-rar5">RAR Header Encodings: RAR4
+vs. RAR5</h3>
+<p>To understand how <code>unrar</code> deals with invalid UTF-8, it is
+necessary to differentiate how filename metadata is stored:</p>
+<ul>
+<li><strong>RAR4 (Legacy):</strong> Filenames were primarily stored
+using a two-byte or single-byte character array mapped to local
+codepages (such as Windows CP-1252 or OEM codepages), alongside an
+optional UTF-16LE field for Unicode support. When parsing RAR4 archives,
+<code>unrar</code> attempts to read the UTF-16 sequence first. If it is
+corrupted or missing, it falls back to the single-byte raw
+representation.</li>
+<li><strong>RAR5 (Modern):</strong> Filenames are strictly defined to be
+encoded in UTF-8 directly inside the header data.</li>
+</ul>
+<h3 id="character-conversion-and-replacement">Character Conversion and
+Replacement</h3>
+<p>Internally, official RARLAB <code>unrar</code> processes paths by
+converting multibyte streams into wide-character strings
+(<code>wchar_t</code>) before writing to the target filesystem.</p>
+<p>When encountering an invalid byte sequence that violates UTF-8
+syntax—such as unexpected continuation bytes, overlong encodings, or
+invalid start bytes—the conversion routine fails to map the sequence to
+a valid Unicode code point. Instead of terminating the entire extraction
+process, <code>unrar</code> handles the error through the following
+mechanisms:</p>
+<ol type="1">
+<li><strong>Substitution with Fallback Characters:</strong> If the
+conversion routine detects an illegal byte sequence, it often replaces
+the offending byte with a standard placeholder (such as an underscore
+<code>_</code> or a question mark <code>?</code>, depending on the
+platform) to construct a valid string.</li>
+<li><strong>Locale-Based Multibyte Conversion:</strong> On POSIX
+platforms (Linux and macOS), <code>unrar</code> relies on standard C
+library functions such as <code>mbstowcs</code> and
+<code>wcstombs</code>, guided by the active system locale
+(<code>LC_CTYPE</code> or <code>LANG</code>). If a filename contains
+bytes that cannot be represented in the current locale, these functions
+return an error, prompting <code>unrar</code> to use a sanitized
+fallback name or emit a warning indicating that the path could not be
+mapped cleanly.</li>
+<li><strong>Hexadecimal Escaping:</strong> In certain builds and fork
+implementations (such as <code>unrar-free</code> or tools built on
+<code>libarchive</code>), bytes that do not conform to UTF-8 are
+converted to hexadecimal escape sequences (e.g., <code>#XX</code>) to
+preserve the uniqueness of the file while ensuring the final path
+remains valid UTF-8.</li>
+</ol>
+<h3 id="filesystem-level-considerations">Filesystem-Level
+Considerations</h3>
+<p>The underlying operating system plays a major role in how
+<code>unrar</code> completes extraction:</p>
+<ul>
+<li><strong>Linux and POSIX Systems:</strong> The Linux kernel treats
+filenames as arbitrary, null-terminated byte sequences without enforcing
+strict UTF-8 validity (apart from disallowing ASCII <code>NUL</code> and
+<code>/</code>). If <code>unrar</code> bypasses wide-character
+conversion, raw invalid UTF-8 bytes may be written directly to the disk,
+resulting in filenames that display as broken characters or replacement
+symbols (such as ``) in standard terminal emulators and file
+managers.</li>
+<li><strong>Windows:</strong> Because the Windows kernel and NTFS
+enforce UTF-16LE for file naming, any invalid UTF-8 sequence must be
+resolved before calling the Win32 API (<code>CreateFileW</code>). Any
+character that cannot be converted into a valid UTF-16 code unit must
+either be replaced or the file creation call will fail with an invalid
+path error.</li>
+</ul>
+<h3 id="resolving-extraction-failures">Resolving Extraction
+Failures</h3>
+<p>If <code>unrar</code> encounters an archive where filename corruption
+prevents extraction entirely, the issue can often be mitigated by
+adjusting the runtime environment:</p>
+<ul>
+<li>Setting <code>LC_ALL=C</code> forces POSIX systems to treat paths as
+raw byte streams, avoiding UTF-8 validation errors during
+extraction.</li>
+<li>Using specialized tools like <code>7z</code> or <code>bsdtar</code>
+provides alternative fallback handling for malformed codepages, allowing
+manual specification of archive character encodings when
+<code>unrar</code>'s default sanitization fails.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

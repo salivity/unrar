@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify UnRAR Executable Integrity - unrar</title>
+    <meta name="description" content="This article explains how to verify the integrity and authenticity of the unrar executable. Because the command-line unrar utility does not feature a built-in flag or internal command to test its own running binary, verifying its integrity requires exter">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/verify-un-rar-executable-integrity">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Verify UnRAR Executable Integrity - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/verify-un-rar-executable-integrity" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to verify the integrity and authenticity of the unrar executable. Because the command-line unrar utility does not feature a built-in flag or internal command to test its own running binary, verifying its integrity requires exter" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="verify-unrar-executable-integrity">Verify UnRAR Executable
+Integrity</h1>
+<p>This article explains how to verify the integrity and authenticity of
+the <code>unrar</code> executable. Because the command-line
+<code>unrar</code> utility does not feature a built-in flag or internal
+command to test its own running binary, verifying its integrity requires
+external validation methods. Below, you will learn why the utility
+cannot verify itself directly and how to confirm that your
+<code>unrar</code> binary is authentic and untampered with using
+cryptographic checksums, digital signatures, and system package
+managers.</p>
+<h3 id="why-unrar-cannot-verify-itself">Why UnRAR Cannot Verify
+Itself</h3>
+<p>The <code>unrar</code> command includes an integrity testing switch
+(<code>unrar t &lt;archive.rar&gt;</code>), but this command is designed
+exclusively to test the CRC and checksums of compressed files inside a
+RAR archive. A running executable cannot securely validate its own
+binary code in memory against tampering, as a compromised binary could
+simply forge a successful verification response. Consequently,
+executable verification must always be performed independently.</p>
+<h3 id="verifying-via-cryptographic-hashes">Verifying via Cryptographic
+Hashes</h3>
+<p>The most universal method to confirm the integrity of
+<code>unrar</code> is comparing its SHA-256 hash against the official
+hash provided by RARLAB or your distribution source.</p>
+<ol type="1">
+<li><p>Locate the executable on your system:</p>
+<ul>
+<li>On Linux/macOS: <code>which unrar</code></li>
+<li>On Windows: <code>where unrar.exe</code></li>
+</ul></li>
+<li><p>Generate the SHA-256 hash of the binary:</p>
+<ul>
+<li><strong>Linux:</strong>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sha256sum</span> <span class="va">$(</span><span class="fu">which</span> unrar<span class="va">)</span></span></code></pre></div></li>
+<li><strong>macOS:</strong>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">shasum</span> <span class="at">-a</span> 256 <span class="va">$(</span><span class="fu">which</span> unrar<span class="va">)</span></span></code></pre></div></li>
+<li><strong>Windows (PowerShell):</strong>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>Get-FileHash <span class="op">(</span><span class="fu">Get-Command</span> unrar<span class="op">.</span><span class="fu">exe</span><span class="op">).</span><span class="fu">Source</span> <span class="op">-</span>Algorithm SHA256</span></code></pre></div></li>
+</ul></li>
+<li><p>Compare the output hash string against the published checksum
+provided on the official download page. If the hashes match, the binary
+has not been modified or corrupted.</p></li>
+</ol>
+<h3 id="verifying-via-package-managers">Verifying via Package
+Managers</h3>
+<p>If you installed <code>unrar</code> through your operating system's
+package manager, the package manager maintains cryptographic records to
+verify file integrity.</p>
+<ul>
+<li><p><strong>Debian/Ubuntu (APT):</strong></p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">debsums</span> unrar</span></code></pre></div>
+<p>This command verifies the MD5 checksums of the installed
+<code>unrar</code> files against the distribution's package
+database.</p></li>
+<li><p><strong>Red Hat/Fedora/CentOS (RPM):</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rpm</span> <span class="at">-V</span> unrar</span></code></pre></div>
+<p>If the executable has not been altered, this command produces no
+output.</p></li>
+<li><p><strong>Arch Linux (Pacman):</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pacman</span> <span class="at">-Qk</span> unrar</span></code></pre></div>
+<p>This checks that the files match the original package state.</p></li>
+</ul>
+<h3 id="verifying-digital-signatures">Verifying Digital Signatures</h3>
+<p>On Windows systems, official binaries distributed by RARLAB are
+digitally signed using Authenticode. You can inspect and verify the
+signature using PowerShell:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-AuthenticodeSignature</span> <span class="op">(</span><span class="fu">Get-Command</span> unrar<span class="op">.</span><span class="fu">exe</span><span class="op">).</span><span class="fu">Source</span></span></code></pre></div>
+<p>Ensure the status returns <code>Valid</code> and the signer
+certificate is issued to Alexander Roshal or win.rar GmbH. If the
+signature is invalid or absent, the executable should not be
+trusted.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

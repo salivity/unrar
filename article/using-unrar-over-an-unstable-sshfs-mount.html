@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Using Unrar Over an Unstable SSHFS Mount - unrar</title>
+    <meta name="description" content="Extracting an archive using unrar across an unstable SSHFS mount introduces significant operational risks, including hung processes, file corruption, and aborted operations. Because SSHFS translates remote SFTP calls into a local virtual file system via">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/using-unrar-over-an-unstable-sshfs-mount">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Using Unrar Over an Unstable SSHFS Mount - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/using-unrar-over-an-unstable-sshfs-mount" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting an archive using unrar across an unstable SSHFS mount introduces significant operational risks, including hung processes, file corruption, and aborted operations. Because SSHFS translates remote SFTP calls into a local virtual file system via" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="using-unrar-over-an-unstable-sshfs-mount">Using Unrar Over an
+Unstable SSHFS Mount</h1>
+<p>Extracting an archive using <code>unrar</code> across an unstable
+SSHFS mount introduces significant operational risks, including hung
+processes, file corruption, and aborted operations. Because SSHFS
+translates remote SFTP calls into a local virtual file system via FUSE,
+network disruptions directly interrupt read and write syscalls, causing
+<code>unrar</code> to fail or lock up entirely.</p>
+<h3 id="uninterruptible-process-freezes-d-state">Uninterruptible Process
+Freezes (D-State)</h3>
+<p>When network connectivity drops, the FUSE driver waits for the remote
+SSH server to acknowledge pending I/O requests. If the SSHFS connection
+stalls, <code>unrar</code> typically enters an uninterruptible sleep
+state (<code>D</code> state in system monitoring tools). In this state,
+the process cannot handle signals, meaning standard termination commands
+like <code>SIGINT</code> (Ctrl+C) or <code>SIGTERM</code> will fail.
+Even <code>kill -9</code> (<code>SIGKILL</code>) is often ignored until
+the underlying mount is forcibly unmounted using
+<code>fusermount -uz /mount/path</code>.</p>
+<h3 id="read-errors-and-crc-verification-failures">Read Errors and CRC
+Verification Failures</h3>
+<p>If the RAR archive resides on the remote SSHFS mount and you extract
+it locally, <code>unrar</code> relies on a continuous stream of byte
+reads to verify block headers and data streams. An unstable connection
+causes socket timeouts and drops packets. When a read fails mid-stream,
+<code>unrar</code> detects missing or out-of-order data, immediately
+aborts the operation, and outputs a "Corrupt file or wrong password" or
+"CRC failed" error, even if the source file itself is completely
+intact.</p>
+<h3 id="incomplete-extractions-and-orphaned-files">Incomplete
+Extractions and Orphaned Files</h3>
+<p>If you are extracting a local archive to a remote target path hosted
+on SSHFS, network interruptions break write operations.
+<code>unrar</code> writes extracted data sequentially. A connection
+timeout mid-write triggers an <code>EIO</code> (Input/Output Error) or
+an <code>ENOTCONN</code> (Transport endpoint is not connected) error.
+This leaves truncated, unusable files on the remote server. Depending on
+whether the archive is solid or split across multiple volumes, the
+entire extraction job terminates prematurely without cleaning up
+partially written data.</p>
+<h3 id="severe-latency-and-bottlenecks">Severe Latency and
+Bottlenecks</h3>
+<p>RAR extraction involves high-frequency metadata queries, directory
+traversals, and non-sequential reads, particularly for large or solid
+archives. SSHFS adds network round-trip latency to every file operation.
+On an unstable network, packet loss triggers aggressive TCP
+retransmissions, drastically reducing extraction speeds to fractions of
+the expected bandwidth and increasing the likelihood of hitting default
+timeout thresholds.</p>
+<h3 id="recommended-alternatives">Recommended Alternatives</h3>
+<p>To avoid failures caused by unstable mounts, avoid running local
+extraction commands on SSHFS volumes:</p>
+<ul>
+<li><strong>Remote Extraction:</strong> Connect to the remote machine
+via SSH and run <code>unrar</code> natively on the host server
+(<code>ssh user@host "unrar x archive.rar"</code>). This confines all
+disk I/O to the remote machine's local storage and eliminates network
+latency from the extraction process.</li>
+<li><strong>Local Transfer First:</strong> Copy the archive to your
+local storage using <code>rsync -P</code> or <code>scp</code>, run
+<code>unrar</code> locally, and sync the extracted contents back once
+finished. <code>rsync</code> includes native resume capabilities that
+handle unstable connections safely.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

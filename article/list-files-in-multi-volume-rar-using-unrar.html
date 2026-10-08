@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Files in Multi-Volume RAR Using Unrar - unrar</title>
+    <meta name="description" content="This article explains how to view the complete list of files stored across all parts of a split, multi-volume RAR archive without extracting them. By using the command-line unrar utility targeted at the first volume, you can inspect the full contents of">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/list-files-in-multi-volume-rar-using-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="List Files in Multi-Volume RAR Using Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/list-files-in-multi-volume-rar-using-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to view the complete list of files stored across all parts of a split, multi-volume RAR archive without extracting them. By using the command-line unrar utility targeted at the first volume, you can inspect the full contents of" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="list-files-in-multi-volume-rar-using-unrar">List Files in
+Multi-Volume RAR Using Unrar</h1>
+<p>This article explains how to view the complete list of files stored
+across all parts of a split, multi-volume RAR archive without extracting
+them. By using the command-line <code>unrar</code> utility targeted at
+the first volume, you can inspect the full contents of spanned archives
+quickly and efficiently.</p>
+<h2 id="the-command">The Command</h2>
+<p>To list all files across a multi-volume archive, point the
+<code>unrar</code> command to the <strong>first volume</strong> using
+either the <code>l</code> (list) or <code>v</code> (verbose list)
+switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.part01.rar</span></code></pre></div>
+<p>or for a detailed view:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v archive.part01.rar</span></code></pre></div>
+<p>When pointed at the first volume, <code>unrar</code> automatically
+detects that the archive is part of a multi-volume set and traverses all
+subsequent parts (e.g., <code>part02.rar</code>,
+<code>part03.rar</code>) located in the same directory to compile the
+complete file list.</p>
+<hr />
+<h2 id="command-variations-and-options">Command Variations and
+Options</h2>
+<p>Depending on your output needs, <code>unrar</code> offers several
+list modifiers:</p>
+<h3 id="1-standard-list-l">1. Standard List (<code>l</code>)</h3>
+<p>Displays basic file details including file name, size, packed size,
+ratio, date, time, and permissions:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.part1.rar</span></code></pre></div>
+<h3 id="2-verbose-list-v">2. Verbose List (<code>v</code>)</h3>
+<p>Shows comprehensive details, including technical file attributes,
+compression method, and which specific volume each file begins or ends
+on:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v archive.part1.rar</span></code></pre></div>
+<h3 id="3-bare-name-list-lb-or-vb">3. Bare Name List (<code>lb</code> or
+<code>vb</code>)</h3>
+<p>Outputs only the file paths, one per line. This is ideal for piping
+output to tools like <code>grep</code>, <code>awk</code>, or writing to
+a text file:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> lb archive.part01.rar</span></code></pre></div>
+<hr />
+<h2 id="handling-legacy-naming-conventions">Handling Legacy Naming
+Conventions</h2>
+<p>Older multi-volume RAR archives use the <code>.rar</code>,
+<code>.r00</code>, <code>.r01</code> naming scheme instead of
+<code>.part01.rar</code>. For these archives, point the command at the
+<code>.rar</code> file:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.rar</span></code></pre></div>
+<p>As long as the <code>.r00</code>, <code>.r01</code>, and subsequent
+files remain in the same working directory, <code>unrar</code> will
+automatically index all contents spanning the remaining volumes.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

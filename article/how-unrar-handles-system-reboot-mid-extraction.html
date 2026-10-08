@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles System Reboot Mid Extraction - unrar</title>
+    <meta name="description" content="When a system unexpectedly reboots during an extraction process, unrar terminates immediately without executing any cleanup or state-saving routines. This article explains the exact filesystem state left behind after such an interruption, how unrar handl">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-system-reboot-mid-extraction">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles System Reboot Mid Extraction - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-system-reboot-mid-extraction" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When a system unexpectedly reboots during an extraction process, unrar terminates immediately without executing any cleanup or state-saving routines. This article explains the exact filesystem state left behind after such an interruption, how unrar handl" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-system-reboot-mid-extraction">How Unrar
+Handles System Reboot Mid Extraction</h1>
+<p>When a system unexpectedly reboots during an extraction process,
+<code>unrar</code> terminates immediately without executing any cleanup
+or state-saving routines. This article explains the exact filesystem
+state left behind after such an interruption, how <code>unrar</code>
+handles partially extracted data, and the recommended steps to safely
+resume or redo the extraction.</p>
+<h3 id="filesystem-state-after-a-reboot">Filesystem State After a
+Reboot</h3>
+<p>Because <code>unrar</code> processes archives sequentially and writes
+data directly to the storage drive, the files in the target directory
+will be left in three distinct states:</p>
+<ol type="1">
+<li><strong>Fully Extracted Files:</strong> Any files that finished
+extracting and were closed prior to the reboot remain fully intact and
+undamaged on the filesystem.</li>
+<li><strong>In-Progress File:</strong> The specific file being written
+at the exact moment power was lost will be incomplete and corrupted. It
+will either have a smaller file size than intended or exist as a
+truncated file containing only the bytes flushed to disk before the
+crash.</li>
+<li><strong>Pending Files:</strong> Any files queued after the
+interrupted file will not exist in the destination directory.</li>
+</ol>
+<h3 id="lack-of-native-rollback-and-resuming">Lack of Native Rollback
+and Resuming</h3>
+<p>The <code>unrar</code> utility does not utilize transactional
+processing, journaling, or an internal checkpointing mechanism.
+Consequently:</p>
+<ul>
+<li><strong>No Automatic Rollback:</strong> It will not delete the
+partially extracted, corrupted file when the system boots back up.</li>
+<li><strong>No Mid-File Resume:</strong> <code>unrar</code> cannot
+inspect a partially written file and pick up decompression from the
+exact byte where it stopped. Extraction of that specific file must
+restart from the beginning.</li>
+</ul>
+<h3 id="handling-re-extraction">Handling Re-Extraction</h3>
+<p>When you execute the extraction command again after the system
+restarts, <code>unrar</code> will encounter the files already present on
+the drive. Its behavior depends entirely on the flags provided:</p>
+<ul>
+<li><strong>Default Interactive Mode:</strong> If run without overwrite
+switches, <code>unrar</code> stops at the first existing file and
+prompts you to choose an action: Overwrite <code>(Y)</code>, Skip
+<code>(N)</code>, Overwrite All <code>(A)</code>, or Never overwrite
+<code>(n)</code>.</li>
+<li><strong>The Danger of Skipping (<code>-o-</code>):</strong> If you
+use the skip existing files switch (<code>-o-</code>),
+<code>unrar</code> will skip all fully extracted files, but it will also
+skip the corrupted, partially written file because the file name already
+exists on disk. This leaves you with damaged data.</li>
+<li><strong>Overwriting Everything (<code>-o+</code>):</strong> Using
+the overwrite switch forces <code>unrar</code> to re-extract and
+overwrite every file from scratch, replacing the corrupted file and
+ensuring total archive integrity.</li>
+<li><strong>Freshening (<code>-f</code>):</strong> The freshen switch
+only extracts files that are older than the ones in the archive. This
+may not reliably identify a truncated file if the filesystem timestamp
+matches the archive entry.</li>
+</ul>
+<h3 id="recommended-recovery-procedure">Recommended Recovery
+Procedure</h3>
+<p>To cleanly recover from an interrupted extraction without leaving
+damaged files:</p>
+<ol type="1">
+<li>Identify and delete the incomplete file that was actively being
+written during the crash, or clear the destination directory
+entirely.</li>
+<li>Re-run the extraction command using the <code>-o+</code> switch to
+ensure all data is overwritten cleanly, or selectively extract only the
+missing and damaged files using target path specifications.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

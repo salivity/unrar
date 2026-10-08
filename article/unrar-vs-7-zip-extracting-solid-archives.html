@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar vs 7-Zip: Extracting Solid Archives - unrar</title>
+    <meta name="description" content="Extracting solid archives introduces unique performance challenges because files are treated as a single continuous data stream to maximize compression efficiency. When comparing Unrar and 7-Zip for this task, performance varies based on whether you are">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-vs-7-zip-extracting-solid-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar vs 7-Zip: Extracting Solid Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-vs-7-zip-extracting-solid-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting solid archives introduces unique performance challenges because files are treated as a single continuous data stream to maximize compression efficiency. When comparing Unrar and 7-Zip for this task, performance varies based on whether you are" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-vs-7-zip-extracting-solid-archives">Unrar vs 7-Zip:
+Extracting Solid Archives</h1>
+<p>Extracting solid archives introduces unique performance challenges
+because files are treated as a single continuous data stream to maximize
+compression efficiency. When comparing Unrar and 7-Zip for this task,
+performance varies based on whether you are unpacking an entire archive
+or searching for a single file, the underlying compression algorithm
+(RAR5 vs. LZMA/LZMA2), and multi-threading capabilities during
+decompression. This comparison breaks down how both tools handle
+resource consumption, decoding speeds, and seek times within solid
+blocks.</p>
+<h3 id="the-mechanics-of-solid-decompression">The Mechanics of Solid
+Decompression</h3>
+<p>In a solid archive, data redundancy is shared across multiple files.
+To unpack any file inside a solid block, the decompressor must read and
+decode all preceding data from the start of that block to reconstruct
+the dictionary state.</p>
+<p>Because of this sequential dependency, neither Unrar nor 7-Zip can
+perform true parallel multi-threaded extraction on a single solid block.
+Both tools are largely bound to single-core CPU throughput and storage
+read speeds during decompression.</p>
+<h3 id="full-archive-extraction-speed">Full Archive Extraction
+Speed</h3>
+<p>When extracting the entirety of an archive, both tools perform
+efficiently, but their speed depends largely on the format's dictionary
+and algorithm design:</p>
+<ul>
+<li><strong>Unrar (RAR5):</strong> RARLAB's Unrar binary contains
+hand-optimized assembly routines tailored for standard desktop
+architectures. RAR5 decompression is typically faster than 7-Zip's
+default LZMA algorithm at high compression levels because the RAR
+algorithm prioritizes decoding speed over maximizing every byte of
+compression ratio.</li>
+<li><strong>7-Zip (.7z using LZMA/LZMA2):</strong> While LZMA offers
+industry-leading compression ratios, decoding complex LZMA streams
+requires more CPU cycles per byte than RAR5. As a result, unpacking a
+maximum-compression solid <code>.7z</code> file generally takes longer
+than extracting an equivalent <code>.rar</code> file of similar size.
+However, if the <code>.7z</code> archive was compressed using the newer
+LZMA2 algorithm divided into multiple solid blocks, 7-Zip can spin up
+multiple threads to unpack distinct blocks simultaneously, pulling ahead
+of Unrar.</li>
+</ul>
+<h3 id="extracting-individual-files-partial-extraction">Extracting
+Individual Files (Partial Extraction)</h3>
+<p>Extracting a single file from the middle or end of a solid archive
+highlights the biggest performance bottleneck:</p>
+<ul>
+<li><strong>7-Zip:</strong> If configured with default solid settings,
+7-Zip creates a single continuous solid stream across the entire
+archive. Extracting a 5 MB file at the end of a 20 GB solid archive
+requires 7-Zip to decode almost the entire 20 GB archive into memory
+discard buffers, resulting in severe delays. However, 7-Zip allows users
+to set custom solid block limits (e.g., 2 GB blocks), which restricts
+the maximum seek and decoding penalty.</li>
+<li><strong>Unrar:</strong> Unrar exhibits the exact same sequential
+decoding penalty on RAR solid archives. However, the official Unrar
+utility is slightly faster at discarding unwanted uncompressed data on
+the fly compared to 7-Zip's RAR-parsing module.</li>
+</ul>
+<h3 id="7-zip-as-a-rar-decompressor">7-Zip as a RAR Decompressor</h3>
+<p>A common scenario is using 7-Zip to unpack solid <code>.rar</code>
+archives instead of the official <code>unrar</code> binary:</p>
+<ul>
+<li><strong>Native Unrar:</strong> The official <code>unrar</code>
+utility from RARLAB consistently outperforms 7-Zip when handling solid
+RAR4 and RAR5 formats. It features the latest proprietary optimizations
+and correctly handles RAR5's advanced dictionary sizes (up to 4
+GB).</li>
+<li><strong>7-Zip's RAR Engine:</strong> 7-Zip uses reverse-engineered
+code and unrar source adaptations to read RAR files. While it handles
+basic solid RAR archives adequately, it is noticeably slower when
+processing large solid RAR5 blocks and occasionally encounters
+compatibility issues with specialized RAR encryption or dictionary
+configurations.</li>
+</ul>
+<h3 id="summary">Summary</h3>
+<p>For unpacking complete archives, <strong>Unrar</strong> provides
+faster baseline decompression throughput due to the lighter
+computational demands of the RAR5 algorithm compared to LZMA. For
+extracting single files from large archives, both tools experience
+significant slowdowns due to solid sequential reading, though 7-Zip
+provides more flexible block-splitting options at creation time to
+prevent this issue entirely. When working exclusively with solid RAR
+archives, native <strong>Unrar</strong> is decisively faster and more
+reliable than opening the archive via 7-Zip.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

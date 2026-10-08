@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Join Split Volumes Without Extracting? - unrar</title>
+    <meta name="description" content="The short answer is no; the command-line utility unrar cannot join split (multi-volume) RAR archives into a single archive without extracting them first. This article explains why unrar lacks this functionality, why simple file-concatenation methods fail">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-join-split-volumes-without-extracting">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Join Split Volumes Without Extracting? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-join-split-volumes-without-extracting" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The short answer is no; the command-line utility unrar cannot join split (multi-volume) RAR archives into a single archive without extracting them first. This article explains why unrar lacks this functionality, why simple file-concatenation methods fail" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-join-split-volumes-without-extracting">Can Unrar Join
+Split Volumes Without Extracting?</h1>
+<p>The short answer is no; the command-line utility <code>unrar</code>
+cannot join split (multi-volume) RAR archives into a single archive
+without extracting them first. This article explains why
+<code>unrar</code> lacks this functionality, why simple
+file-concatenation methods fail on RAR archives, and the correct method
+to convert split volumes into a unified archive.</p>
+<h2 id="why-unrar-cannot-merge-volumes">Why Unrar Cannot Merge
+Volumes</h2>
+<p>The <code>unrar</code> utility is explicitly designed for read-only
+operations. Its functionality is restricted to listing, testing, and
+extracting files from existing archives. It lacks any compression,
+archiving, or file-modification capabilities. Because it cannot create
+or alter RAR files, it cannot perform an archive-level merge.</p>
+<p>Furthermore, even the full <code>rar</code> archiving utility does
+not feature a native command to directly stitch <code>.part1.rar</code>,
+<code>.part2.rar</code>, and subsequent volumes into a single
+<code>.rar</code> container without decompressing the data.</p>
+<h2 id="why-binary-concatenation-does-not-work">Why Binary Concatenation
+Does Not Work</h2>
+<p>Users familiar with basic file streams often attempt to use binary
+concatenation tools—such as
+<code>cat volume.part*.rar &gt; combined.rar</code> on Linux or
+<code>copy /b volume.part*.rar combined.rar</code> on Windows—to merge
+files.</p>
+<p>This approach corrupts RAR archives. Each volume in a multi-part RAR
+set contains proprietary volume headers, end-of-volume markers, and
+internal flags indicating whether a file block continues onto the next
+volume. Simply joining the binary files leaves these internal markers
+intact throughout the middle of the combined file, causing archive
+readers to report the resulting file as corrupt.</p>
+<h2 id="the-standard-method-extract-and-recompress">The Standard Method:
+Extract and Recompress</h2>
+<p>To convert split RAR volumes into a single archive, you must
+decompress the contents and generate a new archive.</p>
+<ol type="1">
+<li><p><strong>Extract the split archive:</strong> Ensure all volumes
+are in the same directory. Run the extraction command on the first
+volume:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part1.rar</span></code></pre></div>
+<p><code>unrar</code> will automatically locate the subsequent volumes,
+assemble the segmented data streams, and write the intact files to your
+disk.</p></li>
+<li><p><strong>Create a single-volume archive:</strong> Using the
+official <code>rar</code> tool (or alternative compression software like
+7-Zip), compress the extracted files into a single container without
+splitting:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">rar</span> a <span class="at">-m5</span> single_archive.rar ./extracted_files/</span></code></pre></div></li>
+</ol>
+<p>If disk space is an issue, you can automate this in a script that
+processes files in batches or writes directly to a new archive format,
+but the data must pass through an extraction phase to properly rebuild
+internal archive headers.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

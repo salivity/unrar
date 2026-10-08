@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why RAR Compression Is Proprietary While UnRAR Is Free - unrar</title>
+    <meta name="description" content="The distinction between RAR compression and decompression exists primarily as a deliberate commercial strategy by its creator, Eugene Roshal, and RARLAB. While the algorithm required to create RAR archives remains a closely guarded commercial secret to d">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/why-rar-compression-is-proprietary-while-un-rar-is-free">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Why RAR Compression Is Proprietary While UnRAR Is Free - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/why-rar-compression-is-proprietary-while-un-rar-is-free" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The distinction between RAR compression and decompression exists primarily as a deliberate commercial strategy by its creator, Eugene Roshal, and RARLAB. While the algorithm required to create RAR archives remains a closely guarded commercial secret to d" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="why-rar-compression-is-proprietary-while-unrar-is-free">Why RAR
+Compression Is Proprietary While UnRAR Is Free</h1>
+<p>The distinction between RAR compression and decompression exists
+primarily as a deliberate commercial strategy by its creator, Eugene
+Roshal, and RARLAB. While the algorithm required to create RAR archives
+remains a closely guarded commercial secret to drive sales of WinRAR
+licenses, the source code to extract RAR archives (UnRAR) is distributed
+freely to ensure the format achieved widespread global adoption. This
+asymmetrical model allows RARLAB to protect its primary revenue stream
+while guaranteeing that end users can open RAR files on almost any
+operating system without paying.</p>
+<h3 id="the-winrar-commercial-business-model">The WinRAR Commercial
+Business Model</h3>
+<p>The RAR format was introduced in 1993 by Eugene Roshal. Unlike
+completely open-source formats such as ZIP, 7z, or Tar, RAR was designed
+from the beginning as commercial software. RARLAB monetizes the format
+through sales of WinRAR on Windows and command-line RAR tools on other
+platforms.</p>
+<p>If the compression algorithm were open-source or freely licensable
+for writing archives, third-party software developers could integrate
+native RAR creation directly into operating systems and free archiving
+utilities. This would eliminate the primary incentive for businesses and
+power users to purchase WinRAR licenses. Keeping the compression
+algorithm proprietary preserves WinRAR's core competitive advantage and
+intellectual property.</p>
+<h3 id="the-strategic-necessity-of-free-decompression">The Strategic
+Necessity of Free Decompression</h3>
+<p>An archive format has no value if recipients cannot open the files
+they receive. In the early days of file sharing, forcing recipients to
+purchase software just to unpack an archive would have driven users
+directly to open standards like ZIP.</p>
+<p>To solve this problem, RARLAB released the portable C++ source code
+for <code>unrar</code>. This code is free to download, compile, and
+embed into third-party tools (such as 7-Zip, PeaZip, and various Linux
+archive managers). By making extraction ubiquitous and frictionless,
+RARLAB ensured the RAR format became an industry standard for
+multi-volume splitting, error recovery, and high-ratio data storage
+across the internet.</p>
+<h3 id="licensing-restrictions-on-the-unrar-code">Licensing Restrictions
+on the UnRAR Code</h3>
+<p>Although the UnRAR source code is freely available, it is not
+open-source in the traditional open-source definition (such as GPL or
+MIT). The official UnRAR license contains a specific, legally binding
+restriction:</p>
+<blockquote>
+<p><em>"The unRAR sources may be used in any software to handle RAR
+archives without limitations starting from RAR 3.0, but may not be used
+to re-create the RAR compression algorithm, which is
+proprietary."</em></p>
+</blockquote>
+<p>This clause prevents developers from studying the decompression logic
+to reverse-engineer an open-source RAR compressor. Third-party tools are
+legally permitted to unpack existing archives, but they cannot legally
+use RARLAB's code to build competing RAR encoders.</p>
+<h3 id="algorithmic-complexity-and-trade-secrets">Algorithmic Complexity
+and Trade Secrets</h3>
+<p>Decompression is fundamentally simpler and more deterministic than
+compression. To decompress a file, an application merely follows the
+explicit instructions recorded in the archive.</p>
+<p>Compression, by contrast, relies on complex heuristics, dictionary
+matching, predictive modeling, and optimization passes that determine
+how data should be structured for maximum space reduction. The
+proprietary compression engine represents decades of refinement by
+RARLAB. Keeping this implementation proprietary shields these algorithms
+from direct copying by competitors.</p>
+<h3 id="summary">Summary</h3>
+<p>The split between proprietary compression and free decompression is
+an intentional balance between intellectual property protection and
+market penetration. By keeping the compression algorithm closed, RARLAB
+preserves the commercial viability of WinRAR; by making the UnRAR code
+free, they ensure the format remains practical, accessible, and widely
+supported across all modern computing platforms.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

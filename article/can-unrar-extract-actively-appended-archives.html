@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Extract Actively Appended Archives? - unrar</title>
+    <meta name="description" content="Attempting to extract a RAR archive while another program is actively writing or appending data to it generally results in errors rather than a successful extraction. Because of how the RAR format structures compressed data, along with operating system f">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-extract-actively-appended-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Extract Actively Appended Archives? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-extract-actively-appended-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Attempting to extract a RAR archive while another program is actively writing or appending data to it generally results in errors rather than a successful extraction. Because of how the RAR format structures compressed data, along with operating system f" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-extract-actively-appended-archives">Can Unrar Extract
+Actively Appended Archives?</h1>
+<p>Attempting to extract a RAR archive while another program is actively
+writing or appending data to it generally results in errors rather than
+a successful extraction. Because of how the RAR format structures
+compressed data, along with operating system file-locking mechanisms and
+built-in integrity checks, <code>unrar</code> expects an archive to
+remain static during read operations. While certain command-line flags
+allow partial extraction of finished segments within an incomplete file,
+extracting a dynamically growing archive is unreliable and prone to
+failure.</p>
+<h3 id="rar-file-architecture-and-header-constraints">RAR File
+Architecture and Header Constraints</h3>
+<p>RAR files are organized into structured blocks consisting of archive
+headers, file headers, compressed data streams, and service blocks. Many
+RAR archives—especially modern RAR5 archives—rely on specific metadata
+blocks or end-of-archive markers to validate the structure.</p>
+<p>When another process is actively appending to a RAR file, the
+internal offsets and block sizes are continuously shifting or missing.
+If <code>unrar</code> parses the file while new bytes are being
+appended, it will typically encounter an "Unexpected end of archive"
+error as soon as it attempts to read past the current write point or
+when it fails to find the expected trailing metadata.</p>
+<h3 id="data-integrity-and-checksum-failures">Data Integrity and
+Checksum Failures</h3>
+<p>Every file packed inside a RAR archive includes a checksum (CRC32 for
+RAR4 or BLAKE2sp for RAR5) to verify data integrity upon
+decompression.</p>
+<p>If <code>unrar</code> attempts to decompress a file entry that has
+only been partially written to disk:</p>
+<ul>
+<li>The decompressor reaches an unexpected end-of-file (EOF) within the
+compressed stream.</li>
+<li>The calculated checksum of the decompressed data will not match the
+checksum stored in the file header.</li>
+<li>By default, <code>unrar</code> aborts the operation and deletes the
+incomplete, corrupted extracted file.</li>
+</ul>
+<h3 id="operating-system-file-locking">Operating System File
+Locking</h3>
+<p>The underlying operating system plays a significant role in whether
+<code>unrar</code> can even open the file:</p>
+<ul>
+<li><strong>Windows:</strong> Programs writing to files typically open
+them with exclusive write access or restricted sharing flags. If the
+writing process does not explicitly grant read-sharing permissions
+(<code>FILE_SHARE_READ</code>), <code>unrar</code> cannot open the file
+and will immediately fail with a sharing violation or access denied
+error.</li>
+<li><strong>Linux and macOS:</strong> Unix-like systems use advisory
+locking by default. While this allows <code>unrar</code> to open and
+read a file that another process is writing to, it does not prevent data
+races. The read pointer will quickly overtake the write pointer,
+triggering read errors.</li>
+</ul>
+<h3 id="partial-recovery-using-the--kb-flag">Partial Recovery Using the
+<code>-kb</code> Flag</h3>
+<p>If an archive is being appended sequentially and you must extract
+files that have already been completely written, you can run
+<code>unrar</code> with the <code>-kb</code> (Keep Broken) switch:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-kb</span> archive.rar</span></code></pre></div>
+<p>The <code>-kb</code> parameter instructs <code>unrar</code> not to
+delete extracted files when a CRC error or unexpected EOF occurs. Any
+files stored completely in the archive prior to the current write offset
+may extract successfully, but the overall extraction process will still
+terminate with an error code once it reaches the incomplete portion of
+the archive. This method will not work if the archive is created as a
+"solid" archive, because solid archives compress multiple files into a
+single, continuous data stream that requires sequential, error-free
+reading from start to finish.</p>
+<h3 id="recommended-approaches">Recommended Approaches</h3>
+<p>Instead of attempting concurrent extraction, implement one of the
+following workflows:</p>
+<ol type="1">
+<li><strong>Wait for Process Completion:</strong> Monitor the writing
+process by tracking its process ID (PID) or monitoring file handle
+release using tools like <code>lsof</code> or <code>fuser</code> on
+Linux, or Handle on Windows.</li>
+<li><strong>Atomic Renaming:</strong> Have the writing program write to
+a temporary file extension (e.g., <code>archive.rar.part</code> or
+<code>archive.rar.tmp</code>) and rename the file to <code>.rar</code>
+only after the write operation has closed cleanly.</li>
+<li><strong>Multi-Volume Archives:</strong> If the data must be
+processed in chunks while being generated, configure the archiving tool
+to create a multi-volume archive (<code>.part1.rar</code>,
+<code>.part2.rar</code>). You can extract finished volumes once their
+subsequent volume has begun writing, provided the archive is
+non-solid.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

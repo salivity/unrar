@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Extracting to a Mount Point - unrar</title>
+    <meta name="description" content="When extracting an archive to a mount point, the unrar utility relies on standard operating system file abstractions rather than managing partition boundaries directly. This article explains how unrar interacts with the Virtual File System (VFS), how it">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-extracting-to-a-mount-point">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Extracting to a Mount Point - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-extracting-to-a-mount-point" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting an archive to a mount point, the unrar utility relies on standard operating system file abstractions rather than managing partition boundaries directly. This article explains how unrar interacts with the Virtual File System (VFS), how it" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-extracting-to-a-mount-point">How Unrar Handles
+Extracting to a Mount Point</h1>
+<p>When extracting an archive to a mount point, the <code>unrar</code>
+utility relies on standard operating system file abstractions rather
+than managing partition boundaries directly. This article explains how
+<code>unrar</code> interacts with the Virtual File System (VFS), how it
+validates disk space on mounted storage, the limitations encountered
+with cross-device hard links, and the impact of specific mount options
+and non-POSIX filesystems during the extraction process.</p>
+<h3 id="virtual-file-system-abstraction">Virtual File System
+Abstraction</h3>
+<p><code>unrar</code> is a user-space application that interacts with
+directories through standard POSIX system calls such as
+<code>opendir()</code>, <code>mkdir()</code>, and <code>open()</code>.
+Because modern operating systems handle mounted filesystems through an
+abstraction layer like the Linux Virtual File System (VFS),
+<code>unrar</code> does not distinguish a mount point from any standard
+local directory.</p>
+<p>When you target a mount point (for example,
+<code>/mnt/storage</code>), the kernel resolves the path and routes all
+subsequent write and read calls directly to the driver responsible for
+that mounted device. As long as the path exists and the executing user
+has write permissions, <code>unrar</code> initiates extraction
+immediately.</p>
+<h3 id="free-space-checks">Free Space Checks</h3>
+<p>Before and during extraction, <code>unrar</code> calculates whether
+the destination has sufficient capacity to store the uncompressed data.
+It queries available disk space via the <code>statvfs()</code> system
+call using the destination path.</p>
+<p>Because <code>statvfs()</code> is called against the targeted
+directory, the kernel returns the geometry and block counts of the
+mounted volume rather than the parent or root filesystem. This ensures
+that <code>unrar</code> correctly calculates limits based on the
+dedicated partition, preventing false out-of-space warnings or
+unexpected disk saturation on the root drive.</p>
+<h3 id="hard-links-and-cross-device-limitations">Hard Links and
+Cross-Device Limitations</h3>
+<p>If an archive contains hard links, extracting to a mount point can
+introduce operational edge cases:</p>
+<ul>
+<li><strong>Internal Hard Links:</strong> If two files within the
+archive are hard-linked and both reside within the target mount point,
+<code>unrar</code> uses the <code>link()</code> system call, which
+succeeds because both files share the same filesystem.</li>
+<li><strong>External Links Across Boundaries:</strong> If an archive
+attempts to establish a hard link between a file on the root filesystem
+and a file inside the mount point, the kernel rejects the operation with
+an <code>EXDEV</code> (<em>Invalid cross-device link</em>) error. Hard
+links cannot span across different filesystems or block devices. In this
+scenario, <code>unrar</code> will typically output an error and either
+skip the link or create an independent duplicate copy of the file,
+depending on the extraction flags used.</li>
+</ul>
+<p>Symbolic links (symlinks) do not face this limitation, as they store
+text-based paths rather than direct inode references. However, symlink
+creation can still be restricted if the mount point was mounted with
+specific security flags.</p>
+<h3 id="mount-options-and-permission-compatibility">Mount Options and
+Permission Compatibility</h3>
+<p>The success of extracting file attributes—such as ownership,
+permissions, and timestamps—depends on the flags and filesystem type
+applied to the mount point:</p>
+<ul>
+<li><strong>Read-Only (<code>ro</code>):</strong> If the target device
+is mounted read-only, <code>unrar</code> fails immediately upon
+attempting to create the first file or directory with an
+<code>EACCES</code> or <code>EROFS</code> (<em>Read-only file
+system</em>) error.</li>
+<li><strong>Non-POSIX Filesystems (FAT32, exFAT, NTFS):</strong> When
+extracting to filesystems that do not natively support POSIX ownership
+(<code>uid</code>/<code>gid</code>) or permissions (<code>chmod</code>),
+<code>unrar</code> will quietly fail or warn when trying to apply
+original attributes. While the file contents are successfully written,
+ownership defaults to the mount-level options specified in
+<code>/etc/fstab</code> (such as <code>uid=1000,gid=1000</code>).</li>
+<li><strong>Filesystem Constraints:</strong> Extracting files with
+characters not supported by certain target filesystems (such as colons
+or question marks on NTFS/FAT) will cause <code>unrar</code> to report
+write errors unless renamed during extraction.</li>
+<li><strong>Execution Flags (<code>noexec</code>):</strong> If the mount
+point is mounted with <code>noexec</code>, <code>unrar</code> can still
+extract executable binaries, but the operating system will block their
+execution directly from that mount point.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Pause Unrar After Each Screen of Text - unrar</title>
+    <meta name="description" content="When viewing the contents of large RAR archives from the command line, the output often scrolls past too quickly to read. This guide explains how to pause the unrar file listing after each full screen of text by redirecting standard output to command-lin">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-pause-unrar-after-each-screen-of-text">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Pause Unrar After Each Screen of Text - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-pause-unrar-after-each-screen-of-text" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When viewing the contents of large RAR archives from the command line, the output often scrolls past too quickly to read. This guide explains how to pause the unrar file listing after each full screen of text by redirecting standard output to command-lin" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-pause-unrar-after-each-screen-of-text">How to Pause Unrar
+After Each Screen of Text</h1>
+<p>When viewing the contents of large RAR archives from the command
+line, the output often scrolls past too quickly to read. This guide
+explains how to pause the <code>unrar</code> file listing after each
+full screen of text by redirecting standard output to command-line
+pagers like <code>more</code> and <code>less</code>.</p>
+<h2 id="using-the-more-pager-universal">Using the <code>more</code>
+Pager (Universal)</h2>
+<p>The <code>unrar</code> utility does not contain a built-in pause
+switch, but you can pipe its output into the standard <code>more</code>
+utility. This method works out of the box on Linux, macOS, and the
+Windows Command Prompt.</p>
+<p>Run the following command to list files:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.rar <span class="kw">|</span> <span class="fu">more</span></span></code></pre></div>
+<p>If you prefer a detailed, verbose list, replace <code>l</code> with
+<code>v</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> v archive.rar <span class="kw">|</span> <span class="fu">more</span></span></code></pre></div>
+<h3 id="navigation-in-more">Navigation in <code>more</code></h3>
+<ul>
+<li><strong>Spacebar:</strong> Advance to the next full screen.</li>
+<li><strong>Enter:</strong> Advance by one line.</li>
+<li><strong>Q:</strong> Exit the viewer immediately and return to the
+prompt.</li>
+</ul>
+<hr />
+<h2 id="using-the-less-pager-linux-and-macos">Using the
+<code>less</code> Pager (Linux and macOS)</h2>
+<p>On Unix-like operating systems, piping into <code>less</code>
+provides greater flexibility, including the ability to scroll backward
+through previously displayed text.</p>
+<p>Run the listing command with <code>less</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> l archive.rar <span class="kw">|</span> <span class="fu">less</span></span></code></pre></div>
+<h3 id="navigation-in-less">Navigation in <code>less</code></h3>
+<ul>
+<li><strong>Spacebar / Page Down:</strong> Move forward one screen.</li>
+<li><strong>B / Page Up:</strong> Move backward one screen.</li>
+<li><strong>Up / Down Arrows:</strong> Scroll line by line.</li>
+<li><strong>/ [search term]:</strong> Search forward for a specific
+filename or text string.</li>
+<li><strong>Q:</strong> Exit and return to the terminal.</li>
+</ul>
+<hr />
+<h2 id="windows-powershell-alternative">Windows PowerShell
+Alternative</h2>
+<p>If you are using Windows PowerShell, you can use the built-in
+<code>Out-Host -Paging</code> cmdlet to achieve the same result:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>unrar l archive<span class="op">.</span><span class="fu">rar</span> <span class="op">|</span> <span class="fu">Out-Host</span> <span class="op">-</span>Paging</span></code></pre></div>
+<p>This displays one page at a time and prompts you to press the
+Spacebar for the next page or <code>Q</code> to quit.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

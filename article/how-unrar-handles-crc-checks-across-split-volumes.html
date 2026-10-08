@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How unrar Handles CRC Checks Across Split Volumes - unrar</title>
+    <meta name="description" content="When extracting multi-part archives, unrar ensures data integrity by combining local volume-level verification with a continuous checksum calculation across volume boundaries. Rather than treating each volume's payload in isolation, the extraction utilit">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-crc-checks-across-split-volumes">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How unrar Handles CRC Checks Across Split Volumes - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-crc-checks-across-split-volumes" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting multi-part archives, unrar ensures data integrity by combining local volume-level verification with a continuous checksum calculation across volume boundaries. Rather than treating each volume's payload in isolation, the extraction utilit" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-crc-checks-across-split-volumes">How unrar
+Handles CRC Checks Across Split Volumes</h1>
+<p>When extracting multi-part archives, <code>unrar</code> ensures data
+integrity by combining local volume-level verification with a continuous
+checksum calculation across volume boundaries. Rather than treating each
+volume's payload in isolation, the extraction utility validates the
+structural headers of each individual archive part while calculating a
+running checksum for the uncompressed file data as it streams across
+split boundaries. This multi-tiered approach allows <code>unrar</code>
+to detect corrupted headers immediately and catch payload corruption as
+soon as a reconstructed file finishes unpacking.</p>
+<h3 id="volume-and-block-level-checksums">Volume and Block-Level
+Checksums</h3>
+<p>Every volume in a multi-part RAR set contains its own headers and
+structural metadata. Each header includes a distinct CRC32 (Cyclic
+Redundancy Check) value that covers the header data itself.</p>
+<p>Before processing the compressed payload inside a volume,
+<code>unrar</code> reads the volume header, the file header, and any
+optional service headers. It validates each header against its embedded
+CRC. If disk corruption or an incomplete download alters the metadata of
+a specific part, <code>unrar</code> halts or warns the user immediately
+with a header CRC error before attempting to decompress payload
+data.</p>
+<h3 id="the-continuous-file-level-checksum">The Continuous File-Level
+Checksum</h3>
+<p>Files spanning across multiple volumes do not have separate file CRCs
+for each split chunk. Instead, the archive metadata stores a single
+checksum for the complete, unpacked file:</p>
+<ul>
+<li><strong>RAR4 Format:</strong> Stores a 32-bit CRC (CRC32) calculated
+over the entire original, uncompressed file.</li>
+<li><strong>RAR5 Format:</strong> Stores either a 32-bit CRC32 or a
+256-bit BLAKE2sp cryptographic hash representing the entire uncompressed
+file.</li>
+</ul>
+<p>Because the stored checksum represents the entire file,
+<code>unrar</code> initializes a running hash accumulator when
+decompression begins in the first volume containing that file.</p>
+<h3 id="cross-volume-processing">Cross-Volume Processing</h3>
+<p>As <code>unrar</code> reads compressed blocks, it decompresses the
+data in memory and writes the resulting output stream to disk.
+Simultaneously, it feeds the decompressed bytes into its active CRC32 or
+BLAKE2 context.</p>
+<p>When the decompressor reaches the end of a volume's data payload:</p>
+<ol type="1">
+<li><strong>State Preservation:</strong> The extraction process pauses
+data decompression but retains the decompression dictionary and the
+running CRC accumulator in memory.</li>
+<li><strong>Next Volume Verification:</strong> <code>unrar</code>
+prompts for or opens the subsequent file (e.g.,
+<code>.part2.rar</code>). It checks the volume header to confirm that
+the file is the correct sequential volume and matches the archive set
+ID.</li>
+<li><strong>Resumption:</strong> Decompression resumes seamlessly,
+feeding the new volume's unpacked bytes into the preserved CRC
+state.</li>
+</ol>
+<h3 id="final-verification-and-error-handling">Final Verification and
+Error Handling</h3>
+<p>Once <code>unrar</code> reaches the terminal block of the file—marked
+by a flag indicating that the file does not continue into another
+volume—it finalizes the hash accumulator.</p>
+<p>The computed hash is directly compared against the expected checksum
+recorded in the file header:</p>
+<ul>
+<li><strong>Match:</strong> The file is marked valid, and
+<code>unrar</code> proceeds to the next file or exits with a success
+code.</li>
+<li><strong>Mismatch:</strong> <code>unrar</code> generates a standard
+"CRC failed" error. By default, the corrupted extracted file is deleted
+unless the user specifies the <code>-kb</code> (keep broken extracted
+files) switch during execution.</li>
+</ul>
+<p>If the archive includes recovery volumes (<code>.rev</code>) or
+recovery records, <code>unrar</code> (or <code>rar</code>) uses
+Reed-Solomon error correction codes to repair missing or corrupted
+volumes before the standard extraction and CRC verification take
+place.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

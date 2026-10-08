@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Source Alternatives to Unrar - unrar</title>
+    <meta name="description" content="The standard unrar utility provided by RARLAB is distributed under a proprietary license that restricts developers from using its source code to reverse-engineer the compression algorithm, making it incompatible with standard open-source definitions (suc">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/open-source-alternatives-to-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Open Source Alternatives to Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/open-source-alternatives-to-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="The standard unrar utility provided by RARLAB is distributed under a proprietary license that restricts developers from using its source code to reverse-engineer the compression algorithm, making it incompatible with standard open-source definitions (suc" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="open-source-alternatives-to-unrar">Open Source Alternatives to
+Unrar</h1>
+<p>The standard <code>unrar</code> utility provided by RARLAB is
+distributed under a proprietary license that restricts developers from
+using its source code to reverse-engineer the compression algorithm,
+making it incompatible with standard open-source definitions (such as
+the DFSG or OSI). This article explores the primary fully open-source
+alternatives available for extracting RAR archives across Linux, macOS,
+and Windows environments, detailing their features, licensing, and
+format compatibility.</p>
+<h3 id="1-libarchive-bsdtar">1. libarchive (bsdtar)</h3>
+<p><code>libarchive</code> is a widely adopted, multi-format compression
+and streaming library distributed under the permissive BSD license. Its
+command-line tool, <code>bsdtar</code>, serves as a direct drop-in
+replacement for tar and zip utilities, but it also natively handles RAR
+archives.</p>
+<ul>
+<li><strong>Format Support:</strong> Supports legacy RAR formats as well
+as modern RAR5 archives.</li>
+<li><strong>License:</strong> Multi-clause BSD License.</li>
+<li><strong>Key Feature:</strong> Because it is built as a library, it
+is integrated into numerous operating system tools and scripting
+languages without imposing copyleft or proprietary restrictions.</li>
+<li><strong>Usage:</strong>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">bsdtar</span> <span class="at">-xf</span> archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="2-the-unarchiver-unar--lsar">2. The Unarchiver (unar /
+lsar)</h3>
+<p><code>The Unarchiver</code> is a mature open-source extraction suite
+originally built for macOS, though its command-line
+utilities—<code>unar</code> and <code>lsar</code>—run on Linux and
+Windows via GNUstep.</p>
+<ul>
+<li><strong>Format Support:</strong> Full support for RAR versions 1.5
+through 5.0, including multi-volume and encrypted archives.</li>
+<li><strong>License:</strong> GNU Lesser General Public License (LGPL
+v2.1+).</li>
+<li><strong>Key Feature:</strong> Excellent handling of archive
+encodings and character sets (especially non-Latin filenames), which
+often cause corruption in simpler extraction tools.</li>
+<li><strong>Usage:</strong>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unar</span> archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="3-unrar-free">3. unrar-free</h3>
+<p>Originally created as a free-software clean-room implementation of an
+extraction tool for Debian systems, <code>unrar-free</code> was designed
+explicitly to replace non-free <code>unrar</code> packages in repository
+distributions.</p>
+<ul>
+<li><strong>Format Support:</strong> Historically limited to RAR 2.0 and
+earlier specifications; modern versions have transitioned to using
+<code>libarchive</code> as the backend engine to support newer RAR
+formats.</li>
+<li><strong>License:</strong> GNU General Public License (GPL v2+).</li>
+<li><strong>Key Feature:</strong> A drop-in binary command structure
+matching the syntax conventions familiar to traditional
+<code>unrar</code> users.</li>
+<li><strong>Usage:</strong>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar-free</span> <span class="at">-x</span> archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="4-7-zip--p7zip">4. 7-Zip / p7zip</h3>
+<p>7-Zip is an open-source file archiver primarily distributed under the
+GNU LGPL. The standalone Linux/POSIX ports (<code>7za</code> or the
+modernized <code>7-zip</code> release) include decompression engines
+capable of unpacking RAR files.</p>
+<ul>
+<li><strong>Format Support:</strong> Supports extraction of both RAR4
+and RAR5 formats.</li>
+<li><strong>License:</strong> GNU LGPL (with unRAR license restrictions
+applying only if compiled against proprietary source components; native
+clean builds omit or re-license the unpack modules).</li>
+<li><strong>Key Feature:</strong> High extraction speed and support for
+virtually every other container format alongside RAR.</li>
+<li><strong>Usage:</strong>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">7z</span> x archive.rar</span></code></pre></div></li>
+</ul>
+<h3 id="comparison-summary">Comparison Summary</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Implementation</th>
+<th style="text-align: left;">Primary License</th>
+<th style="text-align: left;">RAR5 Support</th>
+<th style="text-align: left;">Best Suited For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>libarchive</strong></td>
+<td style="text-align: left;">BSD</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Permissive licensing, library embedding,
+script automation</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>unar</strong></td>
+<td style="text-align: left;">LGPL</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">Broad encoding support, modern RAR
+versions</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>unrar-free</strong></td>
+<td style="text-align: left;">GPL</td>
+<td style="text-align: left;">Yes (via modern backend)</td>
+<td style="text-align: left;">Debian-strict environments, standard CLI
+compatibility</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>7-Zip</strong></td>
+<td style="text-align: left;">LGPL</td>
+<td style="text-align: left;">Yes</td>
+<td style="text-align: left;">High-performance extraction of mixed
+archive formats</td>
+</tr>
+</tbody>
+</table></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

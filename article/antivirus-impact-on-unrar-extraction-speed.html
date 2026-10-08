@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antivirus Impact on Unrar Extraction Speed - unrar</title>
+    <meta name="description" content="Real-time antivirus scanning significantly reduces unrar extraction speeds by continuously intercepting and analyzing files as they are written to disk. This article explains the technical mechanics behind this performance drop, analyzes how archive stru">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/antivirus-impact-on-unrar-extraction-speed">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Antivirus Impact on Unrar Extraction Speed - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/antivirus-impact-on-unrar-extraction-speed" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Real-time antivirus scanning significantly reduces unrar extraction speeds by continuously intercepting and analyzing files as they are written to disk. This article explains the technical mechanics behind this performance drop, analyzes how archive stru" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="antivirus-impact-on-unrar-extraction-speed">Antivirus Impact on
+Unrar Extraction Speed</h1>
+<p>Real-time antivirus scanning significantly reduces unrar extraction
+speeds by continuously intercepting and analyzing files as they are
+written to disk. This article explains the technical mechanics behind
+this performance drop, analyzes how archive structure influences the
+severity of the delay, and outlines safe mitigation strategies to
+restore optimal extraction performance.</p>
+<h2 id="the-mechanism-behind-the-slowdown">The Mechanism Behind the
+Slowdown</h2>
+<p>When you extract a RAR archive, the decompression utility reads the
+compressed stream, unpacks the data in memory, and writes the resulting
+files to storage. Under normal conditions, this process is bounded
+primarily by CPU decompression limits and disk write bandwidth.</p>
+<p>Real-time antivirus solutions introduce an intermediary layer using
+file system minifilter drivers. The operating system informs the
+antivirus software whenever an unrar process creates, writes, or closes
+a file. The security engine temporarily holds the file handle or pauses
+the write operation to perform:</p>
+<ul>
+<li><strong>Signature matching:</strong> Comparing file hashes and byte
+sequences against known malware definitions.</li>
+<li><strong>Heuristic analysis:</strong> Evaluating code routines or
+file headers for suspicious patterns.</li>
+<li><strong>Emulation or sandboxing:</strong> Running potentially
+executable payloads in a lightweight virtual environment to detect
+malicious behavior.</li>
+</ul>
+<p>Because the extraction process must wait for the antivirus engine to
+clear each file before finalizing the operation, a high-latency
+input/output (I/O) bottleneck occurs.</p>
+<h2 id="the-degree-of-performance-impact">The Degree of Performance
+Impact</h2>
+<p>The measurable speed penalty introduced by real-time protection
+typically ranges from a 20% slowdown to well over a 300% increase in
+extraction time (taking up to four times longer). The severity depends
+on specific variables:</p>
+<h3 id="file-count-and-archive-composition">File Count and Archive
+Composition</h3>
+<p>Archive contents dictate the extent of the bottleneck. Extracting a
+single 10 GB file generates relatively low overhead because the
+antivirus engine performs only one initial check and inspects the
+continuous data stream. Conversely, extracting an archive containing
+50,000 small text, code, or asset files multiplies the overhead by
+50,000. Each individual file requires metadata parsing, signature
+verification, and handle open/close routines, causing massive disk queue
+backlogs.</p>
+<h3 id="storage-media-performance">Storage Media Performance</h3>
+<p>Fast NVMe solid-state drives exacerbate the relative difference.
+While modern NVMe drives can write thousands of megabytes per second,
+antivirus drivers operate synchronously within the OS kernel. As a
+result, the hardware capability is severely underutilized because the
+software cannot inspect the files as fast as the drive can write
+them.</p>
+<h3 id="concurrent-cpu-saturation">Concurrent CPU Saturation</h3>
+<p>Decompressing modern RAR formats (such as RAR5 with large dictionary
+sizes) can heavily utilize multiple CPU cores. Antivirus scanning
+engines simultaneously demand substantial CPU cycles to evaluate
+unpacked files. On systems with limited core counts, the decompression
+utility and the antivirus engine actively compete for processor time,
+introducing thread contention and thermal throttling.</p>
+<h2 id="how-to-mitigate-the-extraction-bottleneck">How to Mitigate the
+Extraction Bottleneck</h2>
+<p>If regular extractions suffer from severe performance degradation,
+several practical configurations can restore standard unpacking
+speeds:</p>
+<ol type="1">
+<li><strong>Process Exclusions:</strong> Add your extraction tool (such
+as <code>unrar.exe</code>, <code>WinRAR.exe</code>, or
+<code>7z.exe</code>) to your antivirus process exclusion list. This
+tells the scanner to trust the specific process executing the write
+operations, eliminating file-creation intercepts during unpacking.</li>
+<li><strong>Dedicated Extraction Directories:</strong> Configure a
+specific directory as a designated "unpacking zone" and exclude that
+folder from on-access scanning. Archives can be extracted rapidly to
+this staging area.</li>
+<li><strong>Post-Extraction Scans:</strong> If continuous background
+protection is bypassed for performance, execute a targeted, on-demand
+scan of the extracted files once the unpacking process completes. This
+provides full security verification without interrupting synchronous I/O
+operations.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

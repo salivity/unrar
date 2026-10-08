@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Manages File Fragmentation on Disk - unrar</title>
+    <meta name="description" content="This article explains how the unrar utility mitigates and manages file fragmentation during the extraction process. It covers how the tool utilizes metadata from archive headers, interacts with underlying filesystem allocation APIs to reserve contiguous">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-manages-file-fragmentation-on-disk">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Manages File Fragmentation on Disk - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-manages-file-fragmentation-on-disk" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how the unrar utility mitigates and manages file fragmentation during the extraction process. It covers how the tool utilizes metadata from archive headers, interacts with underlying filesystem allocation APIs to reserve contiguous" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-manages-file-fragmentation-on-disk">How Unrar Manages
+File Fragmentation on Disk</h1>
+<p>This article explains how the <code>unrar</code> utility mitigates
+and manages file fragmentation during the extraction process. It covers
+how the tool utilizes metadata from archive headers, interacts with
+underlying filesystem allocation APIs to reserve contiguous blocks, and
+handles edge cases such as solid archives, interrupted extractions, and
+varied storage environments.</p>
+<h3 id="disk-space-pre-allocation">Disk Space Pre-Allocation</h3>
+<p>The primary method <code>unrar</code> uses to prevent file
+fragmentation is disk space pre-allocation. When a RAR archive is
+created, the uncompressed size of each file is recorded in the archive
+header. During extraction, <code>unrar</code> reads this header before
+decompressing the actual data payload.</p>
+<p>By knowing the exact target size in advance, <code>unrar</code>
+requests the operating system to allocate the required storage space
+upfront rather than expanding the file dynamically in small chunks.</p>
+<ul>
+<li><strong>On Windows (NTFS):</strong> UnRAR/WinRAR can set the end of
+the file pointer or invoke system calls like
+<code>SetFileValidData</code> and <code>SetEndOfFile</code>. This
+signals the NTFS allocator to find a single, contiguous run of clusters
+large enough to hold the complete file.</li>
+<li><strong>On Linux and POSIX Systems:</strong> The utility or
+underlying libraries utilize calls such as
+<code>posix_fallocate()</code> or <code>fallocate()</code>. This
+reserves disk blocks directly within filesystems like ext4, XFS, or
+Btrfs without writing zeroes, guaranteeing space while minimizing
+fragmentation.</li>
+</ul>
+<h3 id="delegation-to-the-operating-system-allocator">Delegation to the
+Operating System Allocator</h3>
+<p><code>unrar</code> itself does not directly manage low-level disk
+clusters or block mapping; it offloads fragmentation control to the host
+operating system's filesystem driver. When <code>unrar</code> requests
+space via pre-allocation:</p>
+<ol type="1">
+<li><strong>Extent-Based Allocation:</strong> Modern filesystems (ext4,
+NTFS, APFS) use extent trees to map large contiguous blocks. Because
+<code>unrar</code> specifies the entire size immediately, the filesystem
+allocator attempts to fulfill the request with the fewest possible
+extents.</li>
+<li><strong>Preventing Interleaved Writes:</strong> Without
+pre-allocation, multiple parallel extraction threads or background disk
+operations would write interleaved blocks, scattering file fragments
+across the drive. Pre-allocating claims the entire block range
+exclusively for that file.</li>
+</ol>
+<h3 id="fallback-behavior-and-dynamic-expansion">Fallback Behavior and
+Dynamic Expansion</h3>
+<p>In scenarios where pre-allocation fails or is unsupported—such as on
+older filesystems (FAT32), non-standard virtual drives, or when
+operating permissions are restricted—<code>unrar</code> falls back to
+sequential buffer writes.</p>
+<p>During fallback operation, <code>unrar</code> writes decompressed
+streams in set buffer increments (typically ranging from 64 KB to
+several megabytes). On heavily populated or already fragmented drives,
+this dynamic growth can lead to fragmentation, as the filesystem
+allocates free clusters on an ad-hoc basis wherever free space is
+available.</p>
+<h3 id="solid-archives-and-multi-volume-archives">Solid Archives and
+Multi-Volume Archives</h3>
+<p>Solid archives bundle multiple files into a single continuous data
+stream to achieve higher compression ratios. When extracting from a
+solid archive:</p>
+<ul>
+<li><code>unrar</code> must decompress files sequentially.</li>
+<li>Pre-allocation is performed on a per-file basis right before each
+file's stream begins unpacking.</li>
+<li>If a multi-volume archive is stored across multiple disks, each
+individual volume extracts to the target destination using the
+destination drive's allocation strategy.</li>
+</ul>
+<h3 id="impact-on-solid-state-drives-vs-mechanical-disks">Impact on
+Solid-State Drives vs. Mechanical Disks</h3>
+<p>While pre-allocation in <code>unrar</code> was originally designed to
+prevent head movement and seek-time latency on traditional Hard Disk
+Drives (HDDs), it also benefits Solid-State Drives (SSDs). Even though
+SSDs have negligible seek times, reducing fragmentation lowers
+filesystem metadata overhead, decreases wear from metadata updates, and
+optimizes read performance when large sequential files are later
+accessed by applications.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

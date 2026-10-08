@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Run unrar on Specific CPU Cores with taskset - unrar</title>
+    <meta name="description" content="This article explains how to restrict the unrar utility to specific CPU cores using the Linux taskset command. It covers the core syntax for setting CPU affinity at execution time, examples for targeting individual or multiple cores, methods for modifyin">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/run-unrar-on-specific-cpu-cores-with-taskset">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Run unrar on Specific CPU Cores with taskset - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/run-unrar-on-specific-cpu-cores-with-taskset" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how to restrict the unrar utility to specific CPU cores using the Linux taskset command. It covers the core syntax for setting CPU affinity at execution time, examples for targeting individual or multiple cores, methods for modifyin" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="run-unrar-on-specific-cpu-cores-with-taskset">Run unrar on
+Specific CPU Cores with taskset</h1>
+<p>This article explains how to restrict the <code>unrar</code> utility
+to specific CPU cores using the Linux <code>taskset</code> command. It
+covers the core syntax for setting CPU affinity at execution time,
+examples for targeting individual or multiple cores, methods for
+modifying already running processes, and the practical benefits of
+controlling CPU usage during resource-heavy decompression tasks.</p>
+<h2 id="yes-you-can-use-taskset-with-unrar">Yes, You Can Use taskset
+with unrar</h2>
+<p>The <code>taskset</code> utility sets or retrieves the CPU affinity
+of a process in Linux. Because <code>unrar</code> runs as a standard
+userspace process, you can launch it through <code>taskset</code> to
+restrict its execution to one or more designated processor cores. This
+is useful for preventing large or multi-part archive extractions from
+consuming all available computing resources on a server or
+workstation.</p>
+<h2 id="basic-syntax">Basic Syntax</h2>
+<p>To launch <code>unrar</code> bound to specific CPU cores, use the
+<code>-c</code> (or <code>--cpu-list</code>) flag with
+<code>taskset</code>, followed by a comma-separated list or range of
+core identifiers, and then your standard <code>unrar</code> command:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-c</span> <span class="op">&lt;</span>core-list<span class="op">&gt;</span> unrar <span class="op">&lt;</span>command<span class="op">&gt;</span> <span class="op">&lt;</span>archive.rar<span class="op">&gt;</span> <span class="pp">[</span><span class="ss">destination</span><span class="pp">]</span></span></code></pre></div>
+<p>CPU cores are numbered starting from <code>0</code>. For example, on
+a 4-core machine, the cores are <code>0</code>, <code>1</code>,
+<code>2</code>, and <code>3</code>.</p>
+<h2 id="practical-examples">Practical Examples</h2>
+<h3 id="restrict-unrar-to-a-single-core">Restrict unrar to a Single
+Core</h3>
+<p>To run an extraction restricted entirely to CPU Core 0:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-c</span> 0 unrar x archive.rar</span></code></pre></div>
+<p>This isolates the workload so the remaining cores remain entirely
+free for other system tasks.</p>
+<h3 id="restrict-unrar-to-a-specific-list-of-cores">Restrict unrar to a
+Specific List of Cores</h3>
+<p>To bind <code>unrar</code> to use only Core 1 and Core 3:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-c</span> 1,3 unrar x archive.rar /path/to/destination/</span></code></pre></div>
+<h3 id="restrict-unrar-to-a-range-of-cores">Restrict unrar to a Range of
+Cores</h3>
+<p>To bind <code>unrar</code> across a range of cores, such as Cores 2
+through 5:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-c</span> 2-5 unrar e archive.rar</span></code></pre></div>
+<h2 id="assigning-cores-to-an-already-running-unrar-process">Assigning
+Cores to an Already Running unrar Process</h2>
+<p>If an <code>unrar</code> process is already executing, you can change
+its CPU affinity dynamically using the process ID (PID) and the
+<code>-p</code> flag:</p>
+<ol type="1">
+<li>Locate the PID of the process:
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pgrep</span> unrar</span></code></pre></div></li>
+<li>Apply the desired CPU cores to that PID:
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">taskset</span> <span class="at">-cp</span> 0,1 <span class="op">&lt;</span>PID<span class="op">&gt;</span></span></code></pre></div></li>
+</ol>
+<h2 id="key-considerations">Key Considerations</h2>
+<ul>
+<li><strong>Threading Behavior:</strong> While older versions of
+<code>unrar</code> are largely single-threaded, newer versions and
+custom builds may spawn multiple threads. <code>taskset</code> will
+restrict all child threads created by <code>unrar</code> to the
+specified core mask.</li>
+<li><strong>Permissions:</strong> Standard user privileges are
+sufficient to assign core affinity to your own <code>unrar</code>
+commands. Modifying the affinity of processes owned by other users
+requires <code>sudo</code> or root privileges.</li>
+<li><strong>I/O Bottlenecks:</strong> Restricting CPU cores reduces CPU
+contention, but archive decompression is frequently disk I/O intensive.
+If system performance remains slow, consider pairing
+<code>taskset</code> with <code>ionice</code> to limit disk priority
+alongside CPU affinity.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

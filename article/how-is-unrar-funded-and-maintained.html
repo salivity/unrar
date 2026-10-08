@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Is Unrar Funded and Maintained? - unrar</title>
+    <meta name="description" content="This article explores the financial and operational model behind UnRAR, the official utility used to unpack RAR archives. While UnRAR is distributed freely and includes source code, its development and maintenance are entirely subsidized by the commercia">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-is-unrar-funded-and-maintained">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Is Unrar Funded and Maintained? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-is-unrar-funded-and-maintained" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explores the financial and operational model behind UnRAR, the official utility used to unpack RAR archives. While UnRAR is distributed freely and includes source code, its development and maintenance are entirely subsidized by the commercia" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-is-unrar-funded-and-maintained">How Is Unrar Funded and
+Maintained?</h1>
+<p>This article explores the financial and operational model behind
+UnRAR, the official utility used to unpack RAR archives. While UnRAR is
+distributed freely and includes source code, its development and
+maintenance are entirely subsidized by the commercial licensing of
+WinRAR and proprietary RAR compression technology through RARLAB and
+win.rar GmbH. By keeping extraction free, the developers support a
+broader business model that monetizes archive creation.</p>
+<h3 id="the-winrar-commercial-ecosystem">The WinRAR Commercial
+Ecosystem</h3>
+<p>UnRAR is developed by Alexander Roshal, the original creator of the
+RAR format and the WinRAR software suite. The development of UnRAR is
+directly funded by revenue generated from commercial software sales:</p>
+<ul>
+<li><strong>WinRAR Licenses:</strong> WinRAR is distributed as
+"trialware" for Windows. Despite its famously permissive trial period,
+individual users, corporate entities, educational institutions, and
+government bodies regularly purchase commercial licenses to remain
+legally compliant.</li>
+<li><strong>Commercial Distribution via win.rar GmbH:</strong> While
+Roshal handles software development via RARLAB, the marketing, sales,
+and distribution operations are managed by win.rar GmbH. Revenue from
+these commercial operations directly funds Roshal's ongoing engineering
+efforts, server infrastructure, and updates across the RAR software
+ecosystem, including UnRAR.</li>
+</ul>
+<h3 id="the-free-decompression-strategy">The "Free Decompression"
+Strategy</h3>
+<p>UnRAR does not rely on public donations, venture capital, or
+community-led fundraising. Instead, it operates on a deliberate
+ecosystem strategy:</p>
+<ul>
+<li><strong>Format Viability:</strong> A proprietary archive format
+cannot survive if recipients cannot open the files sent to them.
+Providing a free extraction utility ensures that RAR archives remain
+universally accessible across multiple operating systems, including
+Windows, Linux, macOS, and BSD.</li>
+<li><strong>Separation of Compression and Decompression:</strong> The
+ability to <em>extract</em> (UnRAR) is free, but the code to
+<em>create</em> RAR archives is strictly proprietary. Anyone who needs
+official RAR creation tools on non-Windows platforms must use the
+commercial command-line RAR utility or purchase WinRAR, protecting
+RARLAB’s commercial market.</li>
+</ul>
+<h3 id="licensing-and-community-maintenance">Licensing and Community
+Maintenance</h3>
+<p>Although UnRAR is distributed with its source code, it is not
+licensed under traditional open-source licenses like the MIT, BSD, or
+GNU GPL licenses.</p>
+<ul>
+<li><strong>The UnRAR Source License:</strong> Roshal distributes the
+UnRAR source code under a custom freeware license. Anyone may freely
+compile, distribute, and integrate the decompression code into other
+programs, provided the code is not used to reverse-engineer the
+proprietary RAR compression algorithm.</li>
+<li><strong>Linux Distribution Packaging:</strong> Downstream Linux and
+Unix distribution maintainers handle the packaging, security patching,
+and platform integration of UnRAR for systems like Debian, Fedora, and
+Arch Linux. These community maintainers contribute their time
+voluntarily, but the upstream core updates and bug fixes originate
+entirely from Roshal's funded work at RARLAB.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

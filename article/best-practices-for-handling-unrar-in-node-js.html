@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Practices for Handling Unrar in Node.js - unrar</title>
+    <meta name="description" content="Extracting RAR archives in Node.js typically involves interacting with external CLI utilities or WebAssembly-based wrappers, both of which require robust output management. This guide covers the essential practices for handling unrar output effectively,">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/best-practices-for-handling-unrar-in-node-js">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Best Practices for Handling Unrar in Node.js - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/best-practices-for-handling-unrar-in-node-js" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Extracting RAR archives in Node.js typically involves interacting with external CLI utilities or WebAssembly-based wrappers, both of which require robust output management. This guide covers the essential practices for handling unrar output effectively," />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="best-practices-for-handling-unrar-in-nodejs">Best Practices for
+Handling Unrar in Node.js</h1>
+<p>Extracting RAR archives in Node.js typically involves interacting
+with external CLI utilities or WebAssembly-based wrappers, both of which
+require robust output management. This guide covers the essential
+practices for handling <code>unrar</code> output effectively, focusing
+on stream management, accurate error detection, progress tracking, and
+security measures to ensure stable archive extraction in production
+environments.</p>
+<h3 id="prefer-spawn-over-exec-for-cli-execution">Prefer
+<code>spawn</code> Over <code>exec</code> for CLI Execution</h3>
+<p>When running the system <code>unrar</code> binary via the
+<code>child_process</code> module, always use <code>spawn</code> rather
+than <code>exec</code>. The <code>exec</code> method buffers all
+standard output (<code>stdout</code>) and standard error
+(<code>stderr</code>) into memory up to a default limit (typically 1
+MB). If an archive contains thousands of files, <code>unrar</code> will
+exceed this buffer, causing the process to crash with an
+<code>ERR_CHILD_PROCESS_STDIO_MAXBUFFER</code> error.</p>
+<p>Using <code>spawn</code> streams the output chunk-by-chunk:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> { spawn } <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;child_process&#39;</span>)<span class="op">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> unrar <span class="op">=</span> <span class="fu">spawn</span>(<span class="st">&#39;unrar&#39;</span><span class="op">,</span> [<span class="st">&#39;x&#39;</span><span class="op">,</span> <span class="st">&#39;-y&#39;</span><span class="op">,</span> <span class="st">&#39;archive.rar&#39;</span><span class="op">,</span> <span class="st">&#39;destination/&#39;</span>])<span class="op">;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>unrar<span class="op">.</span><span class="at">stdout</span><span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;data&#39;</span><span class="op">,</span> (chunk) <span class="kw">=&gt;</span> {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Handle streaming output incrementally</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h3 id="parse-streams-line-by-line">Parse Streams Line-by-Line</h3>
+<p><code>stdout</code> chunks emitted by a Node.js stream do not always
+correspond to single lines of text; a chunk might cut off mid-word or
+contain multiple lines. To reliably parse output for file names,
+percentage updates, or status messages, pipe the stream through the
+built-in <code>readline</code> module:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> readline <span class="op">=</span> <span class="pp">require</span>(<span class="st">&#39;readline&#39;</span>)<span class="op">;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">const</span> rl <span class="op">=</span> readline<span class="op">.</span><span class="fu">createInterface</span>({</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="dt">input</span><span class="op">:</span> unrar<span class="op">.</span><span class="at">stdout</span><span class="op">,</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">terminal</span><span class="op">:</span> <span class="kw">false</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>rl<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;line&#39;</span><span class="op">,</span> (line) <span class="kw">=&gt;</span> {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (line<span class="op">.</span><span class="fu">startsWith</span>(<span class="st">&#39;Extracting &#39;</span>)) {</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">const</span> filename <span class="op">=</span> line<span class="op">.</span><span class="fu">replace</span>(<span class="st">&#39;Extracting &#39;</span><span class="op">,</span> <span class="st">&#39;&#39;</span>)<span class="op">.</span><span class="fu">trim</span>()<span class="op">;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">// Track extracted file</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h3 id="rely-on-exit-codes-instead-of-stderr-for-errors">Rely on Exit
+Codes Instead of <code>stderr</code> for Errors</h3>
+<p>CLI tools often write diagnostic information, notices, or warnings to
+<code>stderr</code> even when an operation succeeds. Do not assume an
+extraction failed simply because <code>stderr</code> received data.
+Instead, monitor the process <code>close</code> or <code>exit</code>
+event to evaluate the numeric exit code.</p>
+<p>Common <code>unrar</code> exit codes include:</p>
+<ul>
+<li><strong>0</strong>: Successful operation.</li>
+<li><strong>1</strong>: Non-fatal error (such as minor warnings).</li>
+<li><strong>2</strong>: Fatal error (corrupt archive, read error).</li>
+<li><strong>3</strong>: CRC error (checksum verification failed).</li>
+<li><strong>4</strong>: Attempted to modify a locked archive.</li>
+<li><strong>5</strong>: Write error (disk full or permission
+denied).</li>
+<li><strong>6</strong>: File open error.</li>
+<li><strong>7</strong>: Wrong command-line syntax.</li>
+<li><strong>8</strong>: Memory error.</li>
+</ul>
+<p>Capture <code>stderr</code> in a variable during runtime, but only
+log or throw it if the process exits with a non-zero status code:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode javascript"><code class="sourceCode javascript"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">let</span> errorOutput <span class="op">=</span> <span class="st">&#39;&#39;</span><span class="op">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>unrar<span class="op">.</span><span class="at">stderr</span><span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;data&#39;</span><span class="op">,</span> (data) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  errorOutput <span class="op">+=</span> data<span class="op">.</span><span class="fu">toString</span>()<span class="op">;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>unrar<span class="op">.</span><span class="fu">on</span>(<span class="st">&#39;close&#39;</span><span class="op">,</span> (code) <span class="kw">=&gt;</span> {</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (code <span class="op">!==</span> <span class="dv">0</span>) {</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">throw</span> <span class="kw">new</span> <span class="bu">Error</span>(<span class="vs">`Unrar failed with code </span><span class="sc">${</span>code<span class="sc">}</span><span class="vs">: </span><span class="sc">${</span>errorOutput<span class="sc">}</span><span class="vs">`</span>)<span class="op">;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code></pre></div>
+<h3 id="defend-against-path-traversal-zip-slip">Defend Against Path
+Traversal (Zip Slip)</h3>
+<p>Maliciously crafted RAR files may contain filenames with relative
+directory paths (such as <code>../../etc/passwd</code>) designed to
+write files outside the intended destination directory. If you are
+handling output or manually extracting entries using libraries like
+<code>node-unrar-js</code>:</p>
+<ol type="1">
+<li>Resolve the absolute path of the target extraction folder.</li>
+<li>Resolve the absolute path of each incoming file path.</li>
+<li>Verify that the file's target path begins strictly with the
+extraction directory's base path before allowing the write
+operation.</li>
+</ol>
+<h3 id="consider-in-memory-webassembly-alternatives">Consider In-Memory
+WebAssembly Alternatives</h3>
+<p>If installing the native <code>unrar</code> CLI binary on your
+deployment environment is impractical or restricted, use
+WebAssembly-compiled alternatives such as <code>node-unrar-js</code>.
+When using WebAssembly libraries, output is handled via JavaScript
+promises and typed arrays rather than standard OS streams:</p>
+<ul>
+<li>Extract metadata first using non-extracting methods to inspect
+archive contents before unpacking.</li>
+<li>Process file entries sequentially to avoid consuming excessive heap
+memory when dealing with large archives.</li>
+<li>Explicitly release memory buffers once an entry has been written to
+disk to allow the Node.js garbage collector to reclaim heap space.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

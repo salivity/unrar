@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Concatenated RAR Archives - unrar</title>
+    <meta name="description" content="When multiple RAR files are concatenated into a single file—such as using binary concatenation commands like cat on Unix or copy /b on Windows—the standard unrar utility processes the resulting file sequentially. This article explains how the unrar e">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-concatenated-rar-archives">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Concatenated RAR Archives - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-concatenated-rar-archives" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When multiple RAR files are concatenated into a single file—such as using binary concatenation commands like cat on Unix or copy /b on Windows—the standard unrar utility processes the resulting file sequentially. This article explains how the unrar e" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-concatenated-rar-archives">How Unrar Handles
+Concatenated RAR Archives</h1>
+<p>When multiple RAR files are concatenated into a single file—such as
+using binary concatenation commands like <code>cat</code> on Unix or
+<code>copy /b</code> on Windows—the standard <code>unrar</code> utility
+processes the resulting file sequentially. This article explains how the
+<code>unrar</code> extraction engine parses archive headers, interprets
+termination blocks, and handles trailing data when dealing with
+concatenated independent archives and merged multi-volume sets.</p>
+<h3 id="archive-block-structure-and-parsing">Archive Block Structure and
+Parsing</h3>
+<p>The RAR format is structured as a continuous series of
+variable-length blocks. Every archive begins with a specific signature
+(the Marker Block), followed by an Archive Header, individual File and
+Service Headers interspersed with compressed data, and concludes with an
+End of Archive (EOA) block.</p>
+<p>When <code>unrar</code> opens a file, it verifies the initial
+signature and begins parsing these blocks sequentially. The parsing
+engine reads each block header to determine the block type, flags, and
+size, allowing it to decompress data streams or skip unneeded blocks
+until it reaches the end of the structure.</p>
+<h3 id="processing-concatenated-independent-archives">Processing
+Concatenated Independent Archives</h3>
+<p>If two separate, complete RAR archives are concatenated together,
+<code>unrar</code> handles the file as follows:</p>
+<ol type="1">
+<li><strong>Initial Extraction:</strong> The utility reads the initial
+marker block and parses all files contained in the first archive
+normally.</li>
+<li><strong>Encountering the Terminator:</strong> When
+<code>unrar</code> encounters the first archive's End of Archive block,
+the parser registers the logical completion of the archive.</li>
+<li><strong>Halting Execution:</strong> By default, standard
+<code>unrar</code> ceases extraction immediately after processing the
+EOA block.</li>
+</ol>
+<p>Because <code>unrar</code> assumes the file is finished once the
+first EOA block is read, the second archive appended to the file is
+treated as trailing data and is completely ignored. As a result, only
+the contents of the first archive are extracted, and no error is
+returned unless strict integrity checks detect unexpected data appended
+to the file.</p>
+<h3 id="behavior-with-concatenated-multi-volume-archives">Behavior with
+Concatenated Multi-Volume Archives</h3>
+<p>A different outcome occurs if multi-volume RAR archives (such as
+<code>.part1.rar</code> and <code>.part2.rar</code>) are manually joined
+via binary concatenation:</p>
+<ul>
+<li><strong>Header Collisions:</strong> Multi-volume RAR files contain
+specific volume flags in their main headers and split-file indicators in
+their file headers. Concatenating these files into a single continuous
+stream places intermediate headers directly in the middle of what should
+be contiguous compressed data.</li>
+<li><strong>Stream Corruption:</strong> Unlike some simple container
+formats, the compressed data in a multi-volume RAR is broken across file
+boundaries with metadata injected at the beginning of each new
+volume.</li>
+<li><strong>Parser Failure:</strong> When <code>unrar</code> hits an
+unexpected volume header or marker block mid-stream, decompression
+fails. The tool will typically report a checksum (CRC) mismatch, an
+"unexpected end of archive" error, or corrupted file alerts, preventing
+the successful extraction of any split files.</li>
+</ul>
+<h3 id="signature-seeking-and-trailing-data">Signature Seeking and
+Trailing Data</h3>
+<p>While <code>unrar</code> possesses signature-scanning
+capabilities—primarily used to locate the RAR marker block inside
+self-extracting (SFX) executables where binary data precedes the
+archive—it does not automatically re-scan for new marker blocks after
+encountering an EOA block. The extraction engine is designed around the
+assumption that one physical file contains one logical archive unless
+explicitly informed that a file represents a multi-volume sequence via
+standard volume naming conventions.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

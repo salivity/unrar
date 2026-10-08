@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Files Matching Archive Name - unrar</title>
+    <meta name="description" content="When using the unrar utility to extract an archive that contains a file sharing the exact same name and extension as the archive itself, a direct file collision occurs in the target directory. This article covers how unrar detects this naming conflict, t">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-files-matching-archive-name">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Files Matching Archive Name - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-files-matching-archive-name" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When using the unrar utility to extract an archive that contains a file sharing the exact same name and extension as the archive itself, a direct file collision occurs in the target directory. This article covers how unrar detects this naming conflict, t" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-files-matching-archive-name">How Unrar Handles
+Files Matching Archive Name</h1>
+<p>When using the <code>unrar</code> utility to extract an archive that
+contains a file sharing the exact same name and extension as the archive
+itself, a direct file collision occurs in the target directory. This
+article covers how <code>unrar</code> detects this naming conflict, the
+default interactive prompts it displays, the technical failures that
+occur if an overwrite is forced, and the command-line flags required to
+extract the file safely.</p>
+<h3 id="the-default-interactive-prompt">The Default Interactive
+Prompt</h3>
+<p>By default, <code>unrar</code> detects that the destination file
+already exists—because the archive file itself is occupying that path in
+the current working directory. Before writing any data to disk,
+<code>unrar</code> halts the operation and displays an overwrite
+confirmation prompt:</p>
+<pre class="text"><code>file.rar already exists. Overwrite it ?
+[Y]es, [N]o, [A]ll, n[E]ver, [R]ename, [Q]uit</code></pre>
+<p>At this stage, you can choose how to proceed:</p>
+<ul>
+<li><strong>[N]o / n[E]ver:</strong> Skips extracting the conflicting
+file, leaving the source archive untouched.</li>
+<li><strong>[R]ename:</strong> Allows you to manually type a new
+filename for the extracted file.</li>
+<li><strong>[Q]uit:</strong> Aborts the entire extraction process.</li>
+</ul>
+<h3 id="what-happens-if-you-force-an-overwrite">What Happens If You
+Force an Overwrite</h3>
+<p>Selecting <strong>[Y]es</strong> or executing the command with the
+force-overwrite flag (<code>-o+</code>) attempts to write the extracted
+content directly over the source archive file. The outcome depends on
+your operating system:</p>
+<ul>
+<li><strong>Windows:</strong> The operating system enforces mandatory
+file locking. Because <code>unrar</code> currently holds an open read
+handle on the archive file, Windows denies write access. The utility
+fails with a write error (such as
+<code>Cannot create file.rar: The process cannot access the file because it is being used by another process</code>).</li>
+<li><strong>Linux and macOS:</strong> POSIX systems permit overwriting
+or truncating open files. If <code>unrar</code> truncates the file to
+begin writing extracted data, it destroys the unread portion of the
+archive it is actively parsing. This results in immediate extraction
+failure, generating errors such as
+<code>Unexpected end of archive</code> or
+<code>Checksum error</code>.</li>
+</ul>
+<h3 id="safe-extraction-methods">Safe Extraction Methods</h3>
+<p>To prevent write failures or potential data loss, handle the
+collision using one of the following methods:</p>
+<h4 id="1-automatic-renaming">1. Automatic Renaming</h4>
+<p>Use the <code>-or</code> switch to instruct <code>unrar</code> to
+automatically rename the extracted file if a duplicate name exists:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-or</span> archive.rar</span></code></pre></div>
+<p>If <code>archive.rar</code> contains a file also named
+<code>archive.rar</code>, the newly extracted file will be saved
+automatically as <code>archive(1).rar</code>.</p>
+<h4 id="2-extracting-to-a-different-directory">2. Extracting to a
+Different Directory</h4>
+<p>Specify a destination folder so the extracted file does not share the
+same directory space as the source archive:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.rar ./extracted_files/</span></code></pre></div>
+<p>Because the destination path contains no existing file by that name,
+the extraction completes without prompts or conflicts.</p>
+<h4 id="3-skip-conflicting-files">3. Skip Conflicting Files</h4>
+<p>If you do not need the conflicting file, use the <code>-o-</code>
+switch to suppress prompts and skip any file that matches an existing
+filename:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-o-</span> archive.rar</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

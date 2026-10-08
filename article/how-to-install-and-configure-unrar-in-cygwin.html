@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Install and Configure Unrar in Cygwin - unrar</title>
+    <meta name="description" content="This guide details how to seamlessly integrate the unrar utility into your Cygwin environment to extract and manage RAR archives directly from the POSIX command line. Because standard Cygwin repositories often omit a pre-compiled unrar binary due to lice">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-install-and-configure-unrar-in-cygwin">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Install and Configure Unrar in Cygwin - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-install-and-configure-unrar-in-cygwin" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide details how to seamlessly integrate the unrar utility into your Cygwin environment to extract and manage RAR archives directly from the POSIX command line. Because standard Cygwin repositories often omit a pre-compiled unrar binary due to lice" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-install-and-configure-unrar-in-cygwin">How to Install and
+Configure Unrar in Cygwin</h1>
+<p>This guide details how to seamlessly integrate the <code>unrar</code>
+utility into your Cygwin environment to extract and manage RAR archives
+directly from the POSIX command line. Because standard Cygwin
+repositories often omit a pre-compiled <code>unrar</code> binary due to
+licensing restrictions, the most effective solutions are compiling the
+official RARLAB source code directly within Cygwin or wrapping an
+existing Windows executable using path-translation scripts.</p>
+<h3 id="method-1-compiling-native-unrar-from-source-recommended">Method
+1: Compiling Native UnRAR from Source (Recommended)</h3>
+<p>Compiling <code>unrar</code> directly within Cygwin produces a native
+POSIX binary that handles POSIX file paths, symlinks, and permissions
+without translation issues.</p>
+<h4 id="step-1-install-build-dependencies">Step 1: Install Build
+Dependencies</h4>
+<p>Run the Cygwin installer (<code>setup-x86_64.exe</code>) and ensure
+the following packages are selected and installed:</p>
+<ul>
+<li><code>gcc-g++</code></li>
+<li><code>make</code></li>
+<li><code>wget</code></li>
+<li><code>tar</code></li>
+</ul>
+<h4 id="step-2-download-and-extract-the-source-code">Step 2: Download
+and Extract the Source Code</h4>
+<p>Open your Cygwin terminal and retrieve the latest source distribution
+from RARLAB:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> /tmp</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://www.rarlab.com/rar/unrarsrc-6.2.12.tar.gz</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> unrarsrc-6.2.12.tar.gz</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> unrar</span></code></pre></div>
+<p><em>(Note: Replace the version number with the current release if
+necessary).</em></p>
+<h4 id="step-3-build-and-install-the-binary">Step 3: Build and Install
+the Binary</h4>
+<p>Compile the binary using the provided generic Unix makefile:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> makefile</span></code></pre></div>
+<p>Once compilation completes, install the executable into
+<code>/usr/local/bin</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> unrar /usr/local/bin/</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> 755 /usr/local/bin/unrar</span></code></pre></div>
+<h4 id="step-4-verify-the-installation">Step 4: Verify the
+Installation</h4>
+<p>Run the command to ensure Cygwin recognizes the native build:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span></span></code></pre></div>
+<hr />
+<h3 id="method-2-wrapper-script-for-windows-unrarexe">Method 2: Wrapper
+Script for Windows UnRAR.exe</h3>
+<p>If you already have <code>UnRAR.exe</code> or WinRAR installed on
+Windows, you can configure a shell wrapper to automatically translate
+Cygwin file paths to Windows file paths using <code>cygpath</code>.</p>
+<h4 id="step-1-locate-the-windows-binary">Step 1: Locate the Windows
+Binary</h4>
+<p>Identify the path to your Windows <code>UnRAR.exe</code>. Common
+locations include:</p>
+<ul>
+<li><code>C:\Program Files\WinRAR\UnRAR.exe</code></li>
+<li><code>C:\Program Files\WinRAR\WinRAR.exe</code></li>
+</ul>
+<h4 id="step-2-create-the-wrapper-script">Step 2: Create the Wrapper
+Script</h4>
+<p>Create a new script in <code>/usr/local/bin/unrar</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> <span class="op">&lt;&lt; &#39;EOF&#39;</span> <span class="op">&gt;</span> /usr/local/bin/unrar</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="st">#!/usr/bin/env bash</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="st"># Path to the Windows executable</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">WIN_UNRAR=&quot;/cygdrive/c/Program Files/WinRAR/UnRAR.exe&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st"># Convert POSIX paths in arguments to Windows paths</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">ARGS=()</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">for arg in &quot;$@&quot;; do</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">    if [ -e &quot;$arg&quot; ]; then</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">        ARGS+=(&quot;$(cygpath -w &quot;$arg&quot;)&quot;)</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="st">    else</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="st">        ARGS+=(&quot;$arg&quot;)</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="st">    fi</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="st">done</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="st"># Execute Windows UnRAR</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;$WIN_UNRAR&quot; &quot;${ARGS[@]}&quot;</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="op">EOF</span></span></code></pre></div>
+<h4 id="step-3-grant-execute-permissions">Step 3: Grant Execute
+Permissions</h4>
+<p>Make the wrapper script executable:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x /usr/local/bin/unrar</span></code></pre></div>
+<hr />
+<h3 id="environment-configuration">Environment Configuration</h3>
+<p>To ensure your preferred <code>unrar</code> configuration is always
+accessible:</p>
+<ol type="1">
+<li>Confirm <code>/usr/local/bin</code> is at the beginning of your
+system path in <code>~/.bashrc</code>:
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">export</span> <span class="va">PATH</span><span class="op">=</span><span class="st">&quot;/usr/local/bin:</span><span class="va">$PATH</span><span class="st">&quot;</span></span></code></pre></div></li>
+<li>Set default flags by adding an alias to <code>~/.bashrc</code> (for
+example, to extract preserving original paths):
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">alias</span> unrar=<span class="st">&#39;unrar x&#39;</span></span></code></pre></div></li>
+<li>Apply changes immediately:
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc</span></code></pre></div></li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How UnRAR Processes ANSI Archive Comments - unrar</title>
+    <meta name="description" content="This article provides an overview of how the UnRAR utility reads, parses, and renders archive comments containing ANSI escape codes. Archive comments in RAR files often include text-based styling and ANSI art, requiring UnRAR to locate the comment data s">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-un-rar-processes-ansi-archive-comments">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How UnRAR Processes ANSI Archive Comments - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-un-rar-processes-ansi-archive-comments" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article provides an overview of how the UnRAR utility reads, parses, and renders archive comments containing ANSI escape codes. Archive comments in RAR files often include text-based styling and ANSI art, requiring UnRAR to locate the comment data s" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-processes-ansi-archive-comments">How UnRAR Processes
+ANSI Archive Comments</h1>
+<p>This article provides an overview of how the UnRAR utility reads,
+parses, and renders archive comments containing ANSI escape codes.
+Archive comments in RAR files often include text-based styling and ANSI
+art, requiring UnRAR to locate the comment data structure, decompress
+the stream if necessary, handle character encoding conversions, and
+sanitize or pass escape sequences to the host console for display.</p>
+<h3 id="archive-comment-storage-in-the-rar-format">Archive Comment
+Storage in the RAR Format</h3>
+<p>In the RAR archive specification, comments can exist at the archive
+level or file level. In RAR 4.x and earlier formats, comments were
+stored in dedicated comment blocks or embedded directly in the main
+archive header. In the modern RAR 5.0 format, comments are stored as a
+dedicated service header (<code>CMT</code>).</p>
+<p>When UnRAR inspects an archive, it parses the header markers
+sequentially. If a comment block is detected, UnRAR reads the block
+flags to determine:</p>
+<ul>
+<li>Whether the comment data is compressed using RAR's proprietary
+compression algorithms.</li>
+<li>The total length of the compressed and uncompressed comment
+payload.</li>
+<li>The target character encoding (historically IBM PC Code Page 437 or
+OEM, and UTF-8 in RAR 5.0).</li>
+</ul>
+<h3 id="decompression-and-memory-buffering">Decompression and Memory
+Buffering</h3>
+<p>If the comment block is compressed, UnRAR invokes its internal
+decompression routines. In older RAR versions, comment blocks could use
+dedicated text compression variants. In RAR 5.0, comments are
+decompressed using the standard LZ/dictionary decompression
+pipeline.</p>
+<p>The decompressed payload is placed into a memory buffer as a raw byte
+stream. At this stage, any ANSI formatting remains in its raw state,
+consisting of printable ASCII or extended characters alongside Escape
+sequences (typically starting with the byte <code>0x1B</code> or
+<code>\033</code> followed by <code>[</code>).</p>
+<h3 id="character-encoding-conversion">Character Encoding
+Conversion</h3>
+<p>ANSI art typically relies on Code Page 437 (DOS OEM) characters for
+borders, shading blocks, and specialized glyphs. UnRAR manages the
+discrepancy between the legacy CP437 character set and modern system
+encodings (such as UTF-8 on Linux or UTF-16 on Windows):</p>
+<ol type="1">
+<li><strong>Detection</strong>: If the archive is in RAR 5.0 format, the
+comment is natively encoded in UTF-8. If it is in RAR 4.x or older,
+UnRAR treats the comment as OEM/CP437 by default.</li>
+<li><strong>Translation</strong>: UnRAR translates legacy OEM byte
+values into wide characters or UTF-8 representations using internal
+conversion tables, ensuring that block characters (e.g., <code>░</code>,
+<code>▒</code>, <code>▓</code>, <code>█</code>) render correctly rather
+than appearing as corrupted output.</li>
+</ol>
+<h3 id="processing-and-rendering-ansi-escape-sequences">Processing and
+Rendering ANSI Escape Sequences</h3>
+<p>UnRAR itself does not contain an internal ANSI rendering engine.
+Instead, it relies on the host environment's terminal to interpret the
+control codes (such as text coloring, bold attributes, and cursor
+placement):</p>
+<ul>
+<li><strong>Unix and Linux Terminals</strong>: Modern terminal emulators
+natively process standard ECMA-48 / VT100 ANSI sequences. UnRAR outputs
+the comment directly to <code>stdout</code>. As the terminal encounters
+escape sequences (e.g., <code>\033[31m</code> for red text), the
+terminal emulator handles the visual rendering.</li>
+<li><strong>Windows Console</strong>: Historically, MS-DOS and early
+Windows consoles required the <code>ANSI.SYS</code> driver to parse
+escape sequences. In modern Windows 10 and 11 environments, UnRAR relies
+on the console's native Virtual Terminal Processing
+(<code>ENABLE_VIRTUAL_TERMINAL_PROCESSING</code> via the Windows Console
+API). When enabled, Windows interprets ANSI color and styling codes
+directly from the output stream.</li>
+</ul>
+<h3 id="security-sanitization-and-control-code-filtering">Security
+Sanitization and Control Code Filtering</h3>
+<p>Allowing raw terminal escape sequences introduces security risks,
+such as terminal injection attacks, where malicious archives attempt to
+rewrite terminal titles, reprogram function keys, or hide malicious
+commands.</p>
+<p>To mitigate this, UnRAR includes filtering mechanisms:</p>
+<ul>
+<li><strong>Allowlisted Codes</strong>: Select Color and Graphic
+Rendition (SGR) codes (e.g., foreground and background colors, bold,
+reset) are typically permitted so that ANSI art renders as
+intended.</li>
+<li><strong>Stripped Sequences</strong>: Dangerous sequences, such as
+Operating System Command (OSC) strings, device status reports, or
+arbitrary terminal reconfiguration sequences, are either stripped or
+neutralised before the text is written to the output stream.</li>
+<li><strong>Control Character Handling</strong>: Destructive characters
+like backspaces (<code>\b</code>) or arbitrary carriage returns that
+attempt to overwrite console lines outside the display area are
+constrained to prevent terminal spoofing.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

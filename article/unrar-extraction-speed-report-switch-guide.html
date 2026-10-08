@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unrar Extraction Speed Report Switch Guide - unrar</title>
+    <meta name="description" content="This guide examines extraction performance tracking in the command-line utility unrar and addresses the question of how to generate an extraction speed report. It clarifies the command-line options available in the official RARLAB utility, explains why n">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/unrar-extraction-speed-report-switch-guide">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Unrar Extraction Speed Report Switch Guide - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/unrar-extraction-speed-report-switch-guide" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide examines extraction performance tracking in the command-line utility unrar and addresses the question of how to generate an extraction speed report. It clarifies the command-line options available in the official RARLAB utility, explains why n" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="unrar-extraction-speed-report-switch-guide">Unrar Extraction
+Speed Report Switch Guide</h1>
+<p>This guide examines extraction performance tracking in the
+command-line utility <code>unrar</code> and addresses the question of
+how to generate an extraction speed report. It clarifies the
+command-line options available in the official RARLAB utility, explains
+why no dedicated speed report switch exists, and provides direct,
+reliable methods for measuring extraction throughput on both Linux and
+Windows environments.</p>
+<p>The official <code>unrar</code> utility does not have a command-line
+switch designed to output a detailed report of extraction speed during
+an archive extraction process. While flags exist for controlling output
+verbosity—such as <code>-id[c,d,p,q]</code> to suppress copyright
+notices, percentage displays, or general messages—none of the native
+extraction switches record or display input/output throughput rates or
+average transfer speeds.</p>
+<p>To evaluate RAR decompression performance or obtain detailed speed
+metrics, users rely on alternative approaches:</p>
+<h3 id="using-the-built-in-benchmark-command">Using the Built-In
+Benchmark Command</h3>
+<p>Although extraction commands (<code>x</code> and <code>e</code>) do
+not measure real-time speed, the utility includes a dedicated benchmark
+command. Running this command tests the processor's compression and
+decompression speed without extracting target files to disk:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> b</span></code></pre></div>
+<p>This command executes an internal algorithm test and outputs
+continuous performance data, including processing speed measured in
+kilobytes per second (KB/s).</p>
+<h3 id="measuring-extraction-speed-on-linux-and-macos">Measuring
+Extraction Speed on Linux and macOS</h3>
+<p>To determine the actual speed of an extraction operation on Unix-like
+platforms, pair <code>unrar</code> with standard system performance
+tools.</p>
+<ol type="1">
+<li><p><strong>The <code>time</code> Utility</strong>: Prefixing the
+command with <code>time</code> measures the total elapsed duration of
+the extraction.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">time</span> unrar x archive.rar</span></code></pre></div>
+<p>Dividing the total uncompressed archive size by the reported real
+elapsed time provides the average extraction speed.</p></li>
+<li><p><strong>Pipe Viewer (<code>pv</code>)</strong>: If monitoring
+real-time throughput is required, data can be piped through
+<code>pv</code> during stream extractions to display instantaneous
+speed, progress, and elapsed time.</p></li>
+</ol>
+<h3 id="measuring-extraction-speed-on-windows">Measuring Extraction
+Speed on Windows</h3>
+<p>On Windows, PowerShell provides built-in timing capabilities to
+measure how long an extraction takes:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Measure-Command</span> <span class="op">{</span> unrar x archive<span class="op">.</span><span class="fu">rar</span> <span class="op">}</span></span></code></pre></div>
+<p>By retrieving the resulting milliseconds and dividing the total
+extracted file volume by that time, users can determine the average
+extraction rate. For real-time disk read and write speeds during
+extraction, the Windows Resource Monitor (Performance tab) displays
+active disk I/O metrics specifically tied to the <code>unrar.exe</code>
+process.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Can Unrar Check RAR Digital Signatures? - unrar</title>
+    <meta name="description" content="This article examines whether the command-line utility unrar can verify digital signatures on archives prior to extraction. While legacy versions of RAR software included a proprietary authenticity verification feature, modern versions of unrar do not su">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/can-unrar-check-rar-digital-signatures">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Can Unrar Check RAR Digital Signatures? - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/can-unrar-check-rar-digital-signatures" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines whether the command-line utility unrar can verify digital signatures on archives prior to extraction. While legacy versions of RAR software included a proprietary authenticity verification feature, modern versions of unrar do not su" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="can-unrar-check-rar-digital-signatures">Can Unrar Check RAR
+Digital Signatures?</h1>
+<p>This article examines whether the command-line utility
+<code>unrar</code> can verify digital signatures on archives prior to
+extraction. While legacy versions of RAR software included a proprietary
+authenticity verification feature, modern versions of <code>unrar</code>
+do not support digital signature checks. Users seeking to verify the
+authenticity and integrity of an archive must rely on modern external
+cryptographic tools before running the extraction command.</p>
+<h3 id="the-short-answer">The Short Answer</h3>
+<p>No, modern versions of <code>unrar</code> cannot check the digital
+signature of an archive before extracting it. The command-line
+<code>unrar</code> utility lacks built-in functionality to parse,
+validate, or enforce digital signatures or public-key certificates on
+modern archives.</p>
+<h3 id="the-removal-of-authenticity-verification-av">The Removal of
+Authenticity Verification (AV)</h3>
+<p>Older RAR formats (RAR 2.x and 3.x) featured a proprietary system
+called Authenticity Verification (AV). This feature allowed archive
+creators to embed a proprietary signature containing the creator's name,
+archive name, and timestamp. Legacy versions of the software included an
+option (<code>-av</code>) to check or enforce these signatures.</p>
+<p>However, starting with WinRAR and <code>unrar</code> version 5.0,
+RARLAB discontinued the Authenticity Verification feature
+completely:</p>
+<ul>
+<li><strong>Weak Cryptography:</strong> The legacy AV system relied on
+outdated cryptographic methods that did not meet modern security
+standards.</li>
+<li><strong>Format Transition:</strong> The introduction of the RAR5
+format overhauled the entire archive structure, omitting the proprietary
+AV feature entirely.</li>
+<li><strong>Obsolete Switches:</strong> Modern command-line builds of
+<code>unrar</code> ignore or reject legacy AV verification
+commands.</li>
+</ul>
+<h3 id="integrity-checks-vs-digital-signatures">Integrity Checks vs.
+Digital Signatures</h3>
+<p>Modern <code>unrar</code> still performs data integrity checks, but
+these must not be confused with digital signatures:</p>
+<ul>
+<li><strong>Checksums (CRC32 and BLAKE2sp):</strong> RAR archives can
+contain CRC32 or BLAKE2sp hashes to verify that the extracted data is
+not corrupted. You can test an archive's data integrity before unpacking
+by running <code>unrar t archive.rar</code>.</li>
+<li><strong>Lack of Identity Verification:</strong> Checksums merely
+confirm that the file is not corrupted; they do not verify who created
+the file or protect against a malicious actor who modifies both the data
+and the checksum.</li>
+</ul>
+<h3 id="how-to-verify-archives-before-extraction">How to Verify Archives
+Before Extraction</h3>
+<p>Because <code>unrar</code> does not handle digital authenticity,
+signature verification must be decoupled from the extraction process. To
+safely verify an archive before extracting:</p>
+<ol type="1">
+<li><strong>Use Detached Signatures:</strong> Archive distributors
+typically provide a detached cryptographic signature using tools like
+GnuPG (<code>.sig</code> or <code>.asc</code> files), Minisign, or
+Signify.</li>
+<li><strong>Verify First:</strong> Run the verification tool against the
+archive before interacting with <code>unrar</code>. For example, with
+GnuPG:
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gpg</span> <span class="at">--verify</span> archive.rar.sig archive.rar</span></code></pre></div></li>
+<li><strong>Extract Conditionally:</strong> Only execute
+<code>unrar x archive.rar</code> if the verification step succeeds.</li>
+</ol></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

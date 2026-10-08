@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build 32-bit UnRAR on a 64-bit System - unrar</title>
+    <meta name="description" content="This guide explains how to cross-compile a 32-bit binary of the UnRAR utility on a 64-bit Linux system. It covers installing the necessary multilib dependencies, obtaining the official source code, passing the required 32-bit compilation flags to the com">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/build-32-bit-un-rar-on-a-64-bit-system">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Build 32-bit UnRAR on a 64-bit System - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/build-32-bit-un-rar-on-a-64-bit-system" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This guide explains how to cross-compile a 32-bit binary of the UnRAR utility on a 64-bit Linux system. It covers installing the necessary multilib dependencies, obtaining the official source code, passing the required 32-bit compilation flags to the com" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="build-32-bit-unrar-on-a-64-bit-system">Build 32-bit UnRAR on a
+64-bit System</h1>
+<p>This guide explains how to cross-compile a 32-bit binary of the UnRAR
+utility on a 64-bit Linux system. It covers installing the necessary
+multilib dependencies, obtaining the official source code, passing the
+required 32-bit compilation flags to the compiler, and verifying that
+the final generated binary is a 32-bit executable.</p>
+<h3 id="1-install-multilib-dependencies">1. Install Multilib
+Dependencies</h3>
+<p>To compile 32-bit binaries on a 64-bit architecture, your system
+needs 32-bit standard C/C++ libraries and multilib support for GCC.</p>
+<p>On Debian or Ubuntu:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt update</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install build-essential gcc-multilib g++-multilib wget</span></code></pre></div>
+<p>On Fedora, CentOS, or RHEL:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> dnf install gcc gcc-c++ glibc-devel.i686 libstdc++-devel.i686 wget</span></code></pre></div>
+<h3 id="2-download-and-extract-the-unrar-source-code">2. Download and
+Extract the UnRAR Source Code</h3>
+<p>Obtain the latest official UnRAR source archive directly from RARLAB
+and extract it:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://www.rarlab.com/rar/unrarsrc-6.2.12.tar.gz</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzf</span> unrarsrc-6.2.12.tar.gz</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> unrar</span></code></pre></div>
+<p><em>(Note: Replace the version number in the URL with the latest
+release if necessary.)</em></p>
+<h3 id="3-compile-unrar-in-32-bit-mode">3. Compile UnRAR in 32-Bit
+Mode</h3>
+<p>The build process uses <code>make</code> with a default
+<code>makefile</code>. To force a 32-bit build, you must pass the
+<code>-m32</code> flag to the C++ compiler (<code>CXX</code>), compiler
+flags (<code>CXXFLAGS</code>), and linker flags
+(<code>LDFLAGS</code>).</p>
+<p>Run the following command inside the <code>unrar</code>
+directory:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> <span class="at">-f</span> makefile CXX=<span class="st">&quot;g++ -m32&quot;</span> CXXFLAGS=<span class="st">&quot;-O2 -m32&quot;</span> LDFLAGS=<span class="st">&quot;-m32&quot;</span></span></code></pre></div>
+<p>This compiles all source objects with 32-bit addressing and links
+them against the 32-bit C/C++ runtime libraries.</p>
+<h3 id="4-verify-the-binary-architecture">4. Verify the Binary
+Architecture</h3>
+<p>Once the compilation finishes, an executable named <code>unrar</code>
+will be present in the directory. Confirm that it is a 32-bit executable
+using the <code>file</code> command:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">file</span> unrar</span></code></pre></div>
+<p>The output should confirm the 32-bit architecture:</p>
+<pre class="text"><code>unrar: ELF 32-bit LSB pie executable, Intel 80386, version 1 (SYSV)...</code></pre>
+<h3 id="5-install-the-binary-optional">5. Install the Binary
+(Optional)</h3>
+<p>To make the newly compiled 32-bit binary accessible system-wide, copy
+it to <code>/usr/local/bin</code>:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> install <span class="at">-m</span> 755 unrar /usr/local/bin/</span></code></pre></div>
+<p>Verify that the binary runs properly:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> <span class="at">--version</span></span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

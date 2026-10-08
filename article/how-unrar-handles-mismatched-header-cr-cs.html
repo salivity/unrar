@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Unrar Handles Mismatched Header CRCs - unrar</title>
+    <meta name="description" content="When extracting files from a RAR archive, the unrar utility verifies the integrity of both the archive structure and the compressed data using Cyclic Redundancy Checks (CRCs). This article explains how unrar detects mismatched header CRCs, its default fa">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-unrar-handles-mismatched-header-cr-cs">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How Unrar Handles Mismatched Header CRCs - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-unrar-handles-mismatched-header-cr-cs" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="When extracting files from a RAR archive, the unrar utility verifies the integrity of both the archive structure and the compressed data using Cyclic Redundancy Checks (CRCs). This article explains how unrar detects mismatched header CRCs, its default fa" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-unrar-handles-mismatched-header-crcs">How Unrar Handles
+Mismatched Header CRCs</h1>
+<p>When extracting files from a RAR archive, the <code>unrar</code>
+utility verifies the integrity of both the archive structure and the
+compressed data using Cyclic Redundancy Checks (CRCs). This article
+explains how <code>unrar</code> detects mismatched header CRCs, its
+default failure response, and the specific mechanisms or commands
+available to bypass corrupted headers and salvage salvageable data.</p>
+<h3 id="the-role-of-header-crcs-in-rar-archives">The Role of Header CRCs
+in RAR Archives</h3>
+<p>Every RAR archive is organized into structured blocks, such as
+archive headers, file headers, and service headers. Each header contains
+essential metadata, including the file name, compression method,
+uncompressed size, and host OS attributes. Crucially, each header block
+includes a dedicated CRC32 checksum calculated strictly across the
+header fields themselves, distinct from the file data CRC.</p>
+<p>When <code>unrar</code> parses an archive, it reads the header block,
+recalculates the checksum over the header's bytes, and compares the
+result to the stored header CRC value. If the calculated value does not
+match the stored checksum, <code>unrar</code> flags the header as
+corrupt.</p>
+<h3 id="default-behavior-on-crc-mismatch">Default Behavior on CRC
+Mismatch</h3>
+<p>By default, <code>unrar</code> treats a header CRC mismatch as a
+fatal structural error. Because a damaged header may have corrupted
+pointers, invalid file sizes, or falsified block lengths, trusting the
+header could cause the extractor to read arbitrary memory, write to
+invalid filesystem paths, or enter infinite loops.</p>
+<p>Consequently, <code>unrar</code> takes the following default
+actions:</p>
+<ol type="1">
+<li>It halts processing for the affected file or block.</li>
+<li>It outputs an error message, typically stating:
+<code>Corrupt header is found</code> or
+<code>Header CRC mismatch</code>.</li>
+<li>It aborts the extraction process or skips to the next recognizable
+block, depending on the severity of the damage.</li>
+</ol>
+<h3 id="recovery-and-scanning-mechanisms">Recovery and Scanning
+Mechanisms</h3>
+<p>When encountering an invalid header, <code>unrar</code> attempts to
+handle the corruption through specific recovery paths:</p>
+<ul>
+<li><strong>Signature Scanning:</strong> If a block header is
+unreadable, <code>unrar</code> attempts to resynchronize with the
+archive stream. It scans forward byte-by-byte looking for standard RAR
+marker signatures (such as <code>0x74</code> for a file header block).
+If it finds a valid marker followed by a valid header CRC, it resumes
+extraction from that point forward, effectively dropping only the
+damaged header.</li>
+<li><strong>Using Recovery Records (<code>rar r</code>):</strong> If the
+archive was generated with built-in recovery records (using Reed-Solomon
+error correction), <code>unrar</code> cannot fix the header on the fly
+during extraction. Instead, the user must run the repair command via RAR
+(<code>rar r damaged.rar</code>). This process reconstructs the
+corrupted sectors—including header blocks—and produces a new
+<code>fixed.rar</code> archive where header CRCs match correctly.</li>
+<li><strong>Keeping Broken Files (<code>-kb</code>):</strong> While the
+<code>-kb</code> (Keep Broken) switch is primarily designed for data CRC
+mismatches, it also instructs <code>unrar</code> not to delete partially
+unpacked files if an error terminates the process prematurely. If the
+header itself is valid enough to initiate extraction but a trailing
+header or block CRC fails, <code>-kb</code> ensures that extracted bytes
+remain on the disk.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

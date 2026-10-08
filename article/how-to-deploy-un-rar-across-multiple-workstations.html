@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Deploy UnRAR Across Multiple Workstations - unrar</title>
+    <meta name="description" content="Deploying UnRAR across an enterprise fleet requires centralized management to ensure consistent, secure, and automated installation without user interruption. This guide outlines the most efficient methods for deploying UnRAR across Windows, macOS, and L">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/how-to-deploy-un-rar-across-multiple-workstations">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="How to Deploy UnRAR Across Multiple Workstations - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/how-to-deploy-un-rar-across-multiple-workstations" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Deploying UnRAR across an enterprise fleet requires centralized management to ensure consistent, secure, and automated installation without user interruption. This guide outlines the most efficient methods for deploying UnRAR across Windows, macOS, and L" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="how-to-deploy-unrar-across-multiple-workstations">How to Deploy
+UnRAR Across Multiple Workstations</h1>
+<p>Deploying UnRAR across an enterprise fleet requires centralized
+management to ensure consistent, secure, and automated installation
+without user interruption. This guide outlines the most efficient
+methods for deploying UnRAR across Windows, macOS, and Linux
+environments, focusing on enterprise deployment platforms like Microsoft
+Intune, MECM, configuration management frameworks, and native package
+managers.</p>
+<h2 id="windows-enterprise-deployment">Windows Enterprise
+Deployment</h2>
+<p>The standard enterprise approach for Windows systems involves
+packaging the binary or installer for distribution via Mobile Device
+Management (MDM) or systems management platforms.</p>
+<h3 id="method-1-microsoft-intune-win32-app">Method 1: Microsoft Intune
+(Win32 App)</h3>
+<p>The modern standard for cloud-managed endpoints is packaging the
+installer as an <code>.intunewin</code> file.</p>
+<ol type="1">
+<li><strong>Prepare the Source Files:</strong> Download the official
+UnRAR command-line binary or the standard WinRAR installer from RARLab.
+If deploying just <code>unrar.exe</code>, place it in a source folder
+alongside a deployment script (such as PowerShell).</li>
+<li><strong>Create the Package:</strong> Use the Microsoft Win32 Content
+Prep Tool (<code>IntuneWinAppUtil.exe</code>) to package the source
+directory.</li>
+<li><strong>Configure Install Commands:</strong>
+<ul>
+<li><strong>Full Installer:</strong> <code>winrar-x64-xxx.exe /S</code>
+(the <code>/S</code> flag executes a completely silent
+installation).</li>
+<li><strong>Standalone Binary Deployment:</strong> Use a PowerShell
+script to copy <code>unrar.exe</code> to a system path (e.g.,
+<code>C:\Program Files\UnRAR\</code>) and add that directory to the
+system <code>PATH</code> environment variable.</li>
+</ul></li>
+<li><strong>Detection Rules:</strong> Set a file-based detection rule
+verifying the existence of <code>unrar.exe</code> in the target
+directory, or check the uninstall registry key if using the full
+installer.</li>
+<li><strong>Assign:</strong> Deploy to target device groups using a
+phased rollout.</li>
+</ol>
+<h3
+id="method-2-microsoft-endpoint-configuration-manager-mecm--sccm">Method
+2: Microsoft Endpoint Configuration Manager (MECM / SCCM)</h3>
+<p>For on-premises environments, MECM provides robust control via
+Applications or Packages.</p>
+<ul>
+<li>Create a new <strong>Application</strong> and select <strong>Script
+Installer</strong>.</li>
+<li>Set the installation program to
+<code>winrar-x64-xxx.exe /S</code>.</li>
+<li>Configure the uninstall command as
+<code>"%ProgramFiles%\WinRAR\uninstall.exe" /S</code>.</li>
+<li>Set user experience settings to install for the system and run
+whether or not a user is logged on.</li>
+</ul>
+<h3 id="method-3-windows-package-manager-winget-or-chocolatey">Method 3:
+Windows Package Manager (Winget) or Chocolatey</h3>
+<p>For lightweight automation via existing RMM (Remote Monitoring and
+Management) tools:</p>
+<ul>
+<li><strong>Winget Script:</strong> Run
+<code>winget install --id RARLab.WinRAR --silent --accept-source-agreements --accept-package-agreements</code>
+via administrative script.</li>
+<li><strong>Chocolatey (for Business):</strong> Host an internal package
+and execute <code>choco install unrar -y</code> across target
+fleets.</li>
+</ul>
+<hr />
+<h2 id="linux-and-macos-deployment">Linux and macOS Deployment</h2>
+<p>Deploying UnRAR to non-Windows workstations is best handled through
+native configuration management or operating system packaging.</p>
+<h3 id="linux-ubuntu-debian-rhel-fedora">Linux (Ubuntu, Debian, RHEL,
+Fedora)</h3>
+<p>Use configuration management platforms like Ansible, Puppet, or
+SaltStack to deploy UnRAR natively across your inventory.</p>
+<p><strong>Ansible Playbook Example:</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install UnRAR across workstations</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hosts</span><span class="kw">:</span><span class="at"> workstations</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">become</span><span class="kw">:</span><span class="at"> </span><span class="ch">yes</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">tasks</span><span class="kw">:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install unrar on Debian/Ubuntu</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">apt</span><span class="kw">:</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span><span class="at"> unrar</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">state</span><span class="kw">:</span><span class="at"> present</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">update_cache</span><span class="kw">:</span><span class="at"> </span><span class="ch">yes</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">when</span><span class="kw">:</span><span class="at"> ansible_os_family == &quot;Debian&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Install unrar on RHEL/CentOS/Fedora</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">dnf</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">name</span><span class="kw">:</span><span class="at"> unrar</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">state</span><span class="kw">:</span><span class="at"> present</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="fu">when</span><span class="kw">:</span><span class="at"> ansible_os_family == &quot;RedHat&quot;</span></span></code></pre></div>
+<h3 id="macos-jamf-pro-kandji-munki">macOS (Jamf Pro, Kandji,
+Munki)</h3>
+<ul>
+<li><strong>Custom PKG:</strong> Package the macOS <code>unrar</code>
+binary into a signed standard <code>.pkg</code> using tools like
+<code>pkgbuild</code>, placing it in <code>/usr/local/bin</code> or
+<code>/opt/homebrew/bin</code>, and deploy via your MDM.</li>
+<li><strong>Homebrew Script:</strong> If workstations utilize managed
+Homebrew installations, trigger an automated script:
+<code>brew install unrar</code>.</li>
+</ul>
+<hr />
+<h2 id="best-practices-for-enterprise-rollouts">Best Practices for
+Enterprise Rollouts</h2>
+<ul>
+<li><strong>Verify Licensing:</strong> UnRAR’s command-line source and
+binary have specific licensing terms distinct from GNU software. If
+deploying the full WinRAR GUI package, ensure adequate volume licenses
+are procured and applied silently by copying the <code>rarreg.key</code>
+to the installation folder during installation.</li>
+<li><strong>Standardize File Paths:</strong> Ensure
+<code>unrar.exe</code> is added to the system's <code>PATH</code>
+variable so command-line utilities and scripts can invoke it without
+requiring hardcoded absolute paths.</li>
+<li><strong>Staged Rollouts:</strong> Deploy to a pilot group first to
+ensure silent switches function properly and do not trigger endpoint
+detection and response (EDR) heuristics.</li>
+</ul></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

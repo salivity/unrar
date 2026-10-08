@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Multiple RAR Files to One Folder with Unrar - unrar</title>
+    <meta name="description" content="Yes, the unrar utility can extract multiple RAR archives into a single, merged directory. By default, unrar places the contents of an archive directly into the specified destination path rather than creating a separate subfolder for each archive name. Th">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extract-multiple-rar-files-to-one-folder-with-unrar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract Multiple RAR Files to One Folder with Unrar - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extract-multiple-rar-files-to-one-folder-with-unrar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="Yes, the unrar utility can extract multiple RAR archives into a single, merged directory. By default, unrar places the contents of an archive directly into the specified destination path rather than creating a separate subfolder for each archive name. Th" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-multiple-rar-files-to-one-folder-with-unrar">Extract
+Multiple RAR Files to One Folder with Unrar</h1>
+<p>Yes, the <code>unrar</code> utility can extract multiple RAR archives
+into a single, merged directory. By default, <code>unrar</code> places
+the contents of an archive directly into the specified destination path
+rather than creating a separate subfolder for each archive name. This
+guide demonstrates how to process multiple archives at once, avoid
+subfolder creation, and handle duplicate file conflicts using both
+Linux/macOS shells and Windows command-line environments.</p>
+<h3 id="the-core-unrar-commands">The Core <code>unrar</code>
+Commands</h3>
+<p>The <code>unrar</code> command offers two primary extraction
+switches:</p>
+<ul>
+<li><strong><code>e</code> (Extract without paths):</strong> Flattens
+the contents. All files are extracted directly into the destination
+directory, ignoring internal folder structures inside the RAR
+archives.</li>
+<li><strong><code>x</code> (Extract with full paths):</strong> Preserves
+the internal directory structure from within the archives, but still
+merges all root-level items into the target directory instead of
+creating a folder named after each archive.</li>
+</ul>
+<h3 id="extracting-multiple-archives-on-linux-and-macos">Extracting
+Multiple Archives on Linux and macOS</h3>
+<p>To extract all RAR files in your current directory into a single
+folder named <code>merged_output</code>, run:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="st">&#39;*.rar&#39;</span> /path/to/merged_output/</span></code></pre></div>
+<p><em>Note: Enclose <code>'*.rar'</code> in single quotes to prevent
+your shell from expanding the wildcard before passing it to
+<code>unrar</code>.</em></p>
+<p>If your version of <code>unrar</code> does not natively process shell
+wildcards for batch inputs, use a standard bash loop:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> archive <span class="kw">in</span> <span class="pp">*</span>.rar<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">unrar</span> x <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> /path/to/merged_output/</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p>If you want to flatten all internal directory structures so every
+file lands in the top level of the destination, replace <code>x</code>
+with <code>e</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> archive <span class="kw">in</span> <span class="pp">*</span>.rar<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">unrar</span> e <span class="st">&quot;</span><span class="va">$archive</span><span class="st">&quot;</span> /path/to/merged_output/</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<h3 id="extracting-multiple-archives-on-windows">Extracting Multiple
+Archives on Windows</h3>
+<h4 id="command-prompt-cmd">Command Prompt (CMD)</h4>
+<p>Using a standard Command Prompt, navigate to the folder containing
+your archives and run:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode cmd"><code class="sourceCode dosbat"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> <span class="er">%i</span> <span class="er">in</span> <span class="er">(*.rar)</span> <span class="er">do</span> <span class="er">unrar</span> <span class="er">x</span> <span class="er">&quot;%i&quot;</span> <span class="er">C:\path\to\merged_output\</span></span></code></pre></div>
+<h4 id="powershell">PowerShell</h4>
+<p>In PowerShell, pipe the target files to <code>unrar</code>:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Filter <span class="op">*.</span><span class="fu">rar</span> <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span> unrar x <span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span> <span class="st">&quot;C:\path\to\merged_output\&quot;</span> <span class="op">}</span></span></code></pre></div>
+<h3 id="handling-duplicate-file-names">Handling Duplicate File
+Names</h3>
+<p>When merging multiple archives into one folder, files with the same
+name across different archives will trigger an overwrite prompt. You can
+control this behavior using overwrite switches:</p>
+<ul>
+<li><strong><code>-o+</code> (Overwrite all):</strong> Automatically
+overwrites existing files with the same name without asking.</li>
+<li><strong><code>-o-</code> (Skip all):</strong> Automatically skips
+any file that already exists in the destination folder.</li>
+<li><strong><code>-or</code> (Auto-rename):</strong> Automatically
+renames extracted files if a duplicate exists.</li>
+</ul>
+<p><strong>Example with auto-renaming conflicts:</strong></p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x <span class="at">-or</span> <span class="st">&#39;*.rar&#39;</span> /path/to/merged_output/</span></code></pre></div></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

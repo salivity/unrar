@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Files Directly from RAR Recovery Volumes - unrar</title>
+    <meta name="description" content="This article examines whether the command-line utility unrar can extract files directly from RAR recovery volumes (.rev files). It explains the technical purpose of recovery volumes, clarifies why direct extraction is not possible, and outlines the corre">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extract-files-directly-from-rar-recovery-volumes">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract Files Directly from RAR Recovery Volumes - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extract-files-directly-from-rar-recovery-volumes" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article examines whether the command-line utility unrar can extract files directly from RAR recovery volumes (.rev files). It explains the technical purpose of recovery volumes, clarifies why direct extraction is not possible, and outlines the corre" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-files-directly-from-rar-recovery-volumes">Extract Files
+Directly from RAR Recovery Volumes</h1>
+<p>This article examines whether the command-line utility
+<code>unrar</code> can extract files directly from RAR recovery volumes
+(<code>.rev</code> files). It explains the technical purpose of recovery
+volumes, clarifies why direct extraction is not possible, and outlines
+the correct method for reconstructing damaged or missing archive parts
+so you can access your compressed data.</p>
+<h2 id="can-unrar-extract-directly-from-a-recovery-volume">Can Unrar
+Extract Directly from a Recovery Volume?</h2>
+<p>No, <code>unrar</code> cannot extract files directly from a recovery
+volume (<code>.rev</code>). If you attempt to run an extraction command
+such as <code>unrar x archive.part01.rev</code>, the program will return
+an error indicating that it cannot process the file as a standard
+archive.</p>
+<p>Recovery volumes do not contain the compressed file data or directory
+structures of your original files. Instead, they store algorithmic
+parity data—typically generated using Reed-Solomon error correction
+codes—designed solely to rebuild missing volumes in a multi-part
+archive.</p>
+<h2 id="how-recovery-volumes-work">How Recovery Volumes Work</h2>
+<p>When creating multi-part RAR archives, users can generate
+<code>.rev</code> files alongside standard <code>.partXX.rar</code>
+files.</p>
+<ul>
+<li>Each <code>.rev</code> file can replace exactly one missing or
+corrupted <code>.partXX.rar</code> volume.</li>
+<li>If you are missing three archive parts, you need at least three
+<code>.rev</code> files to reconstruct them.</li>
+<li>Recovery volumes are independent of specific part numbers; any
+<code>.rev</code> file can reconstruct any missing part, provided you
+have enough total recovery files.</li>
+</ul>
+<p>Because the data inside a <code>.rev</code> file is mathematical
+redundancy rather than direct file blocks, the missing archive volumes
+must be fully reconstructed before any extraction can occur.</p>
+<h2 id="the-correct-process-to-restore-and-extract">The Correct Process
+to Restore and Extract</h2>
+<p>To access the files contained in an archive when one or more parts
+are missing, you must execute the recovery process first.</p>
+<h3 id="1-place-files-in-the-same-directory">1. Place Files in the Same
+Directory</h3>
+<p>Ensure all available <code>.rar</code> parts and your
+<code>.rev</code> files reside in the same folder.</p>
+<h3 id="2-reconstruct-missing-volumes">2. Reconstruct Missing
+Volumes</h3>
+<p>Run the reconstruction command targeting any existing volume in the
+set:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> rc archive.part01.rar</span></code></pre></div>
+<p>The <code>rc</code> command instructs <code>unrar</code> to check the
+archive set, calculate the parity data from the <code>.rev</code> files,
+and automatically recreate the missing <code>.partXX.rar</code>
+files.</p>
+<h3 id="3-extract-the-archive">3. Extract the Archive</h3>
+<p>Once the missing volumes are generated in the directory, extract the
+files using the standard extraction command:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> x archive.part01.rar</span></code></pre></div>
+<p>By allowing <code>unrar</code> to recreate the missing archive
+segments first, you can successfully extract the contained data.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>

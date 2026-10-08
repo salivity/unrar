@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Files Without Extension in UnRAR - unrar</title>
+    <meta name="description" content="This article explains how file extraction works with the UnRAR command-line utility, addressing whether a native switch exists to strip file extensions during extraction. It covers the technical limitations of UnRAR regarding filenames, clarifies the com">
+    <link rel="canonical" href="https://salivity.github.io/unrar/article/extract-files-without-extension-in-un-rar">
+    <link rel="search" type="application/opensearchdescription+xml" title="unrar" href="/unrar/opensearch.xml">
+    <link rel="icon" href="/unrar/favicon.ico">
+    <link rel="stylesheet" href="/unrar/css/style.css">
+    <link media="print" rel="stylesheet" href="/unrar/css/print.css">
+    <script src="/unrar/js/fuse.min.js"></script>
+    <script src="/unrar/js/script.js"></script>
+    <script id="MathJax-script" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/4.1.3/tex-chtml.min.js" defer></script>
+    <script src="/monetize/monetize.js"></script>
+    <script src="/social/social.js"></script>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Extract Files Without Extension in UnRAR - unrar" />
+    <meta property="og:url" content="https://salivity.github.io/unrar/article/extract-files-without-extension-in-un-rar" />
+    <meta property="og:image" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:secure_url" content="https://salivity.github.io/unrar/images/open-graph/default.webp" />
+    <meta property="og:image:width" content="1120" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:description" content="This article explains how file extraction works with the UnRAR command-line utility, addressing whether a native switch exists to strip file extensions during extraction. It covers the technical limitations of UnRAR regarding filenames, clarifies the com" />
+    <link rel="manifest" href="/unrar/pwa/manifest.json" />
+</head>
+<body>
+    <header>
+        <a href="/unrar/" aria-label="Go To Home Page" title="Go To Home Page" id="logo">
+            <span>salivity.github.io/</span><span>unrar</span>
+        </a>
+        <nav>
+            <ul class="header-links">
+                <li><a href="/unrar/search" title="Search" aria-label="Go To Search Page"><svg class="svg-icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"></path></svg></a></li>
+                <li><a id="theme-toggle" title="Theme" href="javascript:void(0);" aria-label="Toggle Website Theme"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        
+    <div class="article-layout">
+        <aside id="profile-sidebar" class="profile-column" aria-label="Author Profile"></aside>
+        <div class="article-main-column">
+            <article><h1 id="extract-files-without-extension-in-unrar">Extract Files Without
+Extension in UnRAR</h1>
+<p>This article explains how file extraction works with the UnRAR
+command-line utility, addressing whether a native switch exists to strip
+file extensions during extraction. It covers the technical limitations
+of UnRAR regarding filenames, clarifies the common confusion between
+file paths and file extensions, and provides straightforward scripting
+solutions to remove extensions immediately after extraction.</p>
+<h2 id="does-unrar-have-a-switch-to-remove-extensions">Does UnRAR Have a
+Switch to Remove Extensions?</h2>
+<p>The short answer is no. UnRAR does not have a built-in switch or
+parameter to strip or alter the file extensions of archived files during
+extraction. By design, UnRAR extracts files preserving the exact
+filenames and extensions stored within the RAR archive to ensure file
+integrity.</p>
+<h2 id="common-confusion-extensions-vs-directory-paths">Common
+Confusion: Extensions vs. Directory Paths</h2>
+<p>Users often confuse stripping file extensions with stripping
+directory paths.</p>
+<p>If your goal is to extract files without their enclosing folders or
+directory structure, UnRAR does provide commands and switches for
+this:</p>
+<ul>
+<li><strong><code>unrar e archive.rar</code></strong>: The
+<code>e</code> command extracts all files into the current working
+directory, ignoring any internal folder paths stored in the
+archive.</li>
+<li><strong><code>-ep</code> switch</strong>: Used with the
+<code>x</code> command (e.g., <code>unrar x -ep archive.rar</code>) to
+exclude paths from filenames, flattening the output into a single
+destination folder.</li>
+</ul>
+<p>Neither of these options will remove the file format extension (such
+as <code>.txt</code>, <code>.jpg</code>, or <code>.dat</code>).</p>
+<h2 id="how-to-extract-files-and-remove-extensions">How to Extract Files
+and Remove Extensions</h2>
+<p>Because UnRAR cannot alter file extensions directly, the standard
+solution is to extract the files first and then use a simple shell
+command or script to strip the extensions.</p>
+<h3 id="linux-and-macos-bash">Linux and macOS (Bash)</h3>
+<p>Extract the archive into a dedicated directory and remove extensions
+using standard shell expansion:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract files ignoring folder paths</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">unrar</span> e archive.rar output_dir/</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Navigate to the folder and strip file extensions</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> output_dir/</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> file <span class="kw">in</span> <span class="pp">*</span>.<span class="pp">*</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">[</span> <span class="ot">-f</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="bu">]</span> <span class="kw">&amp;&amp;</span> <span class="fu">mv</span> <span class="st">&quot;</span><span class="va">$file</span><span class="st">&quot;</span> <span class="st">&quot;</span><span class="va">${file</span><span class="op">%</span>.<span class="pp">*</span><span class="va">}</span><span class="st">&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code></pre></div>
+<p>The parameter expansion <code>${file%.*}</code> removes the final dot
+and any trailing characters from the filename.</p>
+<h3 id="windows-powershell">Windows (PowerShell)</h3>
+<p>On Windows systems, you can achieve the same result using a
+PowerShell pipeline after extracting:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Extract files</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>unrar e archive<span class="op">.</span><span class="fu">rar</span> C<span class="op">:</span>\output_dir\</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Rename extracted files without extensions</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">Get-ChildItem</span> <span class="op">-</span>Path <span class="st">&quot;C:\output_dir&quot;</span> <span class="op">-</span>File <span class="op">|</span> <span class="fu">ForEach-Object</span> <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="va">$newName</span> <span class="op">=</span> <span class="op">[</span>System<span class="op">.</span><span class="fu">IO</span><span class="op">.</span><span class="fu">Path</span><span class="op">]::</span>GetFileNameWithoutExtension<span class="op">(</span><span class="va">$_</span><span class="op">.</span><span class="fu">Name</span><span class="op">)</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">Rename-Item</span> <span class="op">-</span>Path <span class="va">$_</span><span class="op">.</span><span class="fu">FullName</span> <span class="op">-</span>NewName <span class="va">$newName</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>This workflow ensures files are extracted correctly while achieving
+the desired outcome of removing the extension from each extracted
+file.</p></article>
+        <div id="comments-container"></div>
+        <script>
+            const utterancesScript = document.createElement('script');
+            utterancesScript.setAttribute('src', 'https://utteranc.es/client.js');
+            utterancesScript.setAttribute('repo', 'salivity/unrar'); 
+            utterancesScript.setAttribute('issue-term', 'pathname'); 
+            utterancesScript.setAttribute('theme', localStorage.getItem('theme') === 'dark' ? 'github-dark' : 'github-light'); 
+            utterancesScript.setAttribute('crossorigin', 'anonymous');
+            utterancesScript.async = true;
+            document.getElementById('comments-container').appendChild(utterancesScript);
+        </script>
+    
+        </div>
+    </div>
+    
+    </main>
+    <footer>
+        <nav>
+            <ul class="social-links">
+            </ul>
+        </nav>
+        <nav>
+            <ul class="footer-links">
+                <li><a href="/unrar/privacy-policy">Privacy Policy</a></li>
+                <li><a href="/unrar/terms-and-conditions">Terms and Conditions</a></li>
+            </ul>
+        </nav>
+        <div class="copyright">
+            Copyright &copy; <span id="current-year"></span>
+        </div>
+    </footer>
+</body>
+</html>
